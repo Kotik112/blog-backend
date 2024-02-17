@@ -6,6 +6,7 @@ import com.example.blogbackend.domain.Comment;
 import com.example.blogbackend.dto.CommentDto;
 import com.example.blogbackend.dto.CreateCommentDto;
 import com.example.blogbackend.exception.BlogPostNotFoundException;
+import com.example.blogbackend.exception.CommentNotFoundException;
 import com.example.blogbackend.repository.BlogPostRepository;
 import com.example.blogbackend.repository.CommentRepository;
 import org.springframework.stereotype.Service;
@@ -40,5 +41,12 @@ public class CommentService {
         blogPostRepository.save(blogPost);
 
         return CommentDto.from(newComment);
+    }
+
+    public CommentDto getCommentById(Long id) {
+        Comment comment = commentRepository.findById(id).orElseThrow(() -> new CommentNotFoundException(
+                "Comment with id " + id + " not found."
+        ));
+        return comment.toDTO();
     }
 }

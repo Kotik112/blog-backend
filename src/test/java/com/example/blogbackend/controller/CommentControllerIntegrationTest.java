@@ -1,6 +1,7 @@
 package com.example.blogbackend.controller;
 
 import com.example.blogbackend.dto.BlogPostDto;
+import com.example.blogbackend.dto.CommentDto;
 import com.example.blogbackend.dto.CreateBlogPostDto;
 import com.example.blogbackend.dto.CreateCommentDto;
 import com.example.blogbackend.utils.SpringBootComponentTest;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -49,10 +51,14 @@ public class CommentControllerIntegrationTest extends SpringBootComponentTest {
                 blogPostId
         );
 
-        mvc.perform(post(BASE_COMMENTS_URL)
+        MvcResult commentMvcResult = mvc.perform(post(BASE_COMMENTS_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(createCommentDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(1L)));
+                .andExpect(jsonPath("$.id", is(1L)))
+                .andReturn();
+
+        CommentDto commentDto = getFromResult(commentMvcResult, CommentDto.class);
+        assertEquals(commentDto.content(), createCommentDto.content());
     }
 }

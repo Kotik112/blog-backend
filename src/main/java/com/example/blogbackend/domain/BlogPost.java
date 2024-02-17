@@ -63,4 +63,24 @@ public class BlogPost {
         );
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        BlogPost blogPost = (BlogPost) o;
+
+        if (!getTitle().equals(blogPost.getTitle()))
+            return false;
+        return getContent().equals(blogPost.getContent());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getTitle().hashCode();
+        result = 31 * result + getContent().hashCode();
+        return result;
+    }
 }

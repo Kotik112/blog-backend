@@ -1,8 +1,8 @@
 package com.example.blogbackend.service;
 
+import com.example.blogbackend.domain.BlogPost;
 import com.example.blogbackend.dto.BlogPostDto;
 import com.example.blogbackend.dto.CreateBlogPostDto;
-import com.example.blogbackend.domain.BlogPost;
 import com.example.blogbackend.exception.BlogPostNotFoundException;
 import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;

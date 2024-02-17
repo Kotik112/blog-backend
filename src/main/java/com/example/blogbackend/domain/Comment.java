@@ -52,4 +52,21 @@ public class Comment {
                 .isEdited(this.isEdited)
                 .build();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        Comment comment = (Comment) o;
+
+        return getContent().equals(comment.getContent());
+    }
+
+    @Override
+    public int hashCode() {
+        return getContent().hashCode();
+    }
 }
