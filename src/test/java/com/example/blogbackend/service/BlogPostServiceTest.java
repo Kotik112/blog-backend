@@ -1,0 +1,84 @@
+package com.example.blogbackend.service;
+
+import com.example.blogbackend.dto.BlogPostDto;
+import com.example.blogbackend.dto.CreateBlogPostDto;
+import com.example.blogbackend.domain.BlogPost;
+import com.example.blogbackend.exception.BlogPostNotFoundException;
+import com.example.blogbackend.provider.TimeProvider;
+import com.example.blogbackend.repository.BlogPostRepository;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+
+@RunWith(MockitoJUnitRunner.class)
+public class BlogPostServiceTest {
+
+    @InjectMocks
+    BlogPostService blogPostService;
+    @Mock
+    BlogPostRepository blogPostRepository;
+
+    @Mock
+    TimeProvider timeProvider;
+
+    @Test
+    public void test_createBlogPost() {
+        // Create the input data
+        CreateBlogPostDto createBlogPostDTO = new CreateBlogPostDto("Test title", "Test content");
+
+        // Expected output data
+        BlogPostDto expectedBlogPostDto = new BlogPostDto(1L, "Test title", "Test content", Instant.parse("2023-04-04T12:42:00Z"), null, false, Set.of(), Set.of());
+
+        BlogPost blogPost = new BlogPost();
+        blogPost.setId(1L);
+        blogPost.setTitle("Test title");
+        blogPost.setContent("Test content");
+        blogPost.setCreatedAt(Instant.parse("2023-04-04T12:42:00Z"));
+        blogPost.setIsEdited(false);
+
+        when(blogPostRepository.save(any())).thenReturn(blogPost);
+        BlogPostDto blogPostResult = blogPostService.createBlogPost(createBlogPostDTO);
+        verify(blogPostRepository, times(1)).save(any());
+
+        assertEquals(expectedBlogPostDto, blogPostResult);
+    }
+
+    @Test
+    public void when_getAllBlogPosts_then_returnBlogPosts() {
+        // Expected output data
+        BlogPostDto expectedBlogPostDto = new BlogPostDto(1L, "Test title", "Test content", Instant.parse("2023-04-04T12:42:00Z"), null, false, Set.of(), Set.of());
+
+        BlogPost blogPost = new BlogPost();
+        blogPost.setId(1L);
+        blogPost.setTitle("Test title");
+        blogPost.setContent("Test content");
+        blogPost.setCreatedAt(Instant.parse("2023-04-04T12:42:00Z"));
+        blogPost.setIsEdited(false);
+
+        when(blogPostRepository.findAll()).thenReturn(List.of(blogPost));
+        BlogPostDto blogPostResult = blogPostService.getAllBlogPosts().get(0);
+        verify(blogPostRepository, times(1)).findAll();
+
+        assertEquals(expectedBlogPostDto, blogPostResult);
+    }
+
+    @Test
+    public void when_getBlogPostByInvalidId_then_throwBlogPostNotFoundException() {
+        assertThrows(BlogPostNotFoundException.class, () -> blogPostService.getBlogPostById(999L));
+    }
+
+}

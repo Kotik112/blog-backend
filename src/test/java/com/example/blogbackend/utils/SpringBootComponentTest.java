@@ -1,0 +1,52 @@
+package com.example.blogbackend.utils;
+
+import com.example.blogbackend.BlogBackendApplication;
+import com.example.blogbackend.TestBlogBackendApplication;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.web.servlet.MvcResult;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+import static com.example.blogbackend.BlogBackendApplication.API_VERSION_1;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
+
+@SpringBootTest(webEnvironment = RANDOM_PORT)
+@ContextConfiguration(classes = {TestBlogBackendApplication.class, BlogBackendApplication.class})
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
+public abstract class SpringBootComponentTest {
+    public static final String BASE_BLOG_POST_URL = API_VERSION_1 + "/blog";
+    public static final String BASE_COMMENTS_URL = API_VERSION_1 + "/comment";
+    //public static final String BASE_ATTACHMENT_URL = API_VERSION_1 + "/attachments";
+
+    @Autowired
+    protected ObjectMapper objectMapper;
+
+    protected <T> T getFromResult(MvcResult result, Class<T> clazz) {
+        try {
+            return objectMapper.readValue(result.getResponse().getContentAsString(), clazz);
+        } catch (JsonProcessingException | UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected <T> List<T> getFromListResult(MvcResult result, Class<T> clazz) {
+        try {
+            return objectMapper
+                    .readerForListOf(clazz)
+                    .readValue(result.getResponse().getContentAsString());
+        } catch (JsonProcessingException | UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
