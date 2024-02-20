@@ -44,7 +44,7 @@ public class BlogPost {
     @OneToMany(mappedBy = "blogPost", cascade = CascadeType.ALL)
     private Set<Like> likes = new HashSet<>();
 
-    public static BlogPostDto from(BlogPost post) {
+    public static BlogPostDto toDto(BlogPost post) {
         Set<LikeDto> likeDtos = post.getLikes() != null
                 ? post.getLikes().stream().map(Like::toDTO).collect(Collectors.toSet())
                 : Collections.emptySet();

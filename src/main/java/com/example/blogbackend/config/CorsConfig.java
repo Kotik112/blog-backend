@@ -14,10 +14,9 @@ public class CorsConfig {
 	public CorsFilter corsFilter() {
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowCredentials(true);
-		config.addAllowedOrigin("http://localhost:3000");
-		config.addAllowedHeader("*"); // Allow all headers
-		config.addAllowedMethod("*"); // Allow all HTTP methods
-		
+		config.addAllowedOrigin("http://localhost:5173");
+		config.addAllowedHeader("Content-Type"); // What headers are allowed
+		config.addAllowedMethod("*");
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", config);
 		return new CorsFilter(source);
