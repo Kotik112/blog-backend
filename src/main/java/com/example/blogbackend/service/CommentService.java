@@ -12,6 +12,8 @@ import com.example.blogbackend.repository.CommentRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CommentService {
@@ -48,5 +50,13 @@ public class CommentService {
                 "Comment with id " + id + " not found."
         ));
         return comment.toDTO();
+    }
+    
+    public List<CommentDto> getCommentsByBlogPostId(Long blogPostId) {
+        BlogPost blogPost = blogPostRepository.findById(blogPostId).orElseThrow(
+                () -> new BlogPostNotFoundException("Blog post with id " + blogPostId + " not found."));
+        
+        List<Comment> commentList = commentRepository.findByBlogPostId(blogPostId);
+        return commentList.stream().map(Comment::toDTO).toList();
     }
 }

@@ -55,7 +55,7 @@ public class CommentControllerIntegrationTest extends SpringBootComponentTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(createCommentDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(1L)))
+                .andExpect(jsonPath("$.id", is(1)))
                 .andReturn();
 
         CommentDto commentDto = getFromResult(commentMvcResult, CommentDto.class);
