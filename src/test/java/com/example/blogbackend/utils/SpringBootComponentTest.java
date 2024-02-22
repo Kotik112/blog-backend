@@ -4,6 +4,7 @@ import com.example.blogbackend.BlogBackendApplication;
 import com.example.blogbackend.TestBlogBackendApplication;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,8 +12,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
 import java.util.List;
 
 import static com.example.blogbackend.BlogBackendApplication.API_VERSION_1;
@@ -46,6 +49,20 @@ public abstract class SpringBootComponentTest {
                     .readerForListOf(clazz)
                     .readValue(result.getResponse().getContentAsString());
         } catch (JsonProcessingException | UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    protected <T> List<T> getFromPageResult(MvcResult result, Class<T> clazz) {
+        try {
+            JsonNode contentNode = objectMapper.readTree(result.getResponse().getContentAsString()).get("content");
+            if (contentNode != null && contentNode.isArray()) {
+                CollectionType type = objectMapper.getTypeFactory().constructCollectionType(List.class, clazz);
+                return objectMapper.readValue(contentNode.traverse(), type);
+            } else {
+                return Collections.emptyList();
+            }
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

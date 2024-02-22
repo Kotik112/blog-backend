@@ -6,6 +6,8 @@ import com.example.blogbackend.dto.BlogPostDto;
 import com.example.blogbackend.dto.CreateBlogPostDto;
 import com.example.blogbackend.exception.BlogPostNotFoundException;
 import com.example.blogbackend.repository.BlogPostRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,14 +28,20 @@ public class BlogPostService {
         return BlogPost.toDto(newBlogPost);
     }
 
-    public List<BlogPostDto> getAllBlogPosts() {
-        List<BlogPost> blogPostList = blogPostRepository.findAll();
-        return blogPostList.stream().map(BlogPost::toDto).collect(Collectors.toList());
+    public Page<BlogPostDto> getAllBlogPosts(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<BlogPost> blogPostList = blogPostRepository.findAll(pageRequest);
+        
+        List<BlogPostDto> blogPostDtoList = blogPostList.getContent().stream()
+                .map(BlogPost::toDto)
+                .toList();
+        
+        return blogPostList.map(BlogPost::toDto);
     }
 
     public BlogPostDto getBlogPostById(Long id) {
         BlogPost blogPost = blogPostRepository.findById(id).orElseThrow(
-                () -> new BlogPostNotFoundException("Blog post with id " + id + " not found.")
+                () -> new BlogPostNotFoundException("Blog post with id: " + id + " not found.")
         );
         return BlogPost.toDto(blogPost);
     }

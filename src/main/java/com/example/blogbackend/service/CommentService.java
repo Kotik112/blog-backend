@@ -29,7 +29,7 @@ public class CommentService {
     public CommentDto createComment(CreateCommentDto createCommentDto) {
         Long blogPostId = createCommentDto.blogPostId();
         BlogPost blogPost = blogPostRepository.findById(blogPostId).orElseThrow(
-                () -> new BlogPostNotFoundException("Blog post with id " + blogPostId + " not found.")
+                () -> new BlogPostNotFoundException("Blog post with id: " + blogPostId + " not found.")
         );
         CommentDto commentDto = createCommentDto.toDomain();
         Comment comment = Comment.from(commentDto);
@@ -47,14 +47,14 @@ public class CommentService {
 
     public CommentDto getCommentById(Long id) {
         Comment comment = commentRepository.findById(id).orElseThrow(() -> new CommentNotFoundException(
-                "Comment with id " + id + " not found."
+                "Comment with id: " + id + " not found."
         ));
         return comment.toDTO();
     }
     
     public List<CommentDto> getCommentsByBlogPostId(Long blogPostId) {
         BlogPost blogPost = blogPostRepository.findById(blogPostId).orElseThrow(
-                () -> new BlogPostNotFoundException("Blog post with id " + blogPostId + " not found."));
+                () -> new BlogPostNotFoundException("Blog post with id: " + blogPostId + " not found."));
         
         List<Comment> commentList = commentRepository.findByBlogPostId(blogPostId);
         return commentList.stream().map(Comment::toDTO).toList();

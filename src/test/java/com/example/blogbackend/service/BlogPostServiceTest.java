@@ -11,8 +11,12 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -56,23 +60,35 @@ public class BlogPostServiceTest {
 
         assertEquals(expectedBlogPostDto, blogPostResult);
     }
-
+    
     @Test
     public void when_getAllBlogPosts_then_returnBlogPosts() {
         // Expected output data
-        BlogPostDto expectedBlogPostDto = new BlogPostDto(1L, "Test title", "Test content", Instant.parse("2023-04-04T12:42:00Z"), null, false, Set.of(), Set.of());
-
+        BlogPostDto expectedBlogPostDto = new BlogPostDto(1L, "Test title", "Test content", Instant.parse("2023-04-04T12:42:00Z"), null, false, Collections.emptySet(), Collections.emptySet());
+        
         BlogPost blogPost = new BlogPost();
         blogPost.setId(1L);
         blogPost.setTitle("Test title");
         blogPost.setContent("Test content");
         blogPost.setCreatedAt(Instant.parse("2023-04-04T12:42:00Z"));
         blogPost.setIsEdited(false);
-
-        when(blogPostRepository.findAll()).thenReturn(List.of(blogPost));
-        BlogPostDto blogPostResult = blogPostService.getAllBlogPosts().get(0);
-        verify(blogPostRepository, times(1)).findAll();
-
+        
+        // Create a Page containing a single BlogPost
+        Page<BlogPost> blogPostPage = new PageImpl<>(Collections.singletonList(blogPost));
+        
+        // Mock behavior of BlogPostRepository
+        when(blogPostRepository.findAll(PageRequest.of(0, 10))).thenReturn(blogPostPage);
+        
+        // Call the service method
+        Page<BlogPostDto> resultPage = blogPostService.getAllBlogPosts(0, 10);
+        
+        // Extract the first element from the Page
+        BlogPostDto blogPostResult = resultPage.getContent().getFirst();
+        
+        // Verify that the repository method was called
+        verify(blogPostRepository, times(1)).findAll(PageRequest.of(0, 10));
+        
+        // Assert the result
         assertEquals(expectedBlogPostDto, blogPostResult);
     }
 
