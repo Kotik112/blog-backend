@@ -9,6 +9,7 @@ import com.example.blogbackend.exception.BlogPostNotFoundException;
 import com.example.blogbackend.exception.CommentNotFoundException;
 import com.example.blogbackend.repository.BlogPostRepository;
 import com.example.blogbackend.repository.CommentRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -26,6 +27,7 @@ public class CommentService {
         this.blogPostRepository = blogPostRepository;
     }
 
+    @Transactional
     public CommentDto createComment(CreateCommentDto createCommentDto) {
         Long blogPostId = createCommentDto.blogPostId();
         BlogPost blogPost = blogPostRepository.findById(blogPostId).orElseThrow(
