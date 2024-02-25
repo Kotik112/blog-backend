@@ -4,7 +4,10 @@ import com.example.blogbackend.domain.BlogPost;
 
 import java.time.Instant;
 
-public record CreateBlogPostDto(String title, String content) {
+public record CreateBlogPostDto(
+        String title,
+        String content
+) {
     public BlogPost toDomain() {
         return BlogPost.builder()
                 .title(title)

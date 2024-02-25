@@ -17,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 
 import java.time.Instant;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,7 +44,7 @@ public class BlogPostServiceTest {
         CreateBlogPostDto createBlogPostDTO = new CreateBlogPostDto("Test title", "Test content");
 
         // Expected output data
-        BlogPostDto expectedBlogPostDto = new BlogPostDto(1L, "Test title", "Test content", Instant.parse("2023-04-04T12:42:00Z"), null, false, Set.of(), Set.of());
+        BlogPostDto expectedBlogPostDto = new BlogPostDto(1L, "Test title", "Test content", Instant.parse("2023-04-04T12:42:00Z"), null, false, Set.of(), Set.of(), null);
 
         BlogPost blogPost = new BlogPost();
         blogPost.setId(1L);
@@ -64,7 +63,15 @@ public class BlogPostServiceTest {
     @Test
     public void when_getAllBlogPosts_then_returnBlogPosts() {
         // Expected output data
-        BlogPostDto expectedBlogPostDto = new BlogPostDto(1L, "Test title", "Test content", Instant.parse("2023-04-04T12:42:00Z"), null, false, Collections.emptySet(), Collections.emptySet());
+        BlogPostDto expectedBlogPostDto = new BlogPostDto(1L,
+                                                          "Test title",
+                                                          "Test content",
+                                                          Instant.parse("2023-04-04T12:42:00Z"),
+                                                          null,
+                                                          false,
+                                                          Collections.emptySet(),
+                                                          Collections.emptySet(),
+                                                          null);
         
         BlogPost blogPost = new BlogPost();
         blogPost.setId(1L);

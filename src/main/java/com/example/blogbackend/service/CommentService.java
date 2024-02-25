@@ -7,24 +7,25 @@ import com.example.blogbackend.dto.CommentDto;
 import com.example.blogbackend.dto.CreateCommentDto;
 import com.example.blogbackend.exception.BlogPostNotFoundException;
 import com.example.blogbackend.exception.CommentNotFoundException;
+import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
 import com.example.blogbackend.repository.CommentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CommentService {
 
     private final CommentRepository commentRepository;
     private final BlogPostRepository blogPostRepository;
+    private final TimeProvider timeProvider;
 
-    public CommentService(CommentRepository commentRepository, BlogPostRepository blogPostRepository) {
+    public CommentService(CommentRepository commentRepository, BlogPostRepository blogPostRepository, TimeProvider timeProvider) {
         this.commentRepository = commentRepository;
         this.blogPostRepository = blogPostRepository;
+	    this.timeProvider = timeProvider;
     }
 
     @Transactional
@@ -37,10 +38,10 @@ public class CommentService {
         Comment comment = Comment.from(commentDto);
 
         comment.setBlogPost(blogPost);
-        comment.setCreatedAt(Instant.now());
+        comment.setCreatedAt(timeProvider.getNow());
 
         Comment newComment = commentRepository.save(comment);
-
+        
         blogPost.getComments().add(newComment);
         blogPostRepository.save(blogPost);
 
@@ -55,7 +56,8 @@ public class CommentService {
     }
     
     public List<CommentDto> getCommentsByBlogPostId(Long blogPostId) {
-        BlogPost blogPost = blogPostRepository.findById(blogPostId).orElseThrow(
+        // Check if the blog post exists
+        blogPostRepository.findById(blogPostId).orElseThrow(
                 () -> new BlogPostNotFoundException("Blog post with id: " + blogPostId + " not found."));
         
         List<Comment> commentList = commentRepository.findByBlogPostId(blogPostId);

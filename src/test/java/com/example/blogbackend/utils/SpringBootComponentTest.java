@@ -29,8 +29,8 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 public abstract class SpringBootComponentTest {
     public static final String BASE_BLOG_POST_URL = API_VERSION_1 + "/blog";
-    public static final String BASE_COMMENTS_URL = API_VERSION_1 + "/comment";
-    //public static final String BASE_ATTACHMENT_URL = API_VERSION_1 + "/attachments";
+    public static final String BASE_COMMENTS_URL = API_VERSION_1 + "/comments";
+    public static final String BASE_IMAGE_URL = API_VERSION_1 + "/images";
 
     @Autowired
     protected ObjectMapper objectMapper;
