@@ -10,6 +10,13 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+          lob:
+            non_contextual_creation: true
+          type:
+            binary: byte[]
+
   datasource:
     url: ${DB_URL}
     username: ${DB_USER}

@@ -23,6 +23,12 @@ public class GlobalExceptionHandler {
 		return handleException(ex, request, HttpStatus.NOT_FOUND);
 	}
 	
+	@ExceptionHandler(EmptyFileException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ApiError handleEmptyFileException(EmptyFileException ex, WebRequest request) {
+		return handleException(ex, request, HttpStatus.BAD_REQUEST);
+	}
+	
 	private ApiError handleException(Exception ex, WebRequest request, HttpStatus status) {
 		ApiError apiError = new ApiError();
 		apiError.setTimestamp(LocalDateTime.now());
