@@ -26,9 +26,13 @@ public class ImageController {
 		return imageService.uploadImage(file, blogPostId);
 	}
 	
-	@GetMapping("/{filename}")
-	public ResponseEntity<?> downloadImage(String filename) {
-		// return imageService.getImageById(id);
-		return null;
+	@GetMapping("/{id}")
+	public ResponseEntity<?> downloadImage(@PathVariable("id") Long id) {
+		return imageService.getImageById(id);
+	}
+	
+	@GetMapping("filename/{filename}")
+	public ResponseEntity<?> downloadImageByFilename(@PathVariable("filename") String filename) {
+		return imageService.getImageByFilename(filename);
 	}
 }

@@ -5,6 +5,7 @@ import com.example.blogbackend.domain.Image;
 import com.example.blogbackend.dto.ImageDto;
 import com.example.blogbackend.exception.BlogPostNotFoundException;
 import com.example.blogbackend.exception.EmptyFileException;
+import com.example.blogbackend.exception.ImageUploadException;
 import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
 import com.example.blogbackend.repository.ImageRepository;
@@ -49,7 +50,6 @@ public class ImageService {
 			image.setType(file.getContentType());
 			image.setCreatedAt(timeProvider.getNow());
 			byte[] imageData = file.getBytes();
-			LOGGER.warning("Image Data Length: " + imageData.length);
 			image.setImageData(imageData);
 			
 			blogPost.setImage(image);
@@ -59,8 +59,9 @@ public class ImageService {
 			Image savedImage = updatedBlogPost.getImage();
 			return ImageDto.toDto(savedImage);
 			
-		} catch (IOException e) {
-			throw new RuntimeException("Error occurred while uploading the image");
+		}
+		catch (IOException e) {
+			throw new ImageUploadException("Error occurred while uploading the image");
 		}
 	}
 	
@@ -79,5 +80,21 @@ public class ImageService {
 				       .contentLength(image.getImageData().length)
 				       .body(resource);
 		
+	}
+	
+	public ResponseEntity<ByteArrayResource> getImageByFilename(String filename) {
+		Image image = imageRepository.findByName(filename).orElseThrow(
+				() -> new BlogPostNotFoundException("Image with name: " + filename + " not found"));
+		
+		ByteArrayResource resource = new ByteArrayResource(image.getImageData());
+		
+		// Set the header for the response
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentLength(resource.contentLength());
+		headers.setContentType(MediaType.parseMediaType(image.getType()));
+		return ResponseEntity.ok()
+				       .headers(headers)
+				       .contentLength(image.getImageData().length)
+				       .body(resource);
 	}
 }
