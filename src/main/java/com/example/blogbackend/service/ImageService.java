@@ -69,25 +69,18 @@ public class ImageService {
 		Image image = imageRepository.findById(id).orElseThrow(
 				() -> new BlogPostNotFoundException("Image with id: " + id + " not found"));
 		
-		ByteArrayResource resource = new ByteArrayResource(image.getImageData());
-		
-		// Set the header for the response
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentLength(resource.contentLength());
-		headers.setContentType(MediaType.parseMediaType(image.getType()));
-		return ResponseEntity.ok()
-				       .headers(headers)
-				       .contentLength(image.getImageData().length)
-				       .body(resource);
-		
+		return getResponseEntity(image);
 	}
 	
 	public ResponseEntity<ByteArrayResource> getImageByFilename(String filename) {
 		Image image = imageRepository.findByName(filename).orElseThrow(
 				() -> new BlogPostNotFoundException("Image with name: " + filename + " not found"));
 		
+		return getResponseEntity(image);
+	}
+	
+	private ResponseEntity<ByteArrayResource> getResponseEntity(Image image) {
 		ByteArrayResource resource = new ByteArrayResource(image.getImageData());
-		
 		// Set the header for the response
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentLength(resource.contentLength());
