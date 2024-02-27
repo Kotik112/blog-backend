@@ -104,7 +104,6 @@ public class ImageService {
 		image.setCreatedAt(timeProvider.getNow());
 		image.setImageData(file.getBytes());
 		
-		// Don't save here, just return the prepared Image object
 		return image;
 	}
 }
