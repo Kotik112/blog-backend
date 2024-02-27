@@ -54,7 +54,7 @@ public class BlogPostServiceTest {
         blogPost.setIsEdited(false);
 
         when(blogPostRepository.save(any())).thenReturn(blogPost);
-        BlogPostDto blogPostResult = blogPostService.createBlogPost(createBlogPostDTO);
+        BlogPostDto blogPostResult = blogPostService.createBlogPost(createBlogPostDTO, null);
         verify(blogPostRepository, times(1)).save(any());
 
         assertEquals(expectedBlogPostDto, blogPostResult);

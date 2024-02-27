@@ -9,6 +9,8 @@ import com.example.blogbackend.exception.ImageUploadException;
 import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
 import com.example.blogbackend.repository.ImageRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import org.springframework.http.HttpHeaders;
 
-import java.util.logging.Logger;
 
 @Service
 public class ImageService {
@@ -26,8 +27,8 @@ public class ImageService {
 	public final ImageRepository imageRepository;
 	private final BlogPostRepository blogPostRepository;
 	private final TimeProvider timeProvider;
-	private static final Logger LOGGER = Logger.getLogger(ImageService.class.getName());
 	
+	private static final Logger logger = LoggerFactory.getLogger(ImageService.class);
 	
 	public ImageService(ImageRepository imageRepository, BlogPostRepository blogPostRepository, TimeProvider timeProvider) {
 		this.imageRepository = imageRepository;
@@ -68,6 +69,7 @@ public class ImageService {
 	public ResponseEntity<ByteArrayResource> getImageById(Long id) {
 		Image image = imageRepository.findById(id).orElseThrow(
 				() -> new BlogPostNotFoundException("Image with id: " + id + " not found"));
+		logger.debug("Image typr: " + image.getType());
 		
 		return getResponseEntity(image);
 	}
@@ -89,5 +91,20 @@ public class ImageService {
 				       .headers(headers)
 				       .contentLength(image.getImageData().length)
 				       .body(resource);
+	}
+	
+	protected Image prepareImageForUpload(MultipartFile file) throws IOException {
+		if (file.isEmpty()) {
+			throw new EmptyFileException("File is empty, cannot upload the image");
+		}
+		
+		Image image = new Image();
+		image.setName(file.getOriginalFilename());
+		image.setType(file.getContentType());
+		image.setCreatedAt(timeProvider.getNow());
+		image.setImageData(file.getBytes());
+		
+		// Don't save here, just return the prepared Image object
+		return image;
 	}
 }

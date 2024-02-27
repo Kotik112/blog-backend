@@ -13,4 +13,14 @@ public record ImageDto(long id, String name, String type, Instant createdAt) {
 				image.getCreatedAt()
 		);
 	}
+	
+	public Image toDomain() {
+		return new Image(
+				id,
+				name,
+				type,
+				null,
+				createdAt
+		);
+	}
 }

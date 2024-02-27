@@ -2,15 +2,23 @@ package com.example.blogbackend.service;
 
 
 import com.example.blogbackend.domain.BlogPost;
+import com.example.blogbackend.domain.Image;
 import com.example.blogbackend.dto.BlogPostDto;
 import com.example.blogbackend.dto.CreateBlogPostDto;
+import com.example.blogbackend.dto.ImageDto;
 import com.example.blogbackend.exception.BlogPostNotFoundException;
+import com.example.blogbackend.exception.EmptyFileException;
+import com.example.blogbackend.exception.ImageUploadException;
+import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,27 +26,40 @@ import java.util.stream.Collectors;
 public class BlogPostService {
 
     private final BlogPostRepository blogPostRepository;
+    private final ImageService imageService;
+    private final TimeProvider timeProvider;
 
-    public BlogPostService(BlogPostRepository blogPostRepository) {
+    public BlogPostService(BlogPostRepository blogPostRepository, ImageService imageService, TimeProvider timeProvider) {
         this.blogPostRepository = blogPostRepository;
+	    this.imageService = imageService;
+	    this.timeProvider = timeProvider;
     }
 
-    public BlogPostDto createBlogPost(CreateBlogPostDto blogPostDTO) {
+    public BlogPostDto createBlogPost(CreateBlogPostDto blogPostDTO, MultipartFile image) {
         BlogPost blogPost = blogPostDTO.toDomain();
-        BlogPost newBlogPost = blogPostRepository.save(blogPost);
-        return BlogPostDto.toDto(newBlogPost);
+        
+        if (!image.isEmpty()) {
+            try {
+                Image preparedImage = imageService.prepareImageForUpload(image);
+                blogPost.setImage(preparedImage);
+            } catch (IOException e) {
+                throw new ImageUploadException("Error occurred while preparing the image for upload");
+            }
+        }
+        
+        BlogPost savedBlogPost = blogPostRepository.save(blogPost);
+        return BlogPostDto.toDto(savedBlogPost);
     }
 
     public Page<BlogPostDto> getAllBlogPosts(int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<BlogPost> blogPostPage = blogPostRepository.findAll(pageRequest);
         
         List<BlogPostDto> blogPostDtoList = blogPostPage.getContent().stream()
                 .map(BlogPostDto::toDto)
                 .collect(Collectors.toList());
         
-        System.out.println(new PageImpl<>(blogPostDtoList, pageRequest, blogPostPage.getTotalPages()));
-        return new PageImpl<>(blogPostDtoList, pageRequest, blogPostPage.getTotalPages());
+        return new PageImpl<>(blogPostDtoList, pageRequest, blogPostPage.getTotalElements());
     }
 
     public BlogPostDto getBlogPostById(Long id) {

@@ -3,6 +3,11 @@ spring:
     name: blog-service
   config:
     import: classpath:sensitive_data.yml
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 2MB
+      max-request-size: 10MB
   jpa:
     show-sql: true
     hibernate:
@@ -16,7 +21,6 @@ spring:
             non_contextual_creation: true
           type:
             binary: byte[]
-
   datasource:
     url: ${DB_URL}
     username: ${DB_USER}
@@ -28,11 +32,24 @@ spring:
     locations: classpath:db/migration
 
 logging:
+  file:
+    name: logs/app.log
   level:
+    root: INFO
+    com.example.backend: TRACE
     org:
       hibernate:
         SQL: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%level] %c{1.} [%t] %msg%n"
+    file: "%d{HH:mm:ss.SSS} [%level] %c{1.} [%t] %msg%n"
+
+
+
+
 
 server:
   port: 8080
-
+  error:
+    include-stacktrace: never
+    include-message: always

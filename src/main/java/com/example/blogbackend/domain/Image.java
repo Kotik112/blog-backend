@@ -33,7 +33,7 @@ public class Image {
 	private String type;
 	
 	@Lob
-	@Basic(fetch = FetchType.LAZY)
+	@Basic(fetch = FetchType.EAGER)
 	@Column(name = "image_data", length = 1000)
 	@JdbcTypeCode(Types.VARBINARY)
 	private byte[] imageData;
