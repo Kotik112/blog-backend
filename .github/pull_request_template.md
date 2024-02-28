@@ -1,0 +1,2 @@
+- [ ] Self-reviewed your commit and checked the diff
+- [ ] Maven can verify the project build

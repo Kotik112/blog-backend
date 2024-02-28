@@ -1,0 +1,33 @@
+name: CI
+on: push
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout code
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      # Setup Java
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 21
+
+      # Mvnw permission
+      - name: Change wrapper permissions
+        run: chmod +x ./mvnw
+
+      # Cache Maven packages
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+           path: ~/.m2
+           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+           restore-keys: |
+            ${{ runner.os }}-m2
+      # Build and Test
+      - name: Build and Test
+        run: ./mvnw clean install
