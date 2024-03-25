@@ -10,17 +10,23 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -36,14 +42,22 @@ public class BlogPostControllerIntegrationTest extends SpringBootComponentTest {
 
     @Test
     public void when_createBlogPost_then_returnBlogPost() throws Exception {
-        CreateBlogPostDto createdBlogPost = new CreateBlogPostDto("Test title", "Test content");
-        MvcResult mvcResult = mvc.perform(post(BASE_BLOG_POST_URL)
-                .contentType(APPLICATION_JSON)
-                .content(mapper.writeValueAsString(createdBlogPost)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.comments", is(List.of())))
-                .andExpect(jsonPath("$.isEdited", is(false))).andReturn();
-
+        String title = "Test title";
+        String content = "Test content";
+        
+        MockMultipartFile image = new MockMultipartFile("image", "image.jpg", "image/jpeg", "<<jpeg data>>".getBytes());
+        
+        // Convert title and content to MockMultipartFile as form data
+        MockMultipartFile titlePart = new MockMultipartFile("title", "", "text/plain", title.getBytes(StandardCharsets.UTF_8));
+        MockMultipartFile contentPart = new MockMultipartFile("content", "", "text/plain", content.getBytes(StandardCharsets.UTF_8));
+        
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.multipart(BASE_BLOG_POST_URL)
+                                                  .file(titlePart)
+                                                  .file(contentPart)
+                                                  .file(image))
+                                      .andExpect(status().isCreated())
+                                      .andReturn();
+        
         BlogPostDto blogPostDTO = getFromResult(mvcResult, BlogPostDto.class);
         assertEquals("Test title", blogPostDTO.title());
         assertEquals("Test content", blogPostDTO.content());

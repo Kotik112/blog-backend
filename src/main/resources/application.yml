@@ -1,8 +1,6 @@
 spring:
   application:
     name: blog-service
-  config:
-    import: classpath:sensitive_data.yml
   servlet:
     multipart:
       enabled: true
@@ -21,11 +19,6 @@ spring:
             non_contextual_creation: true
           type:
             binary: byte[]
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWD}
-    driver-class-name: org.postgresql.Driver
 
   flyway:
     enabled: true
