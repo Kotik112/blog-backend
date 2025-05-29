@@ -14,7 +14,8 @@ jobs:
       # Setup Java
       - uses: actions/setup-java@v4
         with:
-          java-version: 21
+          distribution: 'temurin'
+          java-version: 17
 
       # Mvnw permission
       - name: Change wrapper permissions
@@ -28,6 +29,7 @@ jobs:
            key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
            restore-keys: |
             ${{ runner.os }}-m2-
+
       # Build and Test
       - name: Build and Test
         run: ./mvnw clean test -DskipTests=false -Pci
