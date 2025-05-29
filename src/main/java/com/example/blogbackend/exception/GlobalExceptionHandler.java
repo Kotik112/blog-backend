@@ -8,6 +8,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
 
+@SuppressWarnings("unused")
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 	
@@ -27,6 +28,12 @@ public class GlobalExceptionHandler {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ApiError handleEmptyFileException(EmptyFileException ex, WebRequest request) {
 		return handleException(ex, request, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(ImageUploadException.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public ApiError handleImageUploadException(ImageUploadException ex, WebRequest request) {
+		return handleException(ex, request, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	private ApiError handleException(Exception ex, WebRequest request, HttpStatus status) {

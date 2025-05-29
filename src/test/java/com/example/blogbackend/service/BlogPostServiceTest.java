@@ -90,7 +90,7 @@ public class BlogPostServiceTest {
         Page<BlogPostDto> resultPage = blogPostService.getAllBlogPosts(0, 10);
         
         // Extract the first element from the Page
-        BlogPostDto blogPostResult = resultPage.getContent().getFirst();
+        BlogPostDto blogPostResult = resultPage.getContent().get(0);
         
         // Verify that the repository method was called
         verify(blogPostRepository, times(1)).findAll(PageRequest.of(0, 10));

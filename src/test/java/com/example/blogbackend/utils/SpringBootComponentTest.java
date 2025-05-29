@@ -13,6 +13,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
@@ -31,6 +34,15 @@ public abstract class SpringBootComponentTest {
     public static final String BASE_BLOG_POST_URL = API_VERSION_1 + "/blog";
     public static final String BASE_COMMENTS_URL = API_VERSION_1 + "/comments";
     public static final String BASE_IMAGE_URL = API_VERSION_1 + "/images";
+
+    @DynamicPropertySource
+    static void overrideProperties(DynamicPropertyRegistry registry) {
+        PostgreSQLContainer<?> postgres = PostgresTestContainer.getInstance();
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.datasource.driver-class-name", postgres::getDriverClassName);
+    }
 
     @Autowired
     protected ObjectMapper objectMapper;

@@ -5,11 +5,8 @@ import com.example.blogbackend.domain.BlogPost;
 import com.example.blogbackend.domain.Image;
 import com.example.blogbackend.dto.BlogPostDto;
 import com.example.blogbackend.dto.CreateBlogPostDto;
-import com.example.blogbackend.dto.ImageDto;
 import com.example.blogbackend.exception.BlogPostNotFoundException;
-import com.example.blogbackend.exception.EmptyFileException;
 import com.example.blogbackend.exception.ImageUploadException;
-import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -27,18 +24,16 @@ public class BlogPostService {
 
     private final BlogPostRepository blogPostRepository;
     private final ImageService imageService;
-    private final TimeProvider timeProvider;
 
-    public BlogPostService(BlogPostRepository blogPostRepository, ImageService imageService, TimeProvider timeProvider) {
+    public BlogPostService(BlogPostRepository blogPostRepository, ImageService imageService) {
         this.blogPostRepository = blogPostRepository;
 	    this.imageService = imageService;
-	    this.timeProvider = timeProvider;
     }
 
     public BlogPostDto createBlogPost(CreateBlogPostDto blogPostDTO, MultipartFile image) {
         BlogPost blogPost = blogPostDTO.toDomain();
         
-        if (!image.isEmpty()) {
+        if (image != null && !image.isEmpty()) {
             try {
                 Image preparedImage = imageService.prepareImageForUpload(image);
                 blogPost.setImage(preparedImage);

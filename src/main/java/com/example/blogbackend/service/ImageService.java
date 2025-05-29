@@ -37,7 +37,7 @@ public class ImageService {
 	}
 	
 	public ImageDto uploadImage(MultipartFile file, Long blogPostId) {
-		if (file.isEmpty()) {
+		if (file != null && file.isEmpty()) {
 			throw new EmptyFileException(
 					String.format(
 							"File %s is empty, cannot upload the image", file.getOriginalFilename()));
@@ -69,7 +69,7 @@ public class ImageService {
 	public ResponseEntity<ByteArrayResource> getImageById(Long id) {
 		Image image = imageRepository.findById(id).orElseThrow(
 				() -> new BlogPostNotFoundException("Image with id: " + id + " not found"));
-		logger.debug("Image typr: " + image.getType());
+		logger.debug("Image type: {}", image.getType());
 		
 		return getResponseEntity(image);
 	}

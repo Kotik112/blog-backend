@@ -37,6 +37,11 @@ logging:
     console: "%d{HH:mm:ss.SSS} [%level] %c{1.} [%t] %msg%n"
     file: "%d{HH:mm:ss.SSS} [%level] %c{1.} [%t] %msg%n"
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/blog
+    username: postgres
+    password: okomos007
+    driver-class-name: org.postgresql.Driver
 
 
 
