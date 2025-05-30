@@ -45,15 +45,17 @@ jobs:
         run: |
           mkdir -p staging/.ebextensions
           cp target/*.jar staging/application.jar
-          
-          # Create Procfile
+
           echo 'web: java -jar application.jar' > staging/Procfile
-          
-          # Create .ebextensions config
-          echo -e "option_settings:\n  aws:elasticbeanstalk:application:environment:\n    SPRING_PROFILES_ACTIVE: dev" > staging/.ebextensions/01_environment.config
-          
-          # Zip everything
-          cd staging && zip -r ../deploy.zip . && cd ..
+
+          cat <<EOF > staging/.ebextensions/01_environment.config
+            option_settings:
+              aws:elasticbeanstalk:application:environment:
+                SPRING_PROFILES_ACTIVE: dev
+                DB_URL: "${{ secrets.DB_URL }}"
+                DB_USER: "${{ secrets.DB_USER }}"
+                DB_PW: "${{ secrets.DB_PW }}"
+              EOF
 
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v22
