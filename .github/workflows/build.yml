@@ -43,9 +43,17 @@ jobs:
 
       - name: Create zip for Elastic Beanstalk
         run: |
-          mkdir staging
+          mkdir -p staging/.ebextensions
           cp target/*.jar staging/application.jar
-          cd staging && zip ../deploy.zip application.jar
+          
+          # Create Procfile
+          echo 'web: java -jar application.jar' > staging/Procfile
+          
+          # Create .ebextensions config
+          echo -e "option_settings:\n  aws:elasticbeanstalk:application:environment:\n    SPRING_PROFILES_ACTIVE: dev" > staging/.ebextensions/01_environment.config
+          
+          # Zip everything
+          cd staging && zip -r ../deploy.zip . && cd ..
 
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v22
