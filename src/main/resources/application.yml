@@ -47,7 +47,7 @@ logging:
 
 
 server:
-  port: 8080
+  port: 5000
   error:
     include-stacktrace: never
     include-message: always
