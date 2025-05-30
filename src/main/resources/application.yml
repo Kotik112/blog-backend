@@ -38,9 +38,9 @@ logging:
     file: "%d{HH:mm:ss.SSS} [%level] %c{1.} [%t] %msg%n"
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/blog
+    url: jdbc:postgresql://localhost:5433/testdb
     username: postgres
-    password: okomos007
+    password: password
     driver-class-name: org.postgresql.Driver
 
 

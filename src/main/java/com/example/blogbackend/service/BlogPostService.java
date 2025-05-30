@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class BlogPostService {
@@ -47,12 +46,12 @@ public class BlogPostService {
     }
 
     public Page<BlogPostDto> getAllBlogPosts(int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").ascending());
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<BlogPost> blogPostPage = blogPostRepository.findAll(pageRequest);
         
         List<BlogPostDto> blogPostDtoList = blogPostPage.getContent().stream()
                 .map(BlogPostDto::toDto)
-                .collect(Collectors.toList());
+                .toList();
         
         return new PageImpl<>(blogPostDtoList, pageRequest, blogPostPage.getTotalElements());
     }
