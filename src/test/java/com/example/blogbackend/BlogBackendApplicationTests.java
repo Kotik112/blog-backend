@@ -12,5 +12,4 @@ class BlogBackendApplicationTests extends SpringBootComponentTest {
         // This test will pass if the application context loads successfully
         // No additional assertions are needed as this is a context load test
     }
-    //
 }
