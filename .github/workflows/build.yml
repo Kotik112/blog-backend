@@ -49,18 +49,23 @@ jobs:
           # Create Procfile
           echo 'web: java -jar application.jar' > staging/Procfile
 
-          # Inject environment variables into .ebextensions config
-          echo "option_settings:" > staging/.ebextensions/01_environment.config
-          echo "  aws:elasticbeanstalk:application:environment:" >> staging/.ebextensions/01_environment.config
-          echo "    SPRING_PROFILES_ACTIVE: dev" >> staging/.ebextensions/01_environment.config
-          echo "    DB_URL: \"${{ secrets.DB_URL }}\"" >> staging/.ebextensions/01_environment.config
-          echo "    DB_USER: \"${{ secrets.DB_USER }}\"" >> staging/.ebextensions/01_environment.config
-          echo "    DB_PW: \"${{ secrets.DB_PW }}\"" >> staging/.ebextensions/01_environment.config
+          # Write .ebextensions config with environment values
+          {
+            echo "option_settings:"
+            echo "  aws:elasticbeanstalk:application:environment:"
+            echo "    SPRING_PROFILES_ACTIVE: dev"
+            echo "    DB_URL: \"${DB_URL}\""
+            echo "    DB_USER: \"${DB_USER}\""
+            echo "    DB_PW: \"${DB_PW}\""
+          } > staging/.ebextensions/01_environment.config
 
-          # Create deploy.zip from staging directory
           cd staging
           zip -r ../deploy.zip .
           cd ..
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PW: ${{ secrets.DB_PW }}
 
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v22
