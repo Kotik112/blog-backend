@@ -46,16 +46,23 @@ jobs:
           mkdir -p staging/.ebextensions
           cp target/*.jar staging/application.jar
 
+          # Create Procfile
           echo 'web: java -jar application.jar' > staging/Procfile
 
+          # Inject secrets into EB config
           cat <<EOF > staging/.ebextensions/01_environment.config
-            option_settings:
-              aws:elasticbeanstalk:application:environment:
-                SPRING_PROFILES_ACTIVE: dev
-                DB_URL: "${{ secrets.DB_URL }}"
-                DB_USER: "${{ secrets.DB_USER }}"
-                DB_PW: "${{ secrets.DB_PW }}"
-              EOF
+option_settings:
+  aws:elasticbeanstalk:application:environment:
+    SPRING_PROFILES_ACTIVE: dev
+    DB_URL: "${{ secrets.DB_URL }}"
+    DB_USER: "${{ secrets.DB_USER }}"
+    DB_PW: "${{ secrets.DB_PW }}"
+  EOF
+          
+          # Move into staging and zip contents correctly
+          cd staging
+          zip -r ../deploy.zip .
+          cd ..
 
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v22
