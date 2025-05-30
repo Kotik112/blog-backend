@@ -33,3 +33,18 @@ jobs:
       # Build and Test
       - name: Build and Test
         run: ./mvnw clean test -DskipTests=false -Pci
+      - name: Create zip for Elastic Beanstalk
+        run: |
+          mkdir staging
+          cp target/*.jar staging/application.jar
+          cd staging && zip ../deploy.zip application.jar
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: blog-backend
+          environment_name: blog-dev
+          version_label: v-${{ github.run_number }}
+          region: us-east-1
+          deployment_package: deploy.zip

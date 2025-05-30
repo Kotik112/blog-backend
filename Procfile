@@ -1,0 +1,1 @@
+web: java -jar your-app-name.jar --spring.profiles.active=dev
