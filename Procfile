@@ -1,1 +1,1 @@
-web: java -jar your-app-name.jar --spring.profiles.active=dev
+web: java -jar blog-backend-0.0.1.jar --spring.profiles.active=dev
