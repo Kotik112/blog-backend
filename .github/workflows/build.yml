@@ -33,6 +33,8 @@ jobs:
       # Build and Test
       - name: Build and Test
         run: ./mvnw clean test -DskipTests=false -Pci
+      - name: Build JAR (for deployment)
+        run: ./mvnw clean package -DskipTests -Pci
       - name: Create zip for Elastic Beanstalk
         run: |
           mkdir staging
