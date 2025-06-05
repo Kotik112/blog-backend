@@ -83,11 +83,16 @@ public class ImageServiceTest {
 		assertEquals(createdAt, imageDto.createdAt());
 	}
 	
-	@Test(expected = EmptyFileException.class)
-	public void test_uploadImage_emptyFile() {
-		MultipartFile file = new MockMultipartFile("file", "test.jpg", IMAGE_JPEG_VALUE, new byte[0]);
-		imageService.uploadImage(file, 1L);
-	}
+        @Test(expected = EmptyFileException.class)
+        public void test_uploadImage_emptyFile() {
+                MultipartFile file = new MockMultipartFile("file", "test.jpg", IMAGE_JPEG_VALUE, new byte[0]);
+                imageService.uploadImage(file, 1L);
+        }
+
+        @Test(expected = EmptyFileException.class)
+        public void test_uploadImage_nullFile() {
+                imageService.uploadImage(null, 1L);
+        }
 	
 	@Test(expected = ImageUploadException.class)
 	public void test_uploadImage_fileUploadException() {

@@ -36,12 +36,13 @@ public class ImageService {
 		this.timeProvider = timeProvider;
 	}
 	
-	public ImageDto uploadImage(MultipartFile file, Long blogPostId) {
-		if (file != null && file.isEmpty()) {
-			throw new EmptyFileException(
-					String.format(
-							"File %s is empty, cannot upload the image", file.getOriginalFilename()));
-		}
+        public ImageDto uploadImage(MultipartFile file, Long blogPostId) {
+                if (file == null || file.isEmpty()) {
+                        throw new EmptyFileException(
+                                        String.format(
+                                                        "File %s is empty, cannot upload the image",
+                                                        file == null ? "" : file.getOriginalFilename()));
+                }
 		BlogPost blogPost = blogPostRepository.findById(blogPostId).orElseThrow(
 				() -> new BlogPostNotFoundException("Blog post with id: " + blogPostId + " not found")
 		);
