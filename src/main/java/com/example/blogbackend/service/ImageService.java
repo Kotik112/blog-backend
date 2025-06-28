@@ -47,6 +47,9 @@ public class ImageService {
 		);
 		try {
 			Image image = new Image();
+			if (file == null || file.isEmpty()) {
+				throw new EmptyFileException("File is empty, cannot upload the image");
+			}
 			image.setName(file.getOriginalFilename());
 			image.setType(file.getContentType());
 			image.setCreatedAt(timeProvider.getNow());

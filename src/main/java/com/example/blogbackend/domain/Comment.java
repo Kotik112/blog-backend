@@ -2,6 +2,7 @@ package com.example.blogbackend.domain;
 
 
 import com.example.blogbackend.dto.CommentDto;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,14 +23,21 @@ import java.time.Instant;
 @Builder
 @Entity
 @Table(name = "comment")
+@Schema(description = "Represents a comment on a blog post")
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Unique identifier for the comment", example = "501")
     private Long id;
+    @Schema(description = "Content of the comment", example = "Great article!")
     private String content;
+    @Schema(description = "Timestamp when the comment was created", example = "2025-06-26T03:15:19.293Z")
     private Instant createdAt;
+    @Schema(description = "Timestamp when the comment was last edited", example = "2025-06-26T03:20:00.000Z")
     private Instant lastEditedAt;
+    @Schema(description = "Whether the comment has been edited", example = "false")
     private Boolean isEdited;
+    @Schema(description = "The blog post to which this comment belongs")
     @ManyToOne
     @JoinColumn(name = "blogPostId")
     private BlogPost blogPost;

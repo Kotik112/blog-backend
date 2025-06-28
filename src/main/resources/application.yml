@@ -7,7 +7,7 @@ spring:
       max-file-size: 2MB
       max-request-size: 10MB
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: none
     properties:
@@ -19,7 +19,6 @@ spring:
             non_contextual_creation: true
           type:
             binary: byte[]
-
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -45,7 +44,11 @@ logging:
 
 
 server:
-  port: 5000
+  port: 8080
   error:
     include-stacktrace: never
     include-message: always
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

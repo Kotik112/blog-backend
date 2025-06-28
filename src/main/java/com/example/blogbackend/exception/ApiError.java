@@ -1,52 +1,23 @@
 package com.example.blogbackend.exception;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@Schema(description = "Represents an error response.")
 public class ApiError {
+	@Schema(description = "Represents an error response.")
 	private LocalDateTime timestamp;
+	@Schema(description = "HTTP status code of the error.", example = "404")
 	private int status;
+	@Schema(description = "Error reason phrase.", example = "Not Found")
 	private String error;
-	private String message;
+	@Schema(description = "Detailed error message.", example = "Blog post with id: 1 not found.")
+    private String message;
+	@Schema(description = "Path of the request that caused the error.", example = "/api/v1/blog/1")
 	private String path;
-	
-	
-	public LocalDateTime getTimestamp() {
-		return timestamp;
-	}
-	
-	public void setTimestamp(LocalDateTime timestamp) {
-		this.timestamp = timestamp;
-	}
-	
-	public int getStatus() {
-		return status;
-	}
-	
-	public void setStatus(int status) {
-		this.status = status;
-	}
-	
-	public String getError() {
-		return error;
-	}
-	
-	public void setError(String error) {
-		this.error = error;
-	}
-	
-	public String getMessage() {
-		return message;
-	}
-	
-	public void setMessage(String message) {
-		this.message = message;
-	}
-	
-	public String getPath() {
-		return path;
-	}
-	
-	public void setPath(String path) {
-		this.path = path;
-	}
 }

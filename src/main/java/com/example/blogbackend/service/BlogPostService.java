@@ -1,6 +1,5 @@
 package com.example.blogbackend.service;
 
-
 import com.example.blogbackend.domain.BlogPost;
 import com.example.blogbackend.domain.Image;
 import com.example.blogbackend.dto.BlogPostDto;
@@ -8,6 +7,8 @@ import com.example.blogbackend.dto.CreateBlogPostDto;
 import com.example.blogbackend.exception.BlogPostNotFoundException;
 import com.example.blogbackend.exception.ImageUploadException;
 import com.example.blogbackend.repository.BlogPostRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +21,7 @@ import java.util.List;
 
 @Service
 public class BlogPostService {
-
+    private final Logger logger = LoggerFactory.getLogger(BlogPostService.class);
     private final BlogPostRepository blogPostRepository;
     private final ImageService imageService;
 
@@ -29,9 +30,16 @@ public class BlogPostService {
 	    this.imageService = imageService;
     }
 
+    /**
+     * Creates a new blog post with an optional image.
+     *
+     * @param blogPostDTO the DTO containing the details of the blog post to be created
+     * @param image       the optional image file to be associated with the blog post
+     * @return the created BlogPostDto
+     */
     public BlogPostDto createBlogPost(CreateBlogPostDto blogPostDTO, MultipartFile image) {
         BlogPost blogPost = blogPostDTO.toDomain();
-        
+        logger.info("Creating blog post with title: {}", blogPost.getTitle());
         if (image != null && !image.isEmpty()) {
             try {
                 Image preparedImage = imageService.prepareImageForUpload(image);
@@ -39,15 +47,25 @@ public class BlogPostService {
             } catch (IOException e) {
                 throw new ImageUploadException("Error occurred while preparing the image for upload");
             }
+        } else {
+            logger.warn("No image provided for blog post with title: {}", blogPost.getTitle());
         }
         
         BlogPost savedBlogPost = blogPostRepository.save(blogPost);
         return BlogPostDto.toDto(savedBlogPost);
     }
 
+    /**
+     * Retrieves all blog posts with pagination.
+     *
+     * @param page the page number to retrieve
+     * @param size the number of blog posts per page
+     * @return a Page containing BlogPostDto objects
+     */
     public Page<BlogPostDto> getAllBlogPosts(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<BlogPost> blogPostPage = blogPostRepository.findAll(pageRequest);
+        logger.info("Retrieved {} blog posts for page {} with size {}", blogPostPage.getTotalElements(), page, size);
         
         List<BlogPostDto> blogPostDtoList = blogPostPage.getContent().stream()
                 .map(BlogPostDto::toDto)
@@ -56,10 +74,17 @@ public class BlogPostService {
         return new PageImpl<>(blogPostDtoList, pageRequest, blogPostPage.getTotalElements());
     }
 
+    /**
+     * Retrieves a blog post by its ID.
+     *
+     * @param id the ID of the blog post to retrieve
+     * @return the BlogPostDto corresponding to the given ID
+     */
     public BlogPostDto getBlogPostById(Long id) {
         BlogPost blogPost = blogPostRepository.findById(id).orElseThrow(
                 () -> new BlogPostNotFoundException("Blog post with id: " + id + " not found.")
         );
+        logger.info("Retrieved blog post with ID: {}", id);
         return BlogPostDto.toDto(blogPost);
     }
 }
