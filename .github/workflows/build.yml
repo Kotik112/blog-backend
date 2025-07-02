@@ -29,9 +29,9 @@ jobs:
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
-           path: ~/.m2
-           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-           restore-keys: |
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
             ${{ runner.os }}-m2-
 
       - name: Test with Maven
@@ -40,40 +40,3 @@ jobs:
 
       - name: Build JAR (for deployment)
         run: ./mvnw clean package -DskipTests -Pci
-
-      - name: Create zip for Elastic Beanstalk
-        run: |
-          mkdir -p staging/.ebextensions
-          cp target/*.jar staging/application.jar
-
-          # Create Procfile
-          echo 'web: java -jar application.jar' > staging/Procfile
-
-          # Write .ebextensions config with environment values
-          {
-            echo "option_settings:"
-            echo "  aws:elasticbeanstalk:application:environment:"
-            echo "    SPRING_PROFILES_ACTIVE: dev"
-            echo "    DB_URL: \"${DB_URL}\""
-            echo "    DB_USER: \"${DB_USER}\""
-            echo "    DB_PW: \"${DB_PW}\""
-          } > staging/.ebextensions/01_environment.config
-
-          cd staging
-          zip -r ../deploy.zip .
-          cd ..
-        env:
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PW: ${{ secrets.DB_PW }}
-
-      - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v22
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: ${{ secrets.EB_APPLICATION_NAME }}
-          environment_name: ${{ secrets.EB_ENVIRONMENT_NAME }}
-          version_label: v-${{ github.run_number }}
-          region: ${{ secrets.AWS_REGION }}
-          deployment_package: deploy.zip
