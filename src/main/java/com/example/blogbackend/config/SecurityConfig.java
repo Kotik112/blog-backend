@@ -1,18 +1,19 @@
 package com.example.blogbackend.config;
 
 import com.example.blogbackend.service.DatabaseUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -22,34 +23,23 @@ import java.util.List;
 
 import static org.springframework.http.HttpMethod.POST;
 
+@SuppressWarnings("unused")
 @Configuration
 public class SecurityConfig {
-
-//    /**
-//     * In-memory user details service for demo purposes.
-//     * In production, use a database or external user management system.
-//     */
-//    @Bean
-//    public UserDetailsService userDetailsServiceInMemory() {
-//        UserDetails user = User.builder()
-//                .username("admin")
-//                .password(passwordEncoder().encode("password123"))
-//                .roles("USER")
-//                .build();
-//
-//        return new InMemoryUserDetailsManager(user);
-//    }
+    private final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     /**
      * Authentication manager bean that uses the in-memory user details service.
      * This can be replaced with a custom UserDetailsService for database-backed users.
      */
     @Bean
-    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    public AuthenticationManager authenticationManager(
+            @Qualifier("passwordEncoder") PasswordEncoder passwordEncoder,
+            @Qualifier("userDetailsService") UserDetailsService userDetailsService
+    ) {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder);
-
         return new ProviderManager(authProvider);
     }
 
@@ -62,6 +52,7 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        logger.info(">>> Custom SecurityFilterChain loaded");
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -71,8 +62,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .anyRequest().permitAll()
                 )
-                .httpBasic(Customizer.withDefaults())  // Basic Auth for Postman or frontend fetch
-                .formLogin(Customizer.withDefaults()); // Optional: form login for browser
+                //.httpBasic(Customizer.withDefaults())  // Basic Auth for Postman or frontend fetch
+                .formLogin(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
