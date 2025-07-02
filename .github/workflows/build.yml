@@ -35,7 +35,6 @@ jobs:
             ${{ runner.os }}-m2-
 
       - name: Test with Maven
-        if: false
         run: ./mvnw clean test -DskipTests=false -Pci
 
       - name: Build JAR (for deployment)
