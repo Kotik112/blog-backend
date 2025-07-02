@@ -9,10 +9,10 @@ import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
 import com.example.blogbackend.repository.ImageRepository;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ImageServiceTest {
 	@InjectMocks
 	ImageService imageService;
@@ -137,13 +137,13 @@ public class ImageServiceTest {
 		// Mocks
 		when(imageRepository.findById(1L)).thenReturn(Optional.of(image));
 		
-		ResponseEntity<ByteArrayResource> ImageDto = imageService.getImageById(1L);
+		ResponseEntity<ByteArrayResource> imageDto = imageService.getImageById(1L);
 		
 		// Verify the result
 		verify(imageRepository).findById(1L);
 		
-		assertNotNull(ImageDto);
-		assertEquals("some data".length(), Objects.requireNonNull(ImageDto.getBody()).contentLength());
-		assertEquals("image/jpeg", Objects.requireNonNull(ImageDto.getHeaders().getContentType()).toString());
+		assertNotNull(imageDto);
+		assertEquals("some data".length(), Objects.requireNonNull(imageDto.getBody()).contentLength());
+		assertEquals("image/jpeg", Objects.requireNonNull(imageDto.getHeaders().getContentType()).toString());
 	}
 }
