@@ -37,9 +37,6 @@ jobs:
       - name: Test with Maven
         run: ./mvnw clean test -DskipTests=false -Pci
 
-      - name: Build JAR
-        run: ./mvnw clean package -DskipTests -Pci
-
       - name: Run tests and check coverage with JaCoCo
         run: ./mvnw clean verify -Pci
 
@@ -48,3 +45,15 @@ jobs:
         with:
           name: jacoco-report
           path: target/site/jacoco/
+
+      - name: Copy coverage report to `gh-pages`
+        run: |
+          mkdir gh-pages
+          cp -r target/site/jacoco/* gh-pages/
+
+      - name: Deploy coverage report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gh-pages
+          destination_dir: coverage
