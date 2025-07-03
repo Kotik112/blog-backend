@@ -54,7 +54,7 @@ class ImageControllerIntegrationTest extends SpringBootComponentTest {
 								.file(file)
 								.contentType(MULTIPART_FORM_DATA)
 				)
-				.andExpect(status().isOk())
+				.andExpect(status().isCreated())
 				.andReturn();
 
 		ImageDto uploadedImage = objectMapper.readValue(uploadImageResult.getResponse().getContentAsString(), ImageDto.class);
