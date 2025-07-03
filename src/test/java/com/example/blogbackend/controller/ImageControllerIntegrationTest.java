@@ -2,8 +2,7 @@ package com.example.blogbackend.controller;
 
 import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.blogbackend.dto.BlogPostDto;
@@ -22,7 +21,32 @@ class ImageControllerIntegrationTest extends SpringBootComponentTest {
 
   @Autowired MockMvc mvc;
 
-  @WithMockUser(username = "testUser", roles = "USER")
+  //  @BeforeAll
+  //  void registerTestUser() throws Exception {
+  //    CreateUserRequestDto user = new CreateUserRequestDto("testUser", "testPassword");
+  //
+  //    MvcResult result =
+  //        mvc.perform(
+  //                post("/api/v1/auth/register")
+  //                    .contentType(MediaType.APPLICATION_JSON)
+  //                    .content(objectMapper.writeValueAsString(user)))
+  //            .andReturn();
+  //
+  //    int status = result.getResponse().getStatus();
+  //    String body = result.getResponse().getContentAsString();
+  //
+  //    if (status == 201) {
+  //      Assertions.assertEquals("User registered successfully", body);
+  //    } else if (status == 400) {
+  //      Assertions.assertTrue(
+  //          body.contains("Username already exists"),
+  //          "Expected 'Username already exists', got: " + body);
+  //    } else {
+  //      Assertions.fail("Unexpected status: " + status + ", body: " + body);
+  //    }
+  //  }
+
+  @WithMockUser(username = "testuser", roles = "USER")
   @Test
   @Transactional
   void when_addImageToBlogPost_then_imageIsUploaded() throws Exception {
@@ -86,7 +110,7 @@ class ImageControllerIntegrationTest extends SpringBootComponentTest {
         .andExpect(status().isBadRequest());
   }
 
-  @WithMockUser(username = "testUser", roles = "USER")
+  @WithMockUser(username = "testuser", roles = "USER")
   @Test
   @Transactional
   void when_getImageById_then_imageIsReturned() throws Exception {

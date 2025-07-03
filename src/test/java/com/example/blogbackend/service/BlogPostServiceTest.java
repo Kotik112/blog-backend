@@ -3,17 +3,20 @@ package com.example.blogbackend.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.example.blogbackend.domain.BlogPost;
+import com.example.blogbackend.domain.User;
 import com.example.blogbackend.dto.BlogPostDto;
 import com.example.blogbackend.dto.CreateBlogPostDto;
 import com.example.blogbackend.exception.BlogPostNotFoundException;
+import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
+import com.example.blogbackend.repository.UserRepository;
+import java.security.Principal;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +32,8 @@ class BlogPostServiceTest {
 
   @InjectMocks BlogPostService blogPostService;
   @Mock BlogPostRepository blogPostRepository;
+  @Mock UserRepository userRepository;
+  @Mock TimeProvider timeProvider;
 
   //    @Mock
   //    TimeProvider timeProvider;
@@ -58,9 +63,23 @@ class BlogPostServiceTest {
     blogPost.setCreatedAt(Instant.parse("2023-04-04T12:42:00Z"));
     blogPost.setIsEdited(false);
 
+    Principal mockPrincipal = mock(Principal.class);
+    User mockUser = new User();
+    mockUser.setId(1L);
+    mockUser.setUsername("testuser");
+
     when(blogPostRepository.save(any())).thenReturn(blogPost);
-    BlogPostDto blogPostResult = blogPostService.createBlogPost(createBlogPostDTO, null);
+    when(mockPrincipal.getName()).thenReturn("testuser");
+    when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(mockUser));
+    when(timeProvider.getNow()).thenReturn(Instant.parse("2023-04-04T12:42:00Z"));
+
+    BlogPostDto blogPostResult =
+        blogPostService.createBlogPost(createBlogPostDTO, null, mockPrincipal);
+
     verify(blogPostRepository, times(1)).save(any());
+    verify(mockPrincipal, times(1)).getName();
+    verify(userRepository, times(1)).findByUsername("testuser");
+    verify(timeProvider, times(1)).getNow();
 
     assertEquals(expectedBlogPostDto, blogPostResult);
   }

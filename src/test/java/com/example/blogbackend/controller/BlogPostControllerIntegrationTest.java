@@ -26,7 +26,33 @@ class BlogPostControllerIntegrationTest extends SpringBootComponentTest {
 
   @Autowired MockMvc mvc;
 
-  @WithMockUser(username = "testUser", roles = "USER")
+  //  @BeforeAll
+  //  void registerTestUser() throws Exception {
+  //    CreateUserRequestDto user = new CreateUserRequestDto("testUser", "testPassword");
+  //
+  //    MvcResult result =
+  //            mvc.perform(
+  //                            post("/api/v1/auth/register")
+  //                                    .contentType(MediaType.APPLICATION_JSON)
+  //                                    .content(objectMapper.writeValueAsString(user)))
+  //                    .andReturn();
+  //
+  //    int status = result.getResponse().getStatus();
+  //    String body = result.getResponse().getContentAsString();
+  //
+  //    if (status == 201) {
+  //      Assertions.assertEquals("User registered successfully", body);
+  //    } else if (status == 400) {
+  //      Assertions.assertTrue(
+  //              body.contains("Username already exists"),
+  //              "Expected 'Username already exists', got: " + body);
+  //    } else {
+  //      Assertions.fail("Unexpected status: " + status + ", body: " + body);
+  //    }
+  //  }
+
+  @WithMockUser(username = "testuser", roles = "USER")
+  @Transactional
   @Test
   void test_createBlogPostWithImageSuccess() throws Exception {
     String title = "Test title";
@@ -51,7 +77,8 @@ class BlogPostControllerIntegrationTest extends SpringBootComponentTest {
     Assertions.assertEquals("Test content", blogPostDTO.content());
   }
 
-  @WithMockUser(username = "testUser", roles = "USER")
+  @WithMockUser(username = "testuser", roles = "USER")
+  @Transactional
   @Test
   void when_getAllBlogPosts_then_returnBlogPosts() throws Exception {
     // Helper to create blog posts
@@ -103,7 +130,7 @@ class BlogPostControllerIntegrationTest extends SpringBootComponentTest {
     Assertions.assertEquals(2, secondPage.size());
   }
 
-  @WithMockUser(username = "testUser", roles = "USER")
+  @WithMockUser(username = "testuser", roles = "USER")
   @Transactional
   @Test
   void when_getBlogPostById_then_returnBlogPost() throws Exception {

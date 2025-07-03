@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.List;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -27,10 +28,12 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class SpringBootComponentTest {
   public static final String BASE_BLOG_POST_URL = API_VERSION_1 + "/blog";
   public static final String BASE_COMMENTS_URL = API_VERSION_1 + "/comments";
   public static final String BASE_IMAGE_URL = API_VERSION_1 + "/images";
+  public static final String BASE_AUTH_URL = API_VERSION_1 + "/auth";
 
   @DynamicPropertySource
   static void overrideProperties(DynamicPropertyRegistry registry) {

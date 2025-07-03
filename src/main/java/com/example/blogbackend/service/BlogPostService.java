@@ -2,12 +2,16 @@ package com.example.blogbackend.service;
 
 import com.example.blogbackend.domain.BlogPost;
 import com.example.blogbackend.domain.Image;
+import com.example.blogbackend.domain.User;
 import com.example.blogbackend.dto.BlogPostDto;
 import com.example.blogbackend.dto.CreateBlogPostDto;
 import com.example.blogbackend.exception.BlogPostNotFoundException;
 import com.example.blogbackend.exception.ImageUploadException;
+import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
+import com.example.blogbackend.repository.UserRepository;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +27,18 @@ public class BlogPostService {
   private final Logger logger = LoggerFactory.getLogger(BlogPostService.class);
   private final BlogPostRepository blogPostRepository;
   private final ImageService imageService;
+  private final TimeProvider timeProvider;
+  private final UserRepository userRepository;
 
-  public BlogPostService(BlogPostRepository blogPostRepository, ImageService imageService) {
+  public BlogPostService(
+      BlogPostRepository blogPostRepository,
+      ImageService imageService,
+      TimeProvider timeProvider,
+      UserRepository userRepository) {
     this.blogPostRepository = blogPostRepository;
     this.imageService = imageService;
+    this.timeProvider = timeProvider;
+    this.userRepository = userRepository;
   }
 
   /**
@@ -36,7 +48,8 @@ public class BlogPostService {
    * @param image the optional image file to be associated with the blog post
    * @return the created BlogPostDto
    */
-  public BlogPostDto createBlogPost(CreateBlogPostDto blogPostDTO, MultipartFile image) {
+  public BlogPostDto createBlogPost(
+      CreateBlogPostDto blogPostDTO, MultipartFile image, Principal principal) {
     BlogPost blogPost = blogPostDTO.toDomain();
     logger.info("Creating blog post with title: {}", blogPost.getTitle());
     if (image != null && !image.isEmpty()) {
@@ -50,6 +63,12 @@ public class BlogPostService {
     } else {
       logger.debug("No image provided for blog post with title: {}", blogPost.getTitle());
     }
+    blogPost.setCreatedAt(timeProvider.getNow());
+    User user =
+        userRepository
+            .findByUsername(principal.getName())
+            .orElseThrow(() -> new RuntimeException("User not found: " + principal.getName()));
+    blogPost.setCreatedBy(user);
 
     BlogPost savedBlogPost = blogPostRepository.save(blogPost);
     logger.debug("Blog post with ID: {} created successfully", savedBlogPost.getId());

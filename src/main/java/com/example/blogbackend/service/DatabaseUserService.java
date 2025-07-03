@@ -1,6 +1,5 @@
 package com.example.blogbackend.service;
 
-import com.example.blogbackend.domain.User;
 import com.example.blogbackend.repository.UserRepository;
 import java.util.List;
 import org.slf4j.Logger;
@@ -11,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-@Service("databaseUserService")
+@Service
 public class DatabaseUserService implements UserDetailsService {
   private final Logger logger = LoggerFactory.getLogger(DatabaseUserService.class);
   private final UserRepository userRepository;
@@ -22,7 +21,7 @@ public class DatabaseUserService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user =
+    com.example.blogbackend.domain.User user =
         userRepository
             .findByUsername(username)
             .orElseThrow(

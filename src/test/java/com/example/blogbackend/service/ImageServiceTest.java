@@ -80,9 +80,7 @@ class ImageServiceTest {
   void test_uploadImage_emptyFile() {
     MultipartFile file = new MockMultipartFile("file", "test.jpg", IMAGE_JPEG_VALUE, new byte[0]);
 
-    assertThrows(
-        EmptyFileException.class,
-        () -> imageService.uploadImage(file, 1L));
+    assertThrows(EmptyFileException.class, () -> imageService.uploadImage(file, 1L));
   }
 
   @Test
@@ -92,9 +90,16 @@ class ImageServiceTest {
 
     MultipartFile file = new MockMultipartFile("file", "test.jpg", IMAGE_JPEG_VALUE, new byte[0]);
 
-    assertThrows(
-        EmptyFileException.class,
-        () -> imageService.uploadImage(file, 1L));
+    assertThrows(EmptyFileException.class, () -> imageService.uploadImage(file, 1L));
+  }
+
+  @Test
+  void test_uploadImage_nullFile_insideTryBlock() {
+    BlogPost blogPost = new BlogPost();
+    blogPost.setId(1L);
+    when(blogPostRepository.findById(1L)).thenReturn(Optional.of(blogPost));
+
+    assertThrows(EmptyFileException.class, () -> imageService.uploadImage(null, 1L));
   }
 
   @Test
@@ -108,9 +113,7 @@ class ImageServiceTest {
     when(file.isEmpty()).thenReturn(false);
     when(file.getBytes()).thenThrow(IOException.class);
 
-    assertThrows(
-        ImageUploadException.class,
-        () -> imageService.uploadImage(file, 1L));
+    assertThrows(ImageUploadException.class, () -> imageService.uploadImage(file, 1L));
   }
 
   @Test
@@ -144,9 +147,7 @@ class ImageServiceTest {
     when(imageRepository.findById(1L)).thenReturn(Optional.empty());
 
     // Verify that an exception is thrown
-    assertThrows(
-        ImageNotFoundException.class,
-        () -> imageService.getImageById(1L));
+    assertThrows(ImageNotFoundException.class, () -> imageService.getImageById(1L));
   }
 
   @Test
@@ -181,7 +182,6 @@ class ImageServiceTest {
 
     // Verify that an exception is thrown
     assertThrows(
-        ImageNotFoundException.class,
-        () -> imageService.getImageByFilename("nonexistent.jpg"));
+        ImageNotFoundException.class, () -> imageService.getImageByFilename("nonexistent.jpg"));
   }
 }

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.security.Principal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -64,9 +65,10 @@ public class BlogPostController {
   public ResponseEntity<BlogPostDto> createBlogPost(
       @RequestPart("title") String title,
       @RequestPart("content") String content,
-      @RequestPart(value = "image", required = false) MultipartFile image) {
+      @RequestPart(value = "image", required = false) MultipartFile image,
+      Principal principal) {
     CreateBlogPostDto dto = new CreateBlogPostDto(title, content);
-    BlogPostDto createdPost = blogPostService.createBlogPost(dto, image);
+    BlogPostDto createdPost = blogPostService.createBlogPost(dto, image, principal);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
   }
 

@@ -22,7 +22,32 @@ class CommentControllerIntegrationTest extends SpringBootComponentTest {
 
   @Autowired MockMvc mvc;
 
-  @WithMockUser(username = "testUser", roles = "USER")
+  //  @BeforeAll
+  //  void registerTestUser() throws Exception {
+  //    CreateUserRequestDto user = new CreateUserRequestDto("testUser", "testPassword");
+  //
+  //    MvcResult result =
+  //            mvc.perform(
+  //                            post("/api/v1/auth/register")
+  //                                    .contentType(MediaType.APPLICATION_JSON)
+  //                                    .content(objectMapper.writeValueAsString(user)))
+  //                    .andReturn();
+  //
+  //    int status = result.getResponse().getStatus();
+  //    String body = result.getResponse().getContentAsString();
+  //
+  //    if (status == 201) {
+  //      Assertions.assertEquals("User registered successfully", body);
+  //    } else if (status == 400) {
+  //      Assertions.assertTrue(
+  //              body.contains("Username already exists"),
+  //              "Expected 'Username already exists', got: " + body);
+  //    } else {
+  //      Assertions.fail("Unexpected status: " + status + ", body: " + body);
+  //    }
+  //  }
+
+  @WithMockUser(username = "testuser", roles = "USER")
   @Transactional
   @Test
   void when_createComment_return_blogPostWithComment() throws Exception {
@@ -72,7 +97,7 @@ class CommentControllerIntegrationTest extends SpringBootComponentTest {
     Assertions.assertEquals("Not Found", apiError.getError());
   }
 
-  @WithMockUser(username = "testUser", roles = "USER")
+  @WithMockUser(username = "testuser", roles = "USER")
   @Transactional
   @Test
   void when_getCommentById_return_comment() throws Exception {
