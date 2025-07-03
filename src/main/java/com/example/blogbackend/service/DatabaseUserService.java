@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
+@Service("databaseUserService")
 public class DatabaseUserService implements UserDetailsService {
     private final Logger logger = LoggerFactory.getLogger(DatabaseUserService.class);
     private final UserRepository userRepository;

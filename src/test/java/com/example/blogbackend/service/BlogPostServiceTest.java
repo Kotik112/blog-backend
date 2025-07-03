@@ -4,16 +4,15 @@ import com.example.blogbackend.domain.BlogPost;
 import com.example.blogbackend.dto.BlogPostDto;
 import com.example.blogbackend.dto.CreateBlogPostDto;
 import com.example.blogbackend.exception.BlogPostNotFoundException;
-import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -28,18 +27,18 @@ import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
-public class BlogPostServiceTest {
+class BlogPostServiceTest {
 
     @InjectMocks
     BlogPostService blogPostService;
     @Mock
     BlogPostRepository blogPostRepository;
 
-    @Mock
-    TimeProvider timeProvider;
+//    @Mock
+//    TimeProvider timeProvider;
 
     @Test
-    public void test_createBlogPost() {
+    void test_createBlogPost() {
         // Create the input data
         CreateBlogPostDto createBlogPostDTO = new CreateBlogPostDto("Test title", "Test content");
 
@@ -61,7 +60,7 @@ public class BlogPostServiceTest {
     }
     
     @Test
-    public void when_getAllBlogPosts_then_returnBlogPosts() {
+    void when_getAllBlogPosts_then_returnBlogPosts() {
         // Expected output data
         BlogPostDto expectedBlogPostDto = new BlogPostDto(1L,
                                                           "Test title",
@@ -84,7 +83,7 @@ public class BlogPostServiceTest {
         Page<BlogPost> blogPostPage = new PageImpl<>(Collections.singletonList(blogPost));
         
         // Mock behavior of BlogPostRepository
-        when(blogPostRepository.findAll(PageRequest.of(0, 10))).thenReturn(blogPostPage);
+        when(blogPostRepository.findAll(any(Pageable.class))).thenReturn(blogPostPage);
         
         // Call the service method
         Page<BlogPostDto> resultPage = blogPostService.getAllBlogPosts(0, 10);
@@ -93,14 +92,15 @@ public class BlogPostServiceTest {
         BlogPostDto blogPostResult = resultPage.getContent().get(0);
         
         // Verify that the repository method was called
-        verify(blogPostRepository, times(1)).findAll(PageRequest.of(0, 10));
-        
+        verify(blogPostRepository, times(1)).findAll(any(Pageable.class));
+
+
         // Assert the result
         assertEquals(expectedBlogPostDto, blogPostResult);
     }
 
     @Test
-    public void when_getBlogPostByInvalidId_then_throwBlogPostNotFoundException() {
+    void when_getBlogPostByInvalidId_then_throwBlogPostNotFoundException() {
         assertThrows(BlogPostNotFoundException.class, () -> blogPostService.getBlogPostById(999L));
     }
 

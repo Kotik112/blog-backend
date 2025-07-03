@@ -1,16 +1,14 @@
 package com.example.blogbackend.utils;
 
-import com.example.blogbackend.BlogBackendApplication;
-import com.example.blogbackend.TestBlogBackendApplication;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -25,8 +23,8 @@ import static com.example.blogbackend.BlogBackendApplication.API_VERSION_1;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 
+@AutoConfigureJsonTesters
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@ContextConfiguration(classes = {TestBlogBackendApplication.class, BlogBackendApplication.class})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)

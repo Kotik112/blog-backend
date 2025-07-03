@@ -23,12 +23,11 @@ import org.springframework.http.HttpHeaders;
 
 @Service
 public class ImageService {
-	
-	public final ImageRepository imageRepository;
+	private final Logger logger = LoggerFactory.getLogger(ImageService.class);
+
+	private final ImageRepository imageRepository;
 	private final BlogPostRepository blogPostRepository;
 	private final TimeProvider timeProvider;
-	
-	private static final Logger logger = LoggerFactory.getLogger(ImageService.class);
 	
 	public ImageService(ImageRepository imageRepository, BlogPostRepository blogPostRepository, TimeProvider timeProvider) {
 		this.imageRepository = imageRepository;
@@ -38,6 +37,7 @@ public class ImageService {
 	
 	public ImageDto uploadImage(MultipartFile file, Long blogPostId) {
 		if (file != null && file.isEmpty()) {
+			logger.warn("File {} is empty, cannot upload the image", file.getOriginalFilename());
 			throw new EmptyFileException(
 					String.format(
 							"File %s is empty, cannot upload the image", file.getOriginalFilename()));
@@ -45,9 +45,11 @@ public class ImageService {
 		BlogPost blogPost = blogPostRepository.findById(blogPostId).orElseThrow(
 				() -> new BlogPostNotFoundException("Blog post with id: " + blogPostId + " not found")
 		);
+		logger.info("Uploading image for blog post with ID: {}", blogPostId);
 		try {
 			Image image = new Image();
 			if (file == null || file.isEmpty()) {
+				logger.info("File is empty, cannot upload the image");
 				throw new EmptyFileException("File is empty, cannot upload the image");
 			}
 			image.setName(file.getOriginalFilename());
@@ -59,12 +61,13 @@ public class ImageService {
 			blogPost.setImage(image);
 			imageRepository.save(image);
 			BlogPost updatedBlogPost = blogPostRepository.save(blogPost);
-			
+			logger.info("Image uploaded successfully for blog post with ID: {}", updatedBlogPost.getId());
 			Image savedImage = updatedBlogPost.getImage();
 			return ImageDto.toDto(savedImage);
 			
 		}
 		catch (IOException e) {
+			logger.info("Error occurred while uploading the image: {}", e.getMessage());
 			throw new ImageUploadException("Error occurred while uploading the image");
 		}
 	}

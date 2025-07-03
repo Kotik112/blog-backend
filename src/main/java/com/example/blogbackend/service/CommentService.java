@@ -11,13 +11,14 @@ import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
 import com.example.blogbackend.repository.CommentRepository;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class CommentService {
-
+    private final Logger logger = org.slf4j.LoggerFactory.getLogger(CommentService.class);
     private final CommentRepository commentRepository;
     private final BlogPostRepository blogPostRepository;
     private final TimeProvider timeProvider;
@@ -31,6 +32,7 @@ public class CommentService {
     @Transactional
     public CommentDto createComment(CreateCommentDto createCommentDto) {
         Long blogPostId = createCommentDto.blogPostId();
+        logger.info("Creating comment for blog post with ID: {}", blogPostId);
         BlogPost blogPost = blogPostRepository.findById(blogPostId).orElseThrow(
                 () -> new BlogPostNotFoundException("Blog post with id: " + blogPostId + " not found.")
         );
@@ -43,8 +45,8 @@ public class CommentService {
         Comment newComment = commentRepository.save(comment);
         
         blogPost.getComments().add(newComment);
-        blogPostRepository.save(blogPost);
-
+        BlogPost savedBlogPost = blogPostRepository.save(blogPost);
+        logger.debug("Comment with ID: {} created successfully for blog post with ID: {}", newComment.getId(), savedBlogPost.getId());
         return CommentDto.from(newComment);
     }
 

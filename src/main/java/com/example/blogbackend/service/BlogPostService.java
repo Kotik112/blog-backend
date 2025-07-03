@@ -45,13 +45,15 @@ public class BlogPostService {
                 Image preparedImage = imageService.prepareImageForUpload(image);
                 blogPost.setImage(preparedImage);
             } catch (IOException e) {
+                logger.debug("Error occurred while preparing the image for upload: {}", e.getMessage());
                 throw new ImageUploadException("Error occurred while preparing the image for upload");
             }
         } else {
-            logger.warn("No image provided for blog post with title: {}", blogPost.getTitle());
+            logger.debug("No image provided for blog post with title: {}", blogPost.getTitle());
         }
         
         BlogPost savedBlogPost = blogPostRepository.save(blogPost);
+        logger.debug("Blog post with ID: {} created successfully", savedBlogPost.getId());
         return BlogPostDto.toDto(savedBlogPost);
     }
 

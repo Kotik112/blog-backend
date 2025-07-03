@@ -7,6 +7,7 @@ import com.example.blogbackend.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/v1/comments")
 @SuppressWarnings("unused")
 @Tag(name = "Comments", description = "Operations related to Blog post comments")
+@RestController
+@RequestMapping("/api/v1/comments")
 public class CommentController {
 
     private final CommentService commentService;
@@ -38,9 +39,8 @@ public class CommentController {
 
     @Operation(summary = "Create a new comment", description = "Creates a new comment for a blog post.")
     @PostMapping("")
-    @ResponseStatus(HttpStatus.CREATED)
-    public CommentDto createComment(@RequestBody CreateCommentDto createCommentDto) {
-        return commentService.createComment(createCommentDto);
+    public ResponseEntity<CommentDto> createComment(@RequestBody CreateCommentDto createCommentDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.createComment(createCommentDto));
     }
 
     /**

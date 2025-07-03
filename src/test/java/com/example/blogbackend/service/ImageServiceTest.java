@@ -8,7 +8,8 @@ import com.example.blogbackend.exception.ImageUploadException;
 import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
 import com.example.blogbackend.repository.ImageRepository;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,8 +24,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
 
 @ExtendWith(MockitoExtension.class)
-public class ImageServiceTest {
+class ImageServiceTest {
 	@InjectMocks
 	ImageService imageService;
 	
@@ -46,7 +46,7 @@ public class ImageServiceTest {
 	TimeProvider timeProvider;
 	
 	@Test
-	public void test_uploadImage() {
+	void test_uploadImage() {
 		BlogPost blogPost = new BlogPost();
 		blogPost.setId(1L);
 		
@@ -77,55 +77,51 @@ public class ImageServiceTest {
 		verify(timeProvider).getNow();
 		verify(imageRepository).save(any());
 		
-		assertNotNull(imageDto);
-		assertEquals("test.jpg", imageDto.name());
-		assertEquals("image/jpeg", imageDto.type());
-		assertEquals(createdAt, imageDto.createdAt());
+		Assertions.assertNotNull(imageDto);
+		Assertions.assertEquals("test.jpg", imageDto.name());
+		Assertions.assertEquals("image/jpeg", imageDto.type());
+		Assertions.assertEquals(createdAt, imageDto.createdAt());
 	}
-	
-	@Test(expected = EmptyFileException.class)
-	public void test_uploadImage_emptyFile() {
+
+	@Test
+	void test_uploadImage_emptyFile() {
 		MultipartFile file = new MockMultipartFile("file", "test.jpg", IMAGE_JPEG_VALUE, new byte[0]);
-		imageService.uploadImage(file, 1L);
+
+		assertThrows(EmptyFileException.class, () -> {
+			imageService.uploadImage(file, 1L);
+		});
 	}
-	
-	@Test(expected = ImageUploadException.class)
-	public void test_uploadImage_fileUploadException() {
+
+	@Test
+	void test_uploadImage_fileUploadException() {
 		BlogPost blogPost = new BlogPost();
 		blogPost.setId(1L);
-		
-		// Mocks
-		when(blogPostRepository.findById(1L)).thenReturn(Optional.of(blogPost));
-		when(blogPostRepository.save(any())).thenReturn(blogPost);
-		when(timeProvider.getNow()).thenReturn(Instant.now());
-		
-		MultipartFile file = new MockMultipartFile("file",
-		                                           "test.jpg",
-		                                           IMAGE_JPEG_VALUE,
-		                                           new byte[0]
-		);
-		imageService.uploadImage(file, 1L);
+
+		MultipartFile file = new MockMultipartFile("file", "test.jpg", IMAGE_JPEG_VALUE, new byte[0]);
+
+		assertThrows(EmptyFileException.class, () -> {
+			imageService.uploadImage(file, 1L);
+		});
 	}
-	
-	@Test(expected = ImageUploadException.class)
-	public void test_uploadImage_ImageUploadException() throws IOException {
-		// Mocks
+
+	@Test
+	void test_uploadImage_ImageUploadException() throws IOException {
 		BlogPost blogPost = new BlogPost();
 		blogPost.setId(1L);
 		when(blogPostRepository.findById(1L)).thenReturn(Optional.of(blogPost));
 		when(timeProvider.getNow()).thenReturn(Instant.now());
-		
-		// Mock empty file
+
 		MultipartFile file = mock(MultipartFile.class);
 		when(file.isEmpty()).thenReturn(false);
 		when(file.getBytes()).thenThrow(IOException.class);
-		
-		// Test the method
-		imageService.uploadImage(file, 1L);
+
+		assertThrows(ImageUploadException.class, () -> {
+			imageService.uploadImage(file, 1L);
+		});
 	}
 	
 	@Test
-	public void test_getImageById() {
+	void test_getImageById() {
 		Image image = new Image();
 		image.setId(1L);
 		image.setName("test.jpg");
@@ -142,8 +138,8 @@ public class ImageServiceTest {
 		// Verify the result
 		verify(imageRepository).findById(1L);
 		
-		assertNotNull(imageDto);
-		assertEquals("some data".length(), Objects.requireNonNull(imageDto.getBody()).contentLength());
-		assertEquals("image/jpeg", Objects.requireNonNull(imageDto.getHeaders().getContentType()).toString());
+		Assertions.assertNotNull(imageDto);
+		Assertions.assertEquals("some data".length(), Objects.requireNonNull(imageDto.getBody()).contentLength());
+		Assertions.assertEquals("image/jpeg", Objects.requireNonNull(imageDto.getHeaders().getContentType()).toString());
 	}
 }
