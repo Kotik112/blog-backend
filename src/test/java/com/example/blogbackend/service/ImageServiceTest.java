@@ -11,6 +11,7 @@ import com.example.blogbackend.domain.BlogPost;
 import com.example.blogbackend.domain.Image;
 import com.example.blogbackend.dto.ImageDto;
 import com.example.blogbackend.exception.EmptyFileException;
+import com.example.blogbackend.exception.ImageNotFoundException;
 import com.example.blogbackend.exception.ImageUploadException;
 import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
@@ -81,9 +82,7 @@ class ImageServiceTest {
 
     assertThrows(
         EmptyFileException.class,
-        () -> {
-          imageService.uploadImage(file, 1L);
-        });
+        () -> imageService.uploadImage(file, 1L));
   }
 
   @Test
@@ -95,9 +94,7 @@ class ImageServiceTest {
 
     assertThrows(
         EmptyFileException.class,
-        () -> {
-          imageService.uploadImage(file, 1L);
-        });
+        () -> imageService.uploadImage(file, 1L));
   }
 
   @Test
@@ -113,9 +110,7 @@ class ImageServiceTest {
 
     assertThrows(
         ImageUploadException.class,
-        () -> {
-          imageService.uploadImage(file, 1L);
-        });
+        () -> imageService.uploadImage(file, 1L));
   }
 
   @Test
@@ -141,5 +136,52 @@ class ImageServiceTest {
         "some data".length(), Objects.requireNonNull(imageDto.getBody()).contentLength());
     Assertions.assertEquals(
         "image/jpeg", Objects.requireNonNull(imageDto.getHeaders().getContentType()).toString());
+  }
+
+  @Test
+  void when_getImageById_notFound_then_throwException() {
+    // Mocks
+    when(imageRepository.findById(1L)).thenReturn(Optional.empty());
+
+    // Verify that an exception is thrown
+    assertThrows(
+        ImageNotFoundException.class,
+        () -> imageService.getImageById(1L));
+  }
+
+  @Test
+  void when_getImageByName_then_returnImage() {
+    Image image = new Image();
+    image.setId(1L);
+    image.setName("test.jpg");
+    image.setType(IMAGE_JPEG_VALUE);
+    image.setImageData("some data".getBytes());
+    Instant createdAt = Instant.now();
+    image.setCreatedAt(createdAt);
+
+    // Mocks
+    when(imageRepository.findByName("test.jpg")).thenReturn(Optional.of(image));
+
+    ResponseEntity<ByteArrayResource> imageDto = imageService.getImageByFilename("test.jpg");
+
+    // Verify the result
+    verify(imageRepository).findByName("test.jpg");
+
+    Assertions.assertNotNull(imageDto);
+    Assertions.assertEquals(
+        "some data".length(), Objects.requireNonNull(imageDto.getBody()).contentLength());
+    Assertions.assertEquals(
+        "image/jpeg", Objects.requireNonNull(imageDto.getHeaders().getContentType()).toString());
+  }
+
+  @Test
+  void when_getImageByName_notFound_then_throwException() {
+    // Mocks
+    when(imageRepository.findByName("nonexistent.jpg")).thenReturn(Optional.empty());
+
+    // Verify that an exception is thrown
+    assertThrows(
+        ImageNotFoundException.class,
+        () -> imageService.getImageByFilename("nonexistent.jpg"));
   }
 }

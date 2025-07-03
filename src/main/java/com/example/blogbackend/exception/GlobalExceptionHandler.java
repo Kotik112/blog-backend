@@ -69,6 +69,19 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Handles exceptions related to image not found scenarios.
+   *
+   * @param ex the exception that was thrown
+   * @param request the current web request
+   * @return an ApiError object containing error details
+   */
+  @ExceptionHandler(ImageNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ApiError handleImageNotFoundException(ImageNotFoundException ex, WebRequest request) {
+    return handleException(ex, request, HttpStatus.NOT_FOUND);
+  }
+
+  /**
    * Private function that constructs an ApiError object from any given exception.
    *
    * @param ex the exception that was thrown

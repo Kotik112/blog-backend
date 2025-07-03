@@ -5,6 +5,7 @@ import com.example.blogbackend.domain.Image;
 import com.example.blogbackend.dto.ImageDto;
 import com.example.blogbackend.exception.BlogPostNotFoundException;
 import com.example.blogbackend.exception.EmptyFileException;
+import com.example.blogbackend.exception.ImageNotFoundException;
 import com.example.blogbackend.exception.ImageUploadException;
 import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
@@ -79,8 +80,7 @@ public class ImageService {
     Image image =
         imageRepository
             .findById(id)
-            .orElseThrow(
-                () -> new BlogPostNotFoundException("Image with id: " + id + " not found"));
+            .orElseThrow(() -> new ImageNotFoundException("Image with id: " + id + " not found"));
     logger.debug("Image type: {}", image.getType());
 
     return getResponseEntity(image);
@@ -91,7 +91,7 @@ public class ImageService {
         imageRepository
             .findByName(filename)
             .orElseThrow(
-                () -> new BlogPostNotFoundException("Image with name: " + filename + " not found"));
+                () -> new ImageNotFoundException("Image with name: " + filename + " not found"));
 
     return getResponseEntity(image);
   }
