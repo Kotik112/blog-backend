@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">blog-backend</a> &gt; <a href="index.source.html" class="el_package">com.example.blogbackend.config</a> &gt; <span class="el_source">SecurityConfig.java</span></div><h1>SecurityConfig.java</h1><pre class="source lang-java linenums">package com.example.blogbackend.config;
+
+import static org.springframework.http.HttpMethod.POST;
+
+import com.example.blogbackend.service.DatabaseUserService;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+@SuppressWarnings(&quot;unused&quot;)
+@Configuration
+<span class="fc" id="L27">public class SecurityConfig {</span>
+<span class="fc" id="L28">  private final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);</span>
+
+  /**
+   * Authentication manager bean that uses the in-memory user details service. This can be replaced
+   * with a custom UserDetailsService for database-backed users.
+   */
+  @Bean
+  public AuthenticationManager authenticationManager(
+      @Qualifier(&quot;passwordEncoder&quot;) PasswordEncoder passwordEncoder,
+      @Qualifier(&quot;userDetailsService&quot;) UserDetailsService userDetailsService) {
+<span class="fc" id="L38">    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();</span>
+<span class="fc" id="L39">    authProvider.setUserDetailsService(userDetailsService);</span>
+<span class="fc" id="L40">    authProvider.setPasswordEncoder(passwordEncoder);</span>
+<span class="fc" id="L41">    return new ProviderManager(authProvider);</span>
+  }
+
+  /**
+   * Main security filter chain config. - CORS enabled for allowed origins - CSRF disabled for
+   * stateless API use - Basic Auth and form login enabled - Endpoint-based authorization
+   */
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+<span class="fc" id="L50">    http.csrf(AbstractHttpConfigurer::disable)</span>
+<span class="fc" id="L51">        .cors(cors -&gt; cors.configurationSource(corsConfigurationSource()))</span>
+<span class="fc" id="L52">        .authorizeHttpRequests(</span>
+            auth -&gt;
+<span class="fc" id="L54">                auth.requestMatchers(POST, &quot;/api/v1/blog/**&quot;)</span>
+<span class="fc" id="L55">                    .hasRole(&quot;USER&quot;)</span>
+<span class="fc" id="L56">                    .requestMatchers(&quot;/api/v1/admin/**&quot;)</span>
+<span class="fc" id="L57">                    .hasRole(&quot;ADMIN&quot;)</span>
+<span class="fc" id="L58">                    .requestMatchers(&quot;/api/v1/auth/**&quot;)</span>
+<span class="fc" id="L59">                    .permitAll()</span>
+<span class="fc" id="L60">                    .anyRequest()</span>
+<span class="fc" id="L61">                    .permitAll())</span>
+        // .httpBasic(Customizer.withDefaults())  // Basic Auth for Postman or frontend fetch
+<span class="fc" id="L63">        .formLogin(AbstractHttpConfigurer::disable);</span>
+
+<span class="fc" id="L65">    return http.build();</span>
+  }
+
+  /**
+   * CORS configuration to allow requests from specific origins. This is necessary for frontend
+   * applications to interact with the backend API.
+   *
+   * @see &lt;a
+   *     href=&quot;https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-cors&quot;&gt;Spring
+   *     CORS Documentation&lt;/a&gt;
+   * @return CorsConfigurationSource
+   */
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+<span class="fc" id="L79">    CorsConfiguration config = new CorsConfiguration();</span>
+<span class="fc" id="L80">    config.setAllowCredentials(true);</span>
+<span class="fc" id="L81">    config.setAllowedOriginPatterns(List.of(&quot;http://localhost:5173&quot;, &quot;http://127.0.0.1:5173&quot;));</span>
+<span class="fc" id="L82">    config.setAllowedHeaders(List.of(&quot;*&quot;));</span>
+<span class="fc" id="L83">    config.setAllowedMethods(List.of(&quot;*&quot;));</span>
+
+<span class="fc" id="L85">    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();</span>
+<span class="fc" id="L86">    source.registerCorsConfiguration(&quot;/**&quot;, config);</span>
+<span class="fc" id="L87">    return source;</span>
+  }
+
+  /**
+   * Password encoder bean for hashing passwords. BCrypt is a strong hashing algorithm suitable for
+   * password storage.
+   *
+   * @see &lt;a
+   *     href=&quot;https://docs.spring.io/spring-security/reference/servlet/password-storage.html&quot;&gt;Spring
+   *     Security Password Storage&lt;/a&gt;
+   * @return PasswordEncoder
+   */
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+<span class="fc" id="L101">    return new BCryptPasswordEncoder();</span>
+  }
+
+  @Bean
+  public UserDetailsService userDetailsService(DatabaseUserService databaseUserService) {
+<span class="fc" id="L106">    return databaseUserService;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

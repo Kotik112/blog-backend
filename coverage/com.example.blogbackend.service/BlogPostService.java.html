@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BlogPostService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">blog-backend</a> &gt; <a href="index.source.html" class="el_package">com.example.blogbackend.service</a> &gt; <span class="el_source">BlogPostService.java</span></div><h1>BlogPostService.java</h1><pre class="source lang-java linenums">package com.example.blogbackend.service;
+
+import com.example.blogbackend.domain.BlogPost;
+import com.example.blogbackend.domain.Image;
+import com.example.blogbackend.dto.BlogPostDto;
+import com.example.blogbackend.dto.CreateBlogPostDto;
+import com.example.blogbackend.exception.BlogPostNotFoundException;
+import com.example.blogbackend.exception.ImageUploadException;
+import com.example.blogbackend.repository.BlogPostRepository;
+import java.io.IOException;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+@Service
+public class BlogPostService {
+<span class="fc" id="L23">  private final Logger logger = LoggerFactory.getLogger(BlogPostService.class);</span>
+  private final BlogPostRepository blogPostRepository;
+  private final ImageService imageService;
+
+<span class="fc" id="L27">  public BlogPostService(BlogPostRepository blogPostRepository, ImageService imageService) {</span>
+<span class="fc" id="L28">    this.blogPostRepository = blogPostRepository;</span>
+<span class="fc" id="L29">    this.imageService = imageService;</span>
+<span class="fc" id="L30">  }</span>
+
+  /**
+   * Creates a new blog post with an optional image.
+   *
+   * @param blogPostDTO the DTO containing the details of the blog post to be created
+   * @param image the optional image file to be associated with the blog post
+   * @return the created BlogPostDto
+   */
+  public BlogPostDto createBlogPost(CreateBlogPostDto blogPostDTO, MultipartFile image) {
+<span class="fc" id="L40">    BlogPost blogPost = blogPostDTO.toDomain();</span>
+<span class="fc" id="L41">    logger.info(&quot;Creating blog post with title: {}&quot;, blogPost.getTitle());</span>
+<span class="pc bpc" id="L42" title="1 of 4 branches missed.">    if (image != null &amp;&amp; !image.isEmpty()) {</span>
+      try {
+<span class="fc" id="L44">        Image preparedImage = imageService.prepareImageForUpload(image);</span>
+<span class="fc" id="L45">        blogPost.setImage(preparedImage);</span>
+<span class="nc" id="L46">      } catch (IOException e) {</span>
+<span class="nc" id="L47">        logger.debug(&quot;Error occurred while preparing the image for upload: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L48">        throw new ImageUploadException(&quot;Error occurred while preparing the image for upload&quot;);</span>
+<span class="fc" id="L49">      }</span>
+    } else {
+<span class="fc" id="L51">      logger.debug(&quot;No image provided for blog post with title: {}&quot;, blogPost.getTitle());</span>
+    }
+
+<span class="fc" id="L54">    BlogPost savedBlogPost = blogPostRepository.save(blogPost);</span>
+<span class="fc" id="L55">    logger.debug(&quot;Blog post with ID: {} created successfully&quot;, savedBlogPost.getId());</span>
+<span class="fc" id="L56">    return BlogPostDto.toDto(savedBlogPost);</span>
+  }
+
+  /**
+   * Retrieves all blog posts with pagination.
+   *
+   * @param page the page number to retrieve
+   * @param size the number of blog posts per page
+   * @return a Page containing BlogPostDto objects
+   */
+  public Page&lt;BlogPostDto&gt; getAllBlogPosts(int page, int size) {
+<span class="fc" id="L67">    PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, &quot;createdAt&quot;));</span>
+<span class="fc" id="L68">    Page&lt;BlogPost&gt; blogPostPage = blogPostRepository.findAll(pageRequest);</span>
+<span class="fc" id="L69">    logger.info(</span>
+        &quot;Retrieved {} blog posts for page {} with size {}&quot;,
+<span class="fc" id="L71">        blogPostPage.getTotalElements(),</span>
+<span class="fc" id="L72">        page,</span>
+<span class="fc" id="L73">        size);</span>
+
+<span class="fc" id="L75">    List&lt;BlogPostDto&gt; blogPostDtoList =</span>
+<span class="fc" id="L76">        blogPostPage.getContent().stream().map(BlogPostDto::toDto).toList();</span>
+
+<span class="fc" id="L78">    return new PageImpl&lt;&gt;(blogPostDtoList, pageRequest, blogPostPage.getTotalElements());</span>
+  }
+
+  /**
+   * Retrieves a blog post by its ID.
+   *
+   * @param id the ID of the blog post to retrieve
+   * @return the BlogPostDto corresponding to the given ID
+   */
+  public BlogPostDto getBlogPostById(Long id) {
+<span class="fc" id="L88">    BlogPost blogPost =</span>
+        blogPostRepository
+<span class="fc" id="L90">            .findById(id)</span>
+<span class="fc" id="L91">            .orElseThrow(</span>
+<span class="fc" id="L92">                () -&gt; new BlogPostNotFoundException(&quot;Blog post with id: &quot; + id + &quot; not found.&quot;));</span>
+<span class="fc" id="L93">    logger.info(&quot;Retrieved blog post with ID: {}&quot;, id);</span>
+<span class="fc" id="L94">    return BlogPostDto.toDto(blogPost);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

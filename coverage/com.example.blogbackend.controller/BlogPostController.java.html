@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BlogPostController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">blog-backend</a> &gt; <a href="index.source.html" class="el_package">com.example.blogbackend.controller</a> &gt; <span class="el_source">BlogPostController.java</span></div><h1>BlogPostController.java</h1><pre class="source lang-java linenums">package com.example.blogbackend.controller;
+
+import com.example.blogbackend.dto.BlogPostDto;
+import com.example.blogbackend.dto.CreateBlogPostDto;
+import com.example.blogbackend.exception.ApiError;
+import com.example.blogbackend.service.BlogPostService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+@SuppressWarnings(&quot;unused&quot;)
+@RestController
+@RequestMapping(&quot;/api/v1/blog&quot;)
+@Tag(name = &quot;Posts&quot;, description = &quot;Operations related to blog posts&quot;)
+public class BlogPostController {
+<span class="fc" id="L27">  private final Logger logger = LoggerFactory.getLogger(BlogPostController.class);</span>
+  private final BlogPostService blogPostService;
+
+<span class="fc" id="L30">  public BlogPostController(BlogPostService blogPostService) {</span>
+<span class="fc" id="L31">    this.blogPostService = blogPostService;</span>
+<span class="fc" id="L32">  }</span>
+
+  /**
+   * Creates a new blog post with an optional image.
+   *
+   * @param title the title of the blog post
+   * @param content the content of the blog post
+   * @param image the optional image file to be associated with the blog post
+   * @return the created BlogPostDto
+   */
+  @Operation(
+      summary = &quot;Create a new blog post&quot;,
+      description = &quot;Creates a new blog post with an optional image.&quot;)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = &quot;201&quot;,
+            description = &quot;Blog post created successfully&quot;,
+            content =
+                @Content(
+                    mediaType = &quot;application/json&quot;,
+                    schema = @Schema(implementation = BlogPostDto.class))),
+        @ApiResponse(
+            responseCode = &quot;400&quot;,
+            description = &quot;Invalid blog post data&quot;,
+            content = @Content),
+        @ApiResponse(
+            responseCode = &quot;500&quot;,
+            description = &quot;Internal server error&quot;,
+            content = @Content)
+      })
+  @PostMapping(value = &quot;&quot;, consumes = &quot;multipart/form-data&quot;, produces = &quot;application/json&quot;)
+  public ResponseEntity&lt;BlogPostDto&gt; createBlogPost(
+      @RequestPart(&quot;title&quot;) String title,
+      @RequestPart(&quot;content&quot;) String content,
+      @RequestPart(value = &quot;image&quot;, required = false) MultipartFile image) {
+<span class="fc" id="L68">    CreateBlogPostDto dto = new CreateBlogPostDto(title, content);</span>
+<span class="fc" id="L69">    BlogPostDto createdPost = blogPostService.createBlogPost(dto, image);</span>
+<span class="fc" id="L70">    return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);</span>
+  }
+
+  /**
+   * Retrieves a paginated list of all blog posts.
+   *
+   * @param page the page number to retrieve (default is 0)
+   * @param size the number of blog posts per page (default is 5)
+   * @return a Page containing BlogPostDto objects
+   */
+  @Operation(
+      summary = &quot;Get all blog posts&quot;,
+      description = &quot;Retrieves a paginated list of all blog posts.&quot;)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = &quot;200&quot;,
+            description = &quot;Successfully retrieved blog posts&quot;,
+            content =
+                @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = BlogPostDto.class)))),
+        @ApiResponse(
+            responseCode = &quot;400&quot;,
+            description = &quot;Invalid pagination parameters&quot;,
+            content = @Content),
+        @ApiResponse(
+            responseCode = &quot;500&quot;,
+            description = &quot;Internal server error&quot;,
+            content = @Content)
+      })
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(value = &quot;&quot;)
+  public Page&lt;BlogPostDto&gt; getAllBlogPosts(
+      @RequestParam(defaultValue = &quot;0&quot;) int page, @RequestParam(defaultValue = &quot;5&quot;) int size) {
+<span class="fc" id="L104">    return blogPostService.getAllBlogPosts(page, size);</span>
+  }
+
+  /**
+   * Retrieves a blog post by its ID.
+   *
+   * @param id the ID of the blog post to retrieve
+   * @return the BlogPostDto corresponding to the given ID
+   */
+  @Operation(
+      summary = &quot;Get a blog post by ID&quot;,
+      description = &quot;Retrieves a blog post by its unique identifier.&quot;)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = &quot;200&quot;,
+            description = &quot;Blog post found&quot;,
+            content =
+                @Content(
+                    mediaType = &quot;application/json&quot;,
+                    schema = @Schema(implementation = BlogPostDto.class))),
+        @ApiResponse(
+            responseCode = &quot;404&quot;,
+            description = &quot;Blog post not found&quot;,
+            content =
+                @Content(
+                    mediaType = &quot;application/json&quot;,
+                    schema = @Schema(implementation = ApiError.class))),
+        @ApiResponse(
+            responseCode = &quot;500&quot;,
+            description = &quot;Internal server error&quot;,
+            content =
+                @Content(
+                    mediaType = &quot;application/json&quot;,
+                    schema = @Schema(implementation = ApiError.class)))
+      })
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(value = &quot;/{id}&quot;)
+  public BlogPostDto getBlogPostById(@PathVariable(&quot;id&quot;) Long id) {
+<span class="fc" id="L143">    return blogPostService.getBlogPostById(id);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
