@@ -34,9 +34,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-m2-
 
-      - name: Test with Maven
-        run: ./mvnw clean test -DskipTests=false -Pci
-
       - name: Run tests and check coverage with JaCoCo
         run: ./mvnw clean verify -Pci
 
@@ -46,10 +43,13 @@ jobs:
           name: jacoco-report
           path: target/site/jacoco/
 
-      - name: Copy coverage report to `gh-pages`
+      - name: Copy coverage report to gh-pages
         run: |
-          mkdir gh-pages
+          mkdir -p gh-pages
           cp -r target/site/jacoco/* gh-pages/
+
+      - name: List files to verify copy
+        run: ls -la gh-pages
 
       - name: Deploy coverage report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
