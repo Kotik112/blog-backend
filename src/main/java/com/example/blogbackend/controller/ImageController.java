@@ -17,48 +17,54 @@ import org.springframework.web.multipart.MultipartFile;
 @SuppressWarnings("unused")
 @Tag(name = "Images", description = "Operations related to images")
 public class ImageController {
-	private final Logger logger = LoggerFactory.getLogger(ImageController.class);
-	private final ImageService imageService;
-	
-	public ImageController(ImageService imageService) {
-		this.imageService = imageService;
-	}
+  private final Logger logger = LoggerFactory.getLogger(ImageController.class);
+  private final ImageService imageService;
 
-	/**
-	 * Uploads an image associated with a blog post.
-	 *
-	 * @param file the image file to be uploaded
-	 * @param blogPostId the ID of the blog post to associate the image with
-	 * @return the uploaded ImageDto
-	 */
-	@Operation(summary = "Upload an image for a blog post", description = "Uploads an image associated with a blog post.")
-	@PostMapping("/blog-post/{blogPostId}")
-	@ResponseStatus(HttpStatus.CREATED)
-	public ImageDto uploadImage(@RequestParam("image") MultipartFile file, @PathVariable("blogPostId") Long blogPostId) {
-		return imageService.uploadImage(file, blogPostId);
-	}
+  public ImageController(ImageService imageService) {
+    this.imageService = imageService;
+  }
 
-	/**
-	 * Downloads an image by its ID.
-	 *
-	 * @param id the ID of the image to be downloaded
-	 * @return the ResponseEntity containing the image data
-	 */
-	@Operation(summary = "Download an image by ID", description = "Downloads an image by its ID.")
-	@GetMapping("/{id}")
-	public ResponseEntity<ByteArrayResource> downloadImage(@PathVariable("id") Long id) {
-		return imageService.getImageById(id);
-	}
+  /**
+   * Uploads an image associated with a blog post.
+   *
+   * @param file the image file to be uploaded
+   * @param blogPostId the ID of the blog post to associate the image with
+   * @return the uploaded ImageDto
+   */
+  @Operation(
+      summary = "Upload an image for a blog post",
+      description = "Uploads an image associated with a blog post.")
+  @PostMapping("/blog-post/{blogPostId}")
+  @ResponseStatus(HttpStatus.CREATED)
+  public ImageDto uploadImage(
+      @RequestParam("image") MultipartFile file, @PathVariable("blogPostId") Long blogPostId) {
+    return imageService.uploadImage(file, blogPostId);
+  }
 
-	/**
-	 * Downloads an image by its filename.
-	 *
-	 * @param filename the filename of the image to be downloaded
-	 * @return the ResponseEntity containing the image data
-	 */
-	@Operation(summary = "Download an image by filename", description = "Downloads an image by its filename.")
-	@GetMapping("filename/{filename}")
-	public ResponseEntity<ByteArrayResource> downloadImageByFilename(@PathVariable("filename") String filename) {
-		return imageService.getImageByFilename(filename);
-	}
+  /**
+   * Downloads an image by its ID.
+   *
+   * @param id the ID of the image to be downloaded
+   * @return the ResponseEntity containing the image data
+   */
+  @Operation(summary = "Download an image by ID", description = "Downloads an image by its ID.")
+  @GetMapping("/{id}")
+  public ResponseEntity<ByteArrayResource> downloadImage(@PathVariable("id") Long id) {
+    return imageService.getImageById(id);
+  }
+
+  /**
+   * Downloads an image by its filename.
+   *
+   * @param filename the filename of the image to be downloaded
+   * @return the ResponseEntity containing the image data
+   */
+  @Operation(
+      summary = "Download an image by filename",
+      description = "Downloads an image by its filename.")
+  @GetMapping("filename/{filename}")
+  public ResponseEntity<ByteArrayResource> downloadImageByFilename(
+      @PathVariable("filename") String filename) {
+    return imageService.getImageByFilename(filename);
+  }
 }

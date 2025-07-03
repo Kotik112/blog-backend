@@ -1,10 +1,10 @@
 package com.example.blogbackend.domain;
 
 public enum Role {
-    USER,
-    ADMIN;
+  USER,
+  ADMIN;
 
-    public String getAuthority() {
-        return "ROLE_" + this.name();
-    }
+  public String getAuthority() {
+    return "ROLE_" + this.name();
+  }
 }

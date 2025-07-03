@@ -19,21 +19,29 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table(name = "users")
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String username;
-    private String password;
-    @Enumerated(EnumType.STRING)
-    private Role role;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", role=" + role +
-                '}';
-    }
+  private String username;
+  private String password;
+
+  @Enumerated(EnumType.STRING)
+  private Role role;
+
+  @Override
+  public String toString() {
+    return "User{"
+        + "id="
+        + id
+        + ", username='"
+        + username
+        + '\''
+        + ", password='"
+        + password
+        + '\''
+        + ", role="
+        + role
+        + '}';
+  }
 }
