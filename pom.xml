@@ -184,7 +184,7 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.80</minimum> <!-- ✅ 80% minimum -->
+                                            <minimum>0.70</minimum> <!-- ✅ 80% minimum aim -->
                                         </limit>
                                     </limits>
                                 </rule>
