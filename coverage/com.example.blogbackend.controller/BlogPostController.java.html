@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.security.Principal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -24,12 +25,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping(&quot;/api/v1/blog&quot;)
 @Tag(name = &quot;Posts&quot;, description = &quot;Operations related to blog posts&quot;)
 public class BlogPostController {
-<span class="fc" id="L27">  private final Logger logger = LoggerFactory.getLogger(BlogPostController.class);</span>
+<span class="fc" id="L28">  private final Logger logger = LoggerFactory.getLogger(BlogPostController.class);</span>
   private final BlogPostService blogPostService;
 
-<span class="fc" id="L30">  public BlogPostController(BlogPostService blogPostService) {</span>
-<span class="fc" id="L31">    this.blogPostService = blogPostService;</span>
-<span class="fc" id="L32">  }</span>
+<span class="fc" id="L31">  public BlogPostController(BlogPostService blogPostService) {</span>
+<span class="fc" id="L32">    this.blogPostService = blogPostService;</span>
+<span class="fc" id="L33">  }</span>
 
   /**
    * Creates a new blog post with an optional image.
@@ -64,10 +65,11 @@ public class BlogPostController {
   public ResponseEntity&lt;BlogPostDto&gt; createBlogPost(
       @RequestPart(&quot;title&quot;) String title,
       @RequestPart(&quot;content&quot;) String content,
-      @RequestPart(value = &quot;image&quot;, required = false) MultipartFile image) {
-<span class="fc" id="L68">    CreateBlogPostDto dto = new CreateBlogPostDto(title, content);</span>
-<span class="fc" id="L69">    BlogPostDto createdPost = blogPostService.createBlogPost(dto, image);</span>
-<span class="fc" id="L70">    return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);</span>
+      @RequestPart(value = &quot;image&quot;, required = false) MultipartFile image,
+      Principal principal) {
+<span class="fc" id="L70">    CreateBlogPostDto dto = new CreateBlogPostDto(title, content);</span>
+<span class="fc" id="L71">    BlogPostDto createdPost = blogPostService.createBlogPost(dto, image, principal);</span>
+<span class="fc" id="L72">    return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);</span>
   }
 
   /**
@@ -101,7 +103,7 @@ public class BlogPostController {
   @GetMapping(value = &quot;&quot;)
   public Page&lt;BlogPostDto&gt; getAllBlogPosts(
       @RequestParam(defaultValue = &quot;0&quot;) int page, @RequestParam(defaultValue = &quot;5&quot;) int size) {
-<span class="fc" id="L104">    return blogPostService.getAllBlogPosts(page, size);</span>
+<span class="fc" id="L106">    return blogPostService.getAllBlogPosts(page, size);</span>
   }
 
   /**
@@ -140,7 +142,7 @@ public class BlogPostController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = &quot;/{id}&quot;)
   public BlogPostDto getBlogPostById(@PathVariable(&quot;id&quot;) Long id) {
-<span class="fc" id="L143">    return blogPostService.getBlogPostById(id);</span>
+<span class="fc" id="L145">    return blogPostService.getBlogPostById(id);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

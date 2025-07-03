@@ -38,7 +38,7 @@ public class ImageService {
 <span class="fc" id="L38">  }</span>
 
   public ImageDto uploadImage(MultipartFile file, Long blogPostId) {
-<span class="pc bpc" id="L41" title="1 of 4 branches missed.">    if (file != null &amp;&amp; file.isEmpty()) {</span>
+<span class="fc bfc" id="L41" title="All 4 branches covered.">    if (file != null &amp;&amp; file.isEmpty()) {</span>
 <span class="fc" id="L42">      logger.warn(&quot;File {} is empty, cannot upload the image&quot;, file.getOriginalFilename());</span>
 <span class="fc" id="L43">      throw new EmptyFileException(</span>
 <span class="fc" id="L44">          String.format(&quot;File %s is empty, cannot upload the image&quot;, file.getOriginalFilename()));</span>
@@ -53,9 +53,9 @@ public class ImageService {
 <span class="fc" id="L53">    logger.info(&quot;Uploading image for blog post with ID: {}&quot;, blogPostId);</span>
     try {
 <span class="fc" id="L55">      Image image = new Image();</span>
-<span class="pc bpc" id="L56" title="2 of 4 branches missed.">      if (file == null || file.isEmpty()) {</span>
-<span class="nc" id="L57">        logger.info(&quot;File is empty, cannot upload the image&quot;);</span>
-<span class="nc" id="L58">        throw new EmptyFileException(&quot;File is empty, cannot upload the image&quot;);</span>
+<span class="pc bpc" id="L56" title="1 of 4 branches missed.">      if (file == null || file.isEmpty()) {</span>
+<span class="fc" id="L57">        logger.info(&quot;File is empty, cannot upload the image&quot;);</span>
+<span class="fc" id="L58">        throw new EmptyFileException(&quot;File is empty, cannot upload the image&quot;);</span>
       }
 <span class="fc" id="L60">      image.setName(file.getOriginalFilename());</span>
 <span class="fc" id="L61">      image.setType(file.getContentType());</span>
