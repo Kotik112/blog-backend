@@ -5,6 +5,7 @@ import com.example.blogbackend.domain.User;
 import com.example.blogbackend.dto.CreateUserRequestDto;
 import com.example.blogbackend.dto.LoginRequestDto;
 import com.example.blogbackend.repository.UserRepository;
+import com.example.blogbackend.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -28,54 +29,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
   private final Logger logger = LoggerFactory.getLogger(AuthController.class);
-  private final UserRepository userRepository;
-  private final PasswordEncoder passwordEncoder;
-  private final AuthenticationManager authenticationManager;
+  private final UserService userService;
+
 
   public AuthController(
-      UserRepository userRepository,
-      PasswordEncoder passwordEncoder,
-      AuthenticationManager authenticationManager) {
-    this.userRepository = userRepository;
-    this.passwordEncoder = passwordEncoder;
-    this.authenticationManager = authenticationManager;
+          UserService userService) {
+      this.userService = userService;
   }
 
   @PostMapping("/register")
   public ResponseEntity<String> registerUser(@RequestBody CreateUserRequestDto user) {
-    if (userRepository.existsByUsername(user.username().toLowerCase()))
-      return ResponseEntity.badRequest().body("Username already exists");
-
     if (user.username().length() < 3 || user.username().length() > 20)
       return ResponseEntity.badRequest().body("Username must be between 3 and 20 characters");
+    if (userService.userExists(user.username()))
+      return ResponseEntity.badRequest().body("User already exists");
 
-    User userToSave = new User();
-    userToSave.setUsername(user.username().toLowerCase());
-    userToSave.setPassword(passwordEncoder.encode(user.password()));
-    userToSave.setRole(Role.USER);
-
-    userRepository.save(userToSave);
-
-    return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+    String response = userService.registerUser(user);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @PostMapping("/login")
   public ResponseEntity<String> loginUser(
       @RequestBody LoginRequestDto request, HttpServletRequest httpRequest) {
-    try {
-      Authentication authentication =
-          authenticationManager.authenticate(
-              new UsernamePasswordAuthenticationToken(
-                  request.getUsername().toLowerCase(), request.getPassword()));
-
-      SecurityContextHolder.getContext().setAuthentication(authentication);
-      httpRequest.getSession(true); // ensures session is created
-
-      return ResponseEntity.ok("Login successful");
-    } catch (AuthenticationException e) {
-      logger.warn(
-          "Authentication failed for user: {} -> {}", request.getUsername(), e.getMessage());
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+    String response = userService.loginUser(request, httpRequest);
+    if (response.equals("Login successful")) {
+      return ResponseEntity.ok(response);
+    } else {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
   }
 }
