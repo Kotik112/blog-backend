@@ -37,5 +37,14 @@ jobs:
       - name: Test with Maven
         run: ./mvnw clean test -DskipTests=false -Pci
 
-      - name: Build JAR (for deployment)
+      - name: Build JAR
         run: ./mvnw clean package -DskipTests -Pci
+
+      - name: Run tests and check coverage with JaCoCo
+        run: ./mvnw clean verify -Pci
+
+      - name: Upload JaCoCo coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
