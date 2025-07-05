@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
- * Initializes a test user in the database when the "test" profile is active.
- * This user can be used for integration tests that require authentication.
+ * Initializes a test user in the database when the "test" profile is active. This user can be used
+ * for integration tests that require authentication.
  */
 @SuppressWarnings("unused")
 @Configuration
