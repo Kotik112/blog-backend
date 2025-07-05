@@ -134,4 +134,26 @@ class UserServiceTest {
     verify(authenticationManager, times(1)).authenticate(any());
     verify(userRepository, times(1)).existsByUsername(username);
   }
+
+  @Test
+  void test_loginUser_usernameNull() {
+    LoginRequestDto loginRequest = new LoginRequestDto(null, "testPassword");
+    HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+
+    String result = userService.loginUser(loginRequest, httpRequest);
+    Assertions.assertEquals("Username and password must not be empty", result);
+
+    verify(userRepository, never()).existsByUsername(any());
+    verify(authenticationManager, never()).authenticate(any());
+  }
+
+  @Test
+  void test_loginUser_passwordNull() {
+    LoginRequestDto loginRequest = new LoginRequestDto("test123", null);
+    HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+    String result = userService.loginUser(loginRequest, httpRequest);
+    Assertions.assertEquals("Username and password must not be empty", result);
+    verify(userRepository, never()).existsByUsername(any());
+    verify(authenticationManager, never()).authenticate(any());
+  }
 }
