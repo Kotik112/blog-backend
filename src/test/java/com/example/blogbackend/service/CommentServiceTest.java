@@ -17,7 +17,9 @@ import com.example.blogbackend.repository.BlogPostRepository;
 import com.example.blogbackend.repository.CommentRepository;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -111,5 +113,48 @@ class CommentServiceTest {
     when(commentRepository.findById(1L)).thenReturn(Optional.empty());
     assertThrows(CommentNotFoundException.class, () -> commentService.getCommentById(1L));
     verify(commentRepository, times(1)).findById(1L);
+  }
+
+  @Test
+  void when_getCommentsByBlogPostId_then_retrieveComments() {
+    // Expected comments
+    Comment comment1 =
+        Comment.builder()
+            .id(1L)
+            .content("Test comment 1")
+            .createdAt(Instant.now())
+            .lastEditedAt(Instant.now())
+            .isEdited(false)
+            .build();
+
+    Comment comment2 =
+        Comment.builder()
+            .id(2L)
+            .content("Test comment 2")
+            .createdAt(Instant.now())
+            .lastEditedAt(Instant.now())
+            .isEdited(false)
+            .build();
+
+    BlogPost blogPost = new BlogPost();
+    blogPost.setId(1L);
+    blogPost.setComments(new HashSet<>(Set.of(comment1, comment2)));
+
+    when(blogPostRepository.findById(1L)).thenReturn(Optional.of(blogPost));
+    when(commentRepository.findByBlogPostId(1L)).thenReturn(List.of(comment1, comment2));
+
+    List<CommentDto> comments = commentService.getCommentsByBlogPostId(1L);
+
+    verify(blogPostRepository, times(1)).findById(1L);
+
+    Assertions.assertNotNull(comments);
+    Assertions.assertEquals(2, comments.size());
+  }
+
+  @Test
+  void when_getCommentsByInvalidBlogPostId_then_throwBlogPostNotFoundException() {
+    when(blogPostRepository.findById(1L)).thenReturn(Optional.empty());
+    assertThrows(BlogPostNotFoundException.class, () -> commentService.getCommentsByBlogPostId(1L));
+    verify(blogPostRepository, times(1)).findById(1L);
   }
 }

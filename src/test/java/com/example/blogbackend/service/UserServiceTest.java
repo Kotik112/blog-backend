@@ -4,8 +4,10 @@ import static org.mockito.Mockito.*;
 
 import com.example.blogbackend.domain.Role;
 import com.example.blogbackend.domain.User;
+import com.example.blogbackend.dto.ApiLoginResponse;
 import com.example.blogbackend.dto.CreateUserRequestDto;
 import com.example.blogbackend.dto.LoginRequestDto;
+import com.example.blogbackend.enums.LoginResponseEnum;
 import com.example.blogbackend.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -128,11 +130,25 @@ class UserServiceTest {
     when(authenticationManager.authenticate(any())).thenReturn(authentication);
     when(httpRequest.getSession(true)).thenReturn(session);
 
-    String result = userService.loginUser(loginRequest, httpRequest);
-    Assertions.assertEquals("Login successful", result);
+    ApiLoginResponse result = userService.loginUser(loginRequest, httpRequest);
+    Assertions.assertEquals(LoginResponseEnum.SUCCESS.getMessage(), result.message());
 
     verify(authenticationManager, times(1)).authenticate(any());
     verify(userRepository, times(1)).existsByUsername(username);
+  }
+
+  @Test
+  void test_loginUser_userNotFound() {
+    LoginRequestDto loginRequest = new LoginRequestDto("nonexistentuser", "testPassword");
+    HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+
+    when(userRepository.existsByUsername("nonexistentuser")).thenReturn(false);
+
+    ApiLoginResponse result = userService.loginUser(loginRequest, httpRequest);
+    Assertions.assertEquals(LoginResponseEnum.USER_NOT_FOUND.getMessage(), result.message());
+
+    verify(userRepository, times(1)).existsByUsername("nonexistentuser");
+    verify(authenticationManager, never()).authenticate(any());
   }
 
   @Test
@@ -140,8 +156,8 @@ class UserServiceTest {
     LoginRequestDto loginRequest = new LoginRequestDto(null, "testPassword");
     HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 
-    String result = userService.loginUser(loginRequest, httpRequest);
-    Assertions.assertEquals("Username and password must not be empty", result);
+    ApiLoginResponse result = userService.loginUser(loginRequest, httpRequest);
+    Assertions.assertEquals(LoginResponseEnum.EMPTY_CREDENTIALS.getMessage(), result.message());
 
     verify(userRepository, never()).existsByUsername(any());
     verify(authenticationManager, never()).authenticate(any());
@@ -151,8 +167,8 @@ class UserServiceTest {
   void test_loginUser_passwordNull() {
     LoginRequestDto loginRequest = new LoginRequestDto("test123", null);
     HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-    String result = userService.loginUser(loginRequest, httpRequest);
-    Assertions.assertEquals("Username and password must not be empty", result);
+    ApiLoginResponse result = userService.loginUser(loginRequest, httpRequest);
+    Assertions.assertEquals(LoginResponseEnum.EMPTY_CREDENTIALS.getMessage(), result.message());
     verify(userRepository, never()).existsByUsername(any());
     verify(authenticationManager, never()).authenticate(any());
   }

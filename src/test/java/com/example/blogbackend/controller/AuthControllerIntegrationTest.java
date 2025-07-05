@@ -3,8 +3,10 @@ package com.example.blogbackend.controller;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.blogbackend.dto.ApiLoginResponse;
 import com.example.blogbackend.dto.CreateUserRequestDto;
 import com.example.blogbackend.dto.LoginRequestDto;
+import com.example.blogbackend.enums.LoginResponseEnum;
 import com.example.blogbackend.utils.SpringBootComponentTest;
 import lombok.val;
 import org.junit.jupiter.api.Assertions;
@@ -111,9 +113,11 @@ class AuthControllerIntegrationTest extends SpringBootComponentTest {
             .andExpect(status().isOk())
             .andReturn();
 
-    String response = result.getResponse().getContentAsString();
+    ApiLoginResponse response = getFromResult(result, ApiLoginResponse.class);
     Assertions.assertEquals(
-        "Login successful", response, "Expected login success message, got: " + response);
+        LoginResponseEnum.SUCCESS,
+        response.responseEnum(),
+        "Expected login success message, got: " + response);
   }
 
   @Test
@@ -128,9 +132,11 @@ class AuthControllerIntegrationTest extends SpringBootComponentTest {
             .andExpect(status().isUnauthorized())
             .andReturn();
 
-    String response = result.getResponse().getContentAsString();
+    ApiLoginResponse response = getFromResult(result, ApiLoginResponse.class);
     Assertions.assertEquals(
-        "User does not exist", response, "Expected user does not exist error, got: " + response);
+        LoginResponseEnum.USER_NOT_FOUND,
+        response.responseEnum(),
+        "Expected user does not exist error, got: " + response);
   }
 
   @Test
@@ -162,10 +168,10 @@ class AuthControllerIntegrationTest extends SpringBootComponentTest {
             .andExpect(status().isUnauthorized())
             .andReturn();
 
-    String responseBody = result.getResponse().getContentAsString();
+    ApiLoginResponse responseBody = getFromResult(result, ApiLoginResponse.class);
     Assertions.assertEquals(
-        "Invalid credentials",
-        responseBody,
+        LoginResponseEnum.INVALID_CREDENTIALS,
+        responseBody.responseEnum(),
         "Expected invalid credentials error, got: " + responseBody);
   }
 }

@@ -2,8 +2,10 @@ package com.example.blogbackend.service;
 
 import com.example.blogbackend.domain.Role;
 import com.example.blogbackend.domain.User;
+import com.example.blogbackend.dto.ApiLoginResponse;
 import com.example.blogbackend.dto.CreateUserRequestDto;
 import com.example.blogbackend.dto.LoginRequestDto;
+import com.example.blogbackend.enums.LoginResponseEnum;
 import com.example.blogbackend.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -49,7 +51,7 @@ public class UserService {
       logger.warn("Registration attempt with invalid username length: {}", userRequest.username());
       return "Username must be between 3 and 20 characters";
     }
-    if (userRequest.password() == null || userRequest.password().length() < 6) {
+    if (userRequest.password().length() < 6) {
       logger.warn("Registration attempt with invalid password length");
       return "Password must be at least 6 characters long";
     }
@@ -63,31 +65,30 @@ public class UserService {
     return "User registered successfully";
   }
 
-  public String loginUser(LoginRequestDto loginRequestDto, HttpServletRequest httpRequest) {
+  public ApiLoginResponse loginUser(
+      LoginRequestDto loginRequestDto, HttpServletRequest httpRequest) {
     if (loginRequestDto.getUsername() == null || loginRequestDto.getPassword() == null) {
       logger.warn("Login attempt with missing username or password");
-      return "Username and password must not be empty";
+      return new ApiLoginResponse(LoginResponseEnum.EMPTY_CREDENTIALS);
     }
-    if (!userExists(loginRequestDto.getUsername().toLowerCase())) {
-      logger.warn("Login attempt with non-existing user: {}", loginRequestDto.getUsername());
-      return "User does not exist";
+    String normalizedUsername = loginRequestDto.getUsername().toLowerCase();
+    if (!userExists(normalizedUsername)) {
+      logger.warn("Login attempt with non-existing user: {}", normalizedUsername);
+      return new ApiLoginResponse(LoginResponseEnum.USER_NOT_FOUND);
     }
     try {
       Authentication authentication =
           authenticationManager.authenticate(
               new UsernamePasswordAuthenticationToken(
-                  loginRequestDto.getUsername().toLowerCase(), loginRequestDto.getPassword()));
+                  normalizedUsername, loginRequestDto.getPassword()));
 
       SecurityContextHolder.getContext().setAuthentication(authentication);
       httpRequest.getSession(true); // ensures session is created
 
-      return "Login successful";
+      return new ApiLoginResponse(LoginResponseEnum.SUCCESS);
     } catch (AuthenticationException e) {
-      logger.warn(
-          "Authentication failed for user: {} -> {}",
-          loginRequestDto.getUsername(),
-          e.getMessage());
-      return "Invalid credentials";
+      logger.warn("Authentication failed for user: {} -> {}", normalizedUsername, e.getMessage());
+      return new ApiLoginResponse(LoginResponseEnum.INVALID_CREDENTIALS);
     }
   }
 }

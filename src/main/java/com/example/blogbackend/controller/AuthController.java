@@ -1,10 +1,12 @@
 package com.example.blogbackend.controller;
 
+import com.example.blogbackend.dto.ApiLoginResponse;
 import com.example.blogbackend.dto.CreateUserRequestDto;
 import com.example.blogbackend.dto.LoginRequestDto;
 import com.example.blogbackend.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -34,7 +36,7 @@ public class AuthController {
    * @return a ResponseEntity with the registration status
    */
   @PostMapping("/register")
-  public ResponseEntity<String> registerUser(@RequestBody CreateUserRequestDto user) {
+  public ResponseEntity<String> registerUser(@RequestBody @Valid CreateUserRequestDto user) {
     if (user.username().length() < 3 || user.username().length() > 20)
       return ResponseEntity.badRequest().body("Username must be between 3 and 20 characters");
     if (userService.userExists(user.username()))
@@ -53,18 +55,19 @@ public class AuthController {
    * Logs in a user with the provided username and password. Validates the input and checks if the
    * user exists.
    *
-   * @param request the login request containing username and password
-   * @param httpRequest the HTTP request for context
+   * @param loginRequest the login request containing username and password
+   * @param request the HTTP request for context
    * @return a ResponseEntity with the login status
    */
   @PostMapping("/login")
-  public ResponseEntity<String> loginUser(
-      @RequestBody LoginRequestDto request, HttpServletRequest httpRequest) {
-    String response = userService.loginUser(request, httpRequest);
-    if (response.equals("Login successful")) {
-      return ResponseEntity.ok(response);
-    } else {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-    }
+  public ResponseEntity<ApiLoginResponse> loginUser(
+      @RequestBody @Valid LoginRequestDto loginRequest, HttpServletRequest request) {
+    ApiLoginResponse result = userService.loginUser(loginRequest, request);
+    return switch (result.responseEnum()) {
+      case SUCCESS -> ResponseEntity.ok(result);
+      case USER_NOT_FOUND, INVALID_CREDENTIALS ->
+          ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);
+      default -> ResponseEntity.badRequest().body(result);
+    };
   }
 }
