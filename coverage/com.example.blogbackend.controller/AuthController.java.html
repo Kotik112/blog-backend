@@ -26,25 +26,45 @@ public class AuthController {
 <span class="fc" id="L26">    this.userService = userService;</span>
 <span class="fc" id="L27">  }</span>
 
+  /**
+   * Registers a new user with the provided username and password. Validates the username length and
+   * checks if the user already exists.
+   *
+   * @param user the user registration request containing username and password
+   * @return a ResponseEntity with the registration status
+   */
   @PostMapping(&quot;/register&quot;)
   public ResponseEntity&lt;String&gt; registerUser(@RequestBody CreateUserRequestDto user) {
-<span class="nc bnc" id="L31" title="All 4 branches missed.">    if (user.username().length() &lt; 3 || user.username().length() &gt; 20)</span>
-<span class="nc" id="L32">      return ResponseEntity.badRequest().body(&quot;Username must be between 3 and 20 characters&quot;);</span>
-<span class="nc bnc" id="L33" title="All 2 branches missed.">    if (userService.userExists(user.username()))</span>
-<span class="nc" id="L34">      return ResponseEntity.badRequest().body(&quot;User already exists&quot;);</span>
+<span class="pc bpc" id="L38" title="1 of 4 branches missed.">    if (user.username().length() &lt; 3 || user.username().length() &gt; 20)</span>
+<span class="fc" id="L39">      return ResponseEntity.badRequest().body(&quot;Username must be between 3 and 20 characters&quot;);</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">    if (userService.userExists(user.username()))</span>
+<span class="nc" id="L41">      return ResponseEntity.badRequest().body(&quot;User already exists&quot;);</span>
 
-<span class="nc" id="L36">    String response = userService.registerUser(user);</span>
-<span class="nc" id="L37">    return ResponseEntity.status(HttpStatus.CREATED).body(response);</span>
+<span class="fc" id="L43">    String response = userService.registerUser(user);</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">    if (response.equals(&quot;User registered successfully&quot;)) {</span>
+<span class="fc" id="L45">      return ResponseEntity.status(HttpStatus.CREATED).body(response);</span>
+    } else {
+<span class="fc" id="L47">      logger.warn(&quot;Registration failed: {}&quot;, response);</span>
+<span class="fc" id="L48">      return ResponseEntity.badRequest().body(response);</span>
+    }
   }
 
+  /**
+   * Logs in a user with the provided username and password. Validates the input and checks if the
+   * user exists.
+   *
+   * @param request the login request containing username and password
+   * @param httpRequest the HTTP request for context
+   * @return a ResponseEntity with the login status
+   */
   @PostMapping(&quot;/login&quot;)
   public ResponseEntity&lt;String&gt; loginUser(
       @RequestBody LoginRequestDto request, HttpServletRequest httpRequest) {
-<span class="nc" id="L43">    String response = userService.loginUser(request, httpRequest);</span>
-<span class="nc bnc" id="L44" title="All 2 branches missed.">    if (response.equals(&quot;Login successful&quot;)) {</span>
-<span class="nc" id="L45">      return ResponseEntity.ok(response);</span>
+<span class="fc" id="L63">    String response = userService.loginUser(request, httpRequest);</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">    if (response.equals(&quot;Login successful&quot;)) {</span>
+<span class="fc" id="L65">      return ResponseEntity.ok(response);</span>
     } else {
-<span class="nc" id="L47">      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);</span>
+<span class="fc" id="L67">      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);</span>
     }
   }
 }

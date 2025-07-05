@@ -21,17 +21,17 @@ public class DatabaseUserService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-<span class="nc" id="L24">    com.example.blogbackend.domain.User user =</span>
+<span class="fc" id="L24">    com.example.blogbackend.domain.User user =</span>
         userRepository
-<span class="nc" id="L26">            .findByUsername(username)</span>
-<span class="nc" id="L27">            .orElseThrow(</span>
+<span class="fc" id="L26">            .findByUsername(username)</span>
+<span class="fc" id="L27">            .orElseThrow(</span>
 <span class="nc" id="L28">                () -&gt; new UsernameNotFoundException(&quot;User not found with username: &quot; + username));</span>
-<span class="nc" id="L29">    logger.info(&quot;User = {}&quot;, user);</span>
+<span class="fc" id="L29">    logger.info(&quot;User = {}&quot;, user);</span>
 
-<span class="nc" id="L31">    return new org.springframework.security.core.userdetails.User(</span>
-<span class="nc" id="L32">        user.getUsername(),</span>
-<span class="nc" id="L33">        user.getPassword(),</span>
-<span class="nc" id="L34">        List.of(new SimpleGrantedAuthority(user.getRole().getAuthority())));</span>
+<span class="fc" id="L31">    return new org.springframework.security.core.userdetails.User(</span>
+<span class="fc" id="L32">        user.getUsername(),</span>
+<span class="fc" id="L33">        user.getPassword(),</span>
+<span class="fc" id="L34">        List.of(new SimpleGrantedAuthority(user.getRole().getAuthority())));</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
