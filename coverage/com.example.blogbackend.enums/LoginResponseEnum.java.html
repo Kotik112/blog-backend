@@ -14,21 +14,22 @@ public enum LoginResponseEnum {
 <span class="fc" id="L14">  EMPTY_CREDENTIALS(&quot;Username and password must not be empty&quot;),</span>
 <span class="fc" id="L15">  USERNAME_LENGTH_ERROR(&quot;Username must be between 3 and 20 characters&quot;),</span>
 <span class="fc" id="L16">  PASSWORD_LENGTH_ERROR(&quot;Password must be at least 6 characters long&quot;),</span>
-<span class="fc" id="L17">  LOGIN_REQUEST_MISSING(&quot;Login request body is missing&quot;);</span>
+<span class="fc" id="L17">  LOGIN_REQUEST_MISSING(&quot;Login request body is missing&quot;),</span>
+<span class="fc" id="L18">  REQUEST_BODY_MISSING(&quot;Request body is missing&quot;);</span>
 
-<span class="fc" id="L19">  private final String message;</span>
+<span class="fc" id="L20">  private final String message;</span>
 
-<span class="fc" id="L21">  LoginResponseEnum(String message) {</span>
-<span class="fc" id="L22">    this.message = message;</span>
-<span class="fc" id="L23">  }</span>
+<span class="fc" id="L22">  LoginResponseEnum(String message) {</span>
+<span class="fc" id="L23">    this.message = message;</span>
+<span class="fc" id="L24">  }</span>
 
   public static LoginResponseEnum fromMessage(String message) {
-<span class="nc bnc" id="L26" title="All 2 branches missed.">    for (LoginResponseEnum response : LoginResponseEnum.values()) {</span>
-<span class="nc bnc" id="L27" title="All 2 branches missed.">      if (response.getMessage().equals(message)) {</span>
-<span class="nc" id="L28">        return response;</span>
+<span class="nc bnc" id="L27" title="All 2 branches missed.">    for (LoginResponseEnum response : LoginResponseEnum.values()) {</span>
+<span class="nc bnc" id="L28" title="All 2 branches missed.">      if (response.getMessage().equals(message)) {</span>
+<span class="nc" id="L29">        return response;</span>
       }
     }
-<span class="nc" id="L31">    return null; // or throw an exception if preferred</span>
+<span class="nc" id="L32">    return null; // or throw an exception if preferred</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

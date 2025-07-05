@@ -2,6 +2,7 @@
 
 import com.example.blogbackend.dto.CreateUserRequestDto;
 import com.example.blogbackend.dto.LoginRequestDto;
+import com.example.blogbackend.enums.LoginResponseEnum;
 import com.example.blogbackend.exception.LoginFailureException;
 import com.example.blogbackend.exception.RegistrationFailureException;
 
@@ -10,16 +11,16 @@ public class ValidationUtility {
   private ValidationUtility() {}
 
   public static void validateUsername(String username) {
-<span class="pc bpc" id="L13" title="1 of 6 branches missed.">    if (username == null || username.length() &lt; 3 || username.length() &gt; 20) {</span>
-<span class="fc" id="L14">      throw new RegistrationFailureException(&quot;Username must be between 3 and 20 characters&quot;);</span>
+<span class="pc bpc" id="L14" title="1 of 6 branches missed.">    if (username == null || username.length() &lt; 3 || username.length() &gt; 20) {</span>
+<span class="fc" id="L15">      throw new RegistrationFailureException(&quot;Username must be between 3 and 20 characters&quot;);</span>
     }
-<span class="fc" id="L16">  }</span>
+<span class="fc" id="L17">  }</span>
 
   public static void validatePassword(String password) {
-<span class="fc bfc" id="L19" title="All 4 branches covered.">    if (password == null || password.length() &lt; 6) {</span>
-<span class="fc" id="L20">      throw new RegistrationFailureException(&quot;Password must be at least 6 characters long&quot;);</span>
+<span class="fc bfc" id="L20" title="All 4 branches covered.">    if (password == null || password.length() &lt; 6) {</span>
+<span class="fc" id="L21">      throw new RegistrationFailureException(&quot;Password must be at least 6 characters long&quot;);</span>
     }
-<span class="fc" id="L22">  }</span>
+<span class="fc" id="L23">  }</span>
 
   /**
    * Validates the given CreateUserRequestDto. Ensures null-safe access and checks for username and
@@ -29,12 +30,12 @@ public class ValidationUtility {
    * @throws RegistrationFailureException if validation fails
    */
   public static void validateUserRequest(CreateUserRequestDto userRequest) {
-<span class="pc bpc" id="L32" title="1 of 2 branches missed.">    if (userRequest == null) {</span>
-<span class="nc" id="L33">      throw new RegistrationFailureException(&quot;Request body is missing&quot;);</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">    if (userRequest == null) {</span>
+<span class="fc" id="L34">      throw new RegistrationFailureException(LoginResponseEnum.REQUEST_BODY_MISSING.getMessage());</span>
     }
-<span class="fc" id="L35">    validateUsername(userRequest.username());</span>
-<span class="fc" id="L36">    validatePassword(userRequest.password());</span>
-<span class="fc" id="L37">  }</span>
+<span class="fc" id="L36">    validateUsername(userRequest.username());</span>
+<span class="fc" id="L37">    validatePassword(userRequest.password());</span>
+<span class="fc" id="L38">  }</span>
 
   /**
    * Validates the given LoginRequestDto. Ensures null-safe access.
@@ -43,14 +44,14 @@ public class ValidationUtility {
    * @throws LoginFailureException if validation fails
    */
   public static void validateLoginRequest(LoginRequestDto loginRequest) {
-<span class="pc bpc" id="L46" title="1 of 2 branches missed.">    if (loginRequest == null) {</span>
-<span class="nc" id="L47">      throw new LoginFailureException(&quot;Login request body is missing&quot;);</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">    if (loginRequest == null) {</span>
+<span class="fc" id="L48">      throw new LoginFailureException(LoginResponseEnum.REQUEST_BODY_MISSING.getMessage());</span>
     }
-<span class="fc" id="L49">    String username = loginRequest.getUsername();</span>
-<span class="fc" id="L50">    String password = loginRequest.getPassword();</span>
-<span class="pc bpc" id="L51" title="2 of 8 branches missed.">    if (username == null || username.isBlank() || password == null || password.isBlank()) {</span>
-<span class="fc" id="L52">      throw new LoginFailureException(&quot;Username and password must not be empty&quot;);</span>
+<span class="fc" id="L50">    String username = loginRequest.getUsername();</span>
+<span class="fc" id="L51">    String password = loginRequest.getPassword();</span>
+<span class="pc bpc" id="L52" title="2 of 8 branches missed.">    if (username == null || username.isBlank() || password == null || password.isBlank()) {</span>
+<span class="fc" id="L53">      throw new LoginFailureException(LoginResponseEnum.EMPTY_CREDENTIALS.getMessage());</span>
     }
-<span class="fc" id="L54">  }</span>
+<span class="fc" id="L55">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
