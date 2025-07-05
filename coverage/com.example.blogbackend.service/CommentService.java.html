@@ -69,14 +69,14 @@ public class CommentService {
 
   public List&lt;CommentDto&gt; getCommentsByBlogPostId(Long blogPostId) {
     // Check if the blog post exists
-<span class="nc" id="L72">    blogPostRepository</span>
-<span class="nc" id="L73">        .findById(blogPostId)</span>
-<span class="nc" id="L74">        .orElseThrow(</span>
+<span class="fc" id="L72">    blogPostRepository</span>
+<span class="fc" id="L73">        .findById(blogPostId)</span>
+<span class="fc" id="L74">        .orElseThrow(</span>
             () -&gt;
-<span class="nc" id="L76">                new BlogPostNotFoundException(&quot;Blog post with id: &quot; + blogPostId + &quot; not found.&quot;));</span>
+<span class="fc" id="L76">                new BlogPostNotFoundException(&quot;Blog post with id: &quot; + blogPostId + &quot; not found.&quot;));</span>
 
-<span class="nc" id="L78">    List&lt;Comment&gt; commentList = commentRepository.findByBlogPostId(blogPostId);</span>
-<span class="nc" id="L79">    return commentList.stream().map(Comment::toDTO).toList();</span>
+<span class="fc" id="L78">    List&lt;Comment&gt; commentList = commentRepository.findByBlogPostId(blogPostId);</span>
+<span class="fc" id="L79">    return commentList.stream().map(Comment::toDTO).toList();</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

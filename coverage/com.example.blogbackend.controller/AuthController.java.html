@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">blog-backend</a> &gt; <a href="index.source.html" class="el_package">com.example.blogbackend.controller</a> &gt; <span class="el_source">AuthController.java</span></div><h1>AuthController.java</h1><pre class="source lang-java linenums">package com.example.blogbackend.controller;
 
+import com.example.blogbackend.dto.ApiLoginResponse;
 import com.example.blogbackend.dto.CreateUserRequestDto;
 import com.example.blogbackend.dto.LoginRequestDto;
 import com.example.blogbackend.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -19,53 +21,56 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(&quot;/api/v1/auth&quot;)
 public class AuthController {
-<span class="fc" id="L22">  private final Logger logger = LoggerFactory.getLogger(AuthController.class);</span>
+<span class="fc" id="L24">  private final Logger logger = LoggerFactory.getLogger(AuthController.class);</span>
   private final UserService userService;
 
-<span class="fc" id="L25">  public AuthController(UserService userService) {</span>
-<span class="fc" id="L26">    this.userService = userService;</span>
-<span class="fc" id="L27">  }</span>
+<span class="fc" id="L27">  public AuthController(UserService userService) {</span>
+<span class="fc" id="L28">    this.userService = userService;</span>
+<span class="fc" id="L29">  }</span>
 
   /**
    * Registers a new user with the provided username and password. Validates the username length and
    * checks if the user already exists.
    *
-   * @param user the user registration request containing username and password
+   * @param userRequest the user registration request containing username and password
    * @return a ResponseEntity with the registration status
    */
   @PostMapping(&quot;/register&quot;)
-  public ResponseEntity&lt;String&gt; registerUser(@RequestBody CreateUserRequestDto user) {
-<span class="pc bpc" id="L38" title="1 of 4 branches missed.">    if (user.username().length() &lt; 3 || user.username().length() &gt; 20)</span>
-<span class="fc" id="L39">      return ResponseEntity.badRequest().body(&quot;Username must be between 3 and 20 characters&quot;);</span>
-<span class="pc bpc" id="L40" title="1 of 2 branches missed.">    if (userService.userExists(user.username()))</span>
-<span class="nc" id="L41">      return ResponseEntity.badRequest().body(&quot;User already exists&quot;);</span>
+  public ResponseEntity&lt;String&gt; registerUser(@RequestBody @Valid CreateUserRequestDto userRequest) {
+<span class="fc" id="L40">    String result = userService.registerUser(userRequest);</span>
 
-<span class="fc" id="L43">    String response = userService.registerUser(user);</span>
-<span class="fc bfc" id="L44" title="All 2 branches covered.">    if (response.equals(&quot;User registered successfully&quot;)) {</span>
-<span class="fc" id="L45">      return ResponseEntity.status(HttpStatus.CREATED).body(response);</span>
-    } else {
-<span class="fc" id="L47">      logger.warn(&quot;Registration failed: {}&quot;, response);</span>
-<span class="fc" id="L48">      return ResponseEntity.badRequest().body(response);</span>
-    }
+<span class="pc bpc" id="L42" title="3 of 4 branches missed.">    return switch (result) {</span>
+<span class="fc" id="L43">      case &quot;User registered successfully&quot; -&gt; ResponseEntity.status(HttpStatus.CREATED).body(result);</span>
+      case &quot;Username must be between 3 and 20 characters&quot;,
+          &quot;Password must be at least 6 characters long&quot; -&gt;
+<span class="nc" id="L46">          ResponseEntity.badRequest().body(result);</span>
+<span class="nc" id="L47">      case &quot;User already exists&quot; -&gt; ResponseEntity.status(HttpStatus.CONFLICT).body(result);</span>
+      default -&gt; {
+<span class="nc" id="L49">        logger.error(&quot;Unexpected registration error: {}&quot;, result);</span>
+<span class="nc" id="L50">        yield ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)</span>
+<span class="nc" id="L51">            .body(&quot;Registration failed unexpectedly&quot;);</span>
+      }
+    };
   }
 
   /**
    * Logs in a user with the provided username and password. Validates the input and checks if the
    * user exists.
    *
-   * @param request the login request containing username and password
-   * @param httpRequest the HTTP request for context
+   * @param loginRequest the login request containing username and password
+   * @param request the HTTP request for context
    * @return a ResponseEntity with the login status
    */
   @PostMapping(&quot;/login&quot;)
-  public ResponseEntity&lt;String&gt; loginUser(
-      @RequestBody LoginRequestDto request, HttpServletRequest httpRequest) {
-<span class="fc" id="L63">    String response = userService.loginUser(request, httpRequest);</span>
-<span class="fc bfc" id="L64" title="All 2 branches covered.">    if (response.equals(&quot;Login successful&quot;)) {</span>
-<span class="fc" id="L65">      return ResponseEntity.ok(response);</span>
-    } else {
-<span class="fc" id="L67">      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);</span>
-    }
+  public ResponseEntity&lt;ApiLoginResponse&gt; loginUser(
+      @RequestBody @Valid LoginRequestDto loginRequest, HttpServletRequest request) {
+<span class="fc" id="L67">    ApiLoginResponse result = userService.loginUser(loginRequest, request);</span>
+<span class="pc bpc" id="L68" title="1 of 3 branches missed.">    return switch (result.responseEnum()) {</span>
+<span class="fc" id="L69">      case SUCCESS -&gt; ResponseEntity.ok(result);</span>
+      case USER_NOT_FOUND, INVALID_CREDENTIALS -&gt;
+<span class="fc" id="L71">          ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);</span>
+<span class="nc" id="L72">      default -&gt; ResponseEntity.badRequest().body(result);</span>
+    };
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
