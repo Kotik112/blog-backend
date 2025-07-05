@@ -2,6 +2,7 @@ package com.example.blogbackend.ultility;
 
 import com.example.blogbackend.dto.CreateUserRequestDto;
 import com.example.blogbackend.dto.LoginRequestDto;
+import com.example.blogbackend.enums.LoginResponseEnum;
 import com.example.blogbackend.exception.LoginFailureException;
 import com.example.blogbackend.exception.RegistrationFailureException;
 
@@ -30,7 +31,7 @@ public class ValidationUtility {
    */
   public static void validateUserRequest(CreateUserRequestDto userRequest) {
     if (userRequest == null) {
-      throw new RegistrationFailureException("Request body is missing");
+      throw new RegistrationFailureException(LoginResponseEnum.REQUEST_BODY_MISSING.getMessage());
     }
     validateUsername(userRequest.username());
     validatePassword(userRequest.password());
@@ -44,12 +45,12 @@ public class ValidationUtility {
    */
   public static void validateLoginRequest(LoginRequestDto loginRequest) {
     if (loginRequest == null) {
-      throw new LoginFailureException("Login request body is missing");
+      throw new LoginFailureException(LoginResponseEnum.REQUEST_BODY_MISSING.getMessage());
     }
     String username = loginRequest.getUsername();
     String password = loginRequest.getPassword();
     if (username == null || username.isBlank() || password == null || password.isBlank()) {
-      throw new LoginFailureException("Username and password must not be empty");
+      throw new LoginFailureException(LoginResponseEnum.EMPTY_CREDENTIALS.getMessage());
     }
   }
 }

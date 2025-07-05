@@ -9,24 +9,25 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
     steps:
-      # Checkout code
-      - name: Checkout
+      # 📥 Checkout code
+      - name: 📥 Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Setup Java
-      - uses: actions/setup-java@v4
+      # ☕ Setup Java
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 17
 
-      # Mvnw permission
-      - name: Change wrapper permissions
+      # 🔐 Set wrapper permissions
+      - name: 🔐 Change wrapper permissions
         run: chmod +x ./mvnw
 
-      # Cache Maven packages
-      - name: Cache Maven packages
+      # 📦 Cache Maven dependencies
+      - name: 📦 Cache Maven packages
         uses: actions/cache@v4
         with:
           path: ~/.m2
@@ -34,31 +35,37 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-m2-
 
-      - name: Run tests and check coverage with JaCoCo
+      # 🧪 Run tests & generate coverage
+      - name: 🧪 Run tests and check coverage with JaCoCo
         run: ./mvnw clean verify -Pci
 
-      - name: Upload JaCoCo coverage report
+      # 📤 Upload coverage report
+      - name: 📤 Upload JaCoCo coverage report
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
           path: target/site/jacoco/
 
-      - name: Copy coverage report to gh-pages
+      # 🗂️ Copy coverage report to gh-pages dir
+      - name: 🗂️ Copy coverage report to gh-pages
         run: |
           mkdir -p gh-pages
           cp -r target/site/jacoco/* gh-pages/
 
-      - name: List files to verify copy
+      # 📄 Verify copied files
+      - name: 📄 List files to verify copy
         run: ls -la gh-pages
 
-      - name: Deploy coverage report to GitHub Pages
+      # 🚀 Deploy coverage report to GitHub Pages
+      - name: 🚀 Deploy coverage report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./gh-pages
           destination_dir: coverage
 
-      - name: Echo coverage report URL
+      # 🔗 Print report URL
+      - name: 🔗 Echo coverage report URL
         run: |
           echo "📊 JaCoCo Coverage Report:"
           echo "🔗 https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/coverage/"

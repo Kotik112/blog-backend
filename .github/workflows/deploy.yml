@@ -6,39 +6,43 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
     steps:
-      # Checkout code
-      - name: Checkout
+      # 📥 Checkout code
+      - name: 📥 Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Setup Java
-      - uses: actions/setup-java@v4
+      # ☕ Setup Java
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 17
 
-      # Mvnw permission
-      - name: Change wrapper permissions
+      # 🔐 Set wrapper permissions
+      - name: 🔐 Change wrapper permissions
         run: chmod +x ./mvnw
 
-      # Cache Maven packages
-      - name: Cache Maven packages
+      # 📦 Cache Maven dependencies
+      - name: 📦 Cache Maven packages
         uses: actions/cache@v4
         with:
-           path: ~/.m2
-           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-           restore-keys: |
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
             ${{ runner.os }}-m2-
 
-      - name: Test with Maven
+      # 🧪 (Optional) Run tests
+      - name: 🧪 Test with Maven (skipped)
         if: false
         run: ./mvnw clean test -DskipTests=false -Pci
 
-      - name: Build JAR (for deployment)
+      # 🏗️ Build JAR for deployment
+      - name: 🏗️ Build JAR (for deployment)
         run: ./mvnw clean package -DskipTests -Pci
 
-      - name: Create zip for Elastic Beanstalk
+      # 📦 Create deployment zip for Elastic Beanstalk
+      - name: 📦 Create zip for Elastic Beanstalk
         run: |
           mkdir -p staging/.ebextensions
           cp target/*.jar staging/application.jar
@@ -64,7 +68,8 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PW: ${{ secrets.DB_PW }}
 
-      - name: Deploy to EB
+      # 🚀 Deploy to AWS Elastic Beanstalk
+      - name: 🚀 Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v22
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}

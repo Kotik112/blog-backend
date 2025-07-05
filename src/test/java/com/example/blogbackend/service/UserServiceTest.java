@@ -128,6 +128,16 @@ class UserServiceTest {
   }
 
   @Test
+  void test_registerUser_createUserRequestDtoNull_throwsException() {
+    CreateUserRequestDto userRequest = null;
+    RegistrationFailureException ex =
+        Assertions.assertThrows(
+            RegistrationFailureException.class, () -> userService.registerUser(userRequest));
+    Assertions.assertEquals("Request body is missing", ex.getMessage());
+  }
+
+  // Login tests
+  @Test
   void test_loginUser_success() {
     String username = "testuser";
 
@@ -185,5 +195,15 @@ class UserServiceTest {
     Assertions.assertEquals(LoginResponseEnum.EMPTY_CREDENTIALS.getMessage(), ex.getMessage());
     verify(userRepository, never()).existsByUsername(any());
     verify(authenticationManager, never()).authenticate(any());
+  }
+
+  @Test
+  void test_loginUser_loginRequestDtoNull() {
+    LoginRequestDto loginRequest = null;
+    HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+    LoginFailureException ex =
+        Assertions.assertThrows(
+            LoginFailureException.class, () -> userService.loginUser(loginRequest, httpRequest));
+    Assertions.assertEquals(LoginResponseEnum.REQUEST_BODY_MISSING.getMessage(), ex.getMessage());
   }
 }
