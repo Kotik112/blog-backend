@@ -51,7 +51,7 @@ public class UserService {
       logger.warn("Registration attempt with invalid username length: {}", userRequest.username());
       return "Username must be between 3 and 20 characters";
     }
-    if (userRequest.password().length() < 6) {
+    if (userRequest.password() == null || userRequest.password().length() < 6) {
       logger.warn("Registration attempt with invalid password length");
       return "Password must be at least 6 characters long";
     }
