@@ -7,6 +7,7 @@ import com.example.blogbackend.dto.ApiLoginResponse;
 import com.example.blogbackend.dto.CreateUserRequestDto;
 import com.example.blogbackend.dto.LoginRequestDto;
 import com.example.blogbackend.enums.LoginResponseEnum;
+import com.example.blogbackend.exception.ApiError;
 import com.example.blogbackend.utils.SpringBootComponentTest;
 import lombok.val;
 import org.junit.jupiter.api.Assertions;
@@ -51,10 +52,10 @@ class AuthControllerIntegrationTest extends SpringBootComponentTest {
             .andExpect(status().isBadRequest())
             .andReturn();
 
-    String response = result.getResponse().getContentAsString();
+    ApiError response = getFromResult(result, ApiError.class);
     Assertions.assertEquals(
         "Username must be between 3 and 20 characters",
-        response,
+        response.getMessage(),
         "Expected username length error, got: " + response);
   }
 
@@ -83,12 +84,14 @@ class AuthControllerIntegrationTest extends SpringBootComponentTest {
                 post(BASE_AUTH_URL + "/register")
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(user)))
-            .andExpect(status().isBadRequest())
+            .andExpect(status().isConflict())
             .andReturn();
 
-    String response = failedResult.getResponse().getContentAsString();
+    ApiError response = getFromResult(failedResult, ApiError.class);
     Assertions.assertEquals(
-        "User already exists", response, "Expected user already exists error, got: " + response);
+        "User already exists",
+        response.getMessage(),
+        "Expected user already exists error, got: " + response);
   }
 
   // Login tests

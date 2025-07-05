@@ -6,7 +6,9 @@ import com.example.blogbackend.dto.ApiLoginResponse;
 import com.example.blogbackend.dto.CreateUserRequestDto;
 import com.example.blogbackend.dto.LoginRequestDto;
 import com.example.blogbackend.enums.LoginResponseEnum;
+import com.example.blogbackend.exception.UserAlreadyExistsException;
 import com.example.blogbackend.repository.UserRepository;
+import com.example.blogbackend.ultility.ValidationUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,21 +45,16 @@ public class UserService {
   }
 
   public String registerUser(CreateUserRequestDto userRequest) {
-    if (userRepository.existsByUsername(userRequest.username().toLowerCase())) {
+    ValidationUtility.validateUserRequest(userRequest);
+
+    String normalizedUsername = userRequest.username().toLowerCase();
+    if (userRepository.existsByUsername(normalizedUsername)) {
       logger.warn("Registration attempt with existing username: {}", userRequest.username());
-      return "User already exists";
-    }
-    if (userRequest.username().length() < 3 || userRequest.username().length() > 20) {
-      logger.warn("Registration attempt with invalid username length: {}", userRequest.username());
-      return "Username must be between 3 and 20 characters";
-    }
-    if (userRequest.password() == null || userRequest.password().length() < 6) {
-      logger.warn("Registration attempt with invalid password length");
-      return "Password must be at least 6 characters long";
+      throw new UserAlreadyExistsException("User already exists");
     }
 
     User user = new User();
-    user.setUsername(userRequest.username().toLowerCase());
+    user.setUsername(normalizedUsername);
     user.setPassword(passwordEncoder.encode(userRequest.password()));
     user.setRole(Role.USER);
     User savedUser = userRepository.save(user);
@@ -67,10 +64,8 @@ public class UserService {
 
   public ApiLoginResponse loginUser(
       LoginRequestDto loginRequestDto, HttpServletRequest httpRequest) {
-    if (loginRequestDto.getUsername() == null || loginRequestDto.getPassword() == null) {
-      logger.warn("Login attempt with missing username or password");
-      return new ApiLoginResponse(LoginResponseEnum.EMPTY_CREDENTIALS);
-    }
+    ValidationUtility.validateLoginRequest(loginRequestDto);
+
     String normalizedUsername = loginRequestDto.getUsername().toLowerCase();
     if (!userExists(normalizedUsername)) {
       logger.warn("Login attempt with non-existing user: {}", normalizedUsername);

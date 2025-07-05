@@ -8,6 +8,8 @@ import com.example.blogbackend.dto.ApiLoginResponse;
 import com.example.blogbackend.dto.CreateUserRequestDto;
 import com.example.blogbackend.dto.LoginRequestDto;
 import com.example.blogbackend.enums.LoginResponseEnum;
+import com.example.blogbackend.exception.LoginFailureException;
+import com.example.blogbackend.exception.RegistrationFailureException;
 import com.example.blogbackend.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -91,30 +93,38 @@ class UserServiceTest {
   @Test
   void test_registerUser_usernameTooShort() {
     CreateUserRequestDto userRequest = new CreateUserRequestDto("nu", "password123");
-    String result = userService.registerUser(userRequest);
-    Assertions.assertEquals("Username must be between 3 and 20 characters", result);
+    RegistrationFailureException ex =
+        Assertions.assertThrows(
+            RegistrationFailureException.class, () -> userService.registerUser(userRequest));
+    Assertions.assertEquals("Username must be between 3 and 20 characters", ex.getMessage());
   }
 
   @Test
   void test_registerUser_usernameTooLong() {
     CreateUserRequestDto userRequest =
         new CreateUserRequestDto("thisusernameistoolong", "password123");
-    String result = userService.registerUser(userRequest);
-    Assertions.assertEquals("Username must be between 3 and 20 characters", result);
+    RegistrationFailureException ex =
+        Assertions.assertThrows(
+            RegistrationFailureException.class, () -> userService.registerUser(userRequest));
+    Assertions.assertEquals("Username must be between 3 and 20 characters", ex.getMessage());
   }
 
   @Test
   void test_registerUser_passwordTooShort() {
     CreateUserRequestDto userRequest = new CreateUserRequestDto("newuser", "123");
-    String result = userService.registerUser(userRequest);
-    Assertions.assertEquals("Password must be at least 6 characters long", result);
+    RegistrationFailureException ex =
+        Assertions.assertThrows(
+            RegistrationFailureException.class, () -> userService.registerUser(userRequest));
+    Assertions.assertEquals("Password must be at least 6 characters long", ex.getMessage());
   }
 
   @Test
-  void test_registerUser_passwordNull() {
+  void test_registerUser_passwordNull_throwsException() {
     CreateUserRequestDto userRequest = new CreateUserRequestDto("newuser", null);
-    String result = userService.registerUser(userRequest);
-    Assertions.assertEquals("Password must be at least 6 characters long", result);
+    RegistrationFailureException ex =
+        Assertions.assertThrows(
+            RegistrationFailureException.class, () -> userService.registerUser(userRequest));
+    Assertions.assertEquals("Password must be at least 6 characters long", ex.getMessage());
   }
 
   @Test
@@ -156,8 +166,10 @@ class UserServiceTest {
     LoginRequestDto loginRequest = new LoginRequestDto(null, "testPassword");
     HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 
-    ApiLoginResponse result = userService.loginUser(loginRequest, httpRequest);
-    Assertions.assertEquals(LoginResponseEnum.EMPTY_CREDENTIALS.getMessage(), result.message());
+    LoginFailureException ex =
+        Assertions.assertThrows(
+            LoginFailureException.class, () -> userService.loginUser(loginRequest, httpRequest));
+    Assertions.assertEquals(LoginResponseEnum.EMPTY_CREDENTIALS.getMessage(), ex.getMessage());
 
     verify(userRepository, never()).existsByUsername(any());
     verify(authenticationManager, never()).authenticate(any());
@@ -167,8 +179,10 @@ class UserServiceTest {
   void test_loginUser_passwordNull() {
     LoginRequestDto loginRequest = new LoginRequestDto("test123", null);
     HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-    ApiLoginResponse result = userService.loginUser(loginRequest, httpRequest);
-    Assertions.assertEquals(LoginResponseEnum.EMPTY_CREDENTIALS.getMessage(), result.message());
+    LoginFailureException ex =
+        Assertions.assertThrows(
+            LoginFailureException.class, () -> userService.loginUser(loginRequest, httpRequest));
+    Assertions.assertEquals(LoginResponseEnum.EMPTY_CREDENTIALS.getMessage(), ex.getMessage());
     verify(userRepository, never()).existsByUsername(any());
     verify(authenticationManager, never()).authenticate(any());
   }

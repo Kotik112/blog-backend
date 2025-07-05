@@ -32,23 +32,25 @@ public class AuthController {
    * Registers a new user with the provided username and password. Validates the username length and
    * checks if the user already exists.
    *
-   * @param user the user registration request containing username and password
+   * @param userRequest the user registration request containing username and password
    * @return a ResponseEntity with the registration status
    */
   @PostMapping("/register")
-  public ResponseEntity<String> registerUser(@RequestBody @Valid CreateUserRequestDto user) {
-    if (user.username().length() < 3 || user.username().length() > 20)
-      return ResponseEntity.badRequest().body("Username must be between 3 and 20 characters");
-    if (userService.userExists(user.username()))
-      return ResponseEntity.badRequest().body("User already exists");
+  public ResponseEntity<String> registerUser(@RequestBody @Valid CreateUserRequestDto userRequest) {
+    String result = userService.registerUser(userRequest);
 
-    String response = userService.registerUser(user);
-    if (response.equals("User registered successfully")) {
-      return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    } else {
-      logger.warn("Registration failed: {}", response);
-      return ResponseEntity.badRequest().body(response);
-    }
+    return switch (result) {
+      case "User registered successfully" -> ResponseEntity.status(HttpStatus.CREATED).body(result);
+      case "Username must be between 3 and 20 characters",
+          "Password must be at least 6 characters long" ->
+          ResponseEntity.badRequest().body(result);
+      case "User already exists" -> ResponseEntity.status(HttpStatus.CONFLICT).body(result);
+      default -> {
+        logger.error("Unexpected registration error: {}", result);
+        yield ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("Registration failed unexpectedly");
+      }
+    };
   }
 
   /**
