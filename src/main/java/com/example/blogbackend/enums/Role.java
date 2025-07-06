@@ -1,5 +1,8 @@
-package com.example.blogbackend.domain;
+package com.example.blogbackend.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum Role {
   USER,
   ADMIN;

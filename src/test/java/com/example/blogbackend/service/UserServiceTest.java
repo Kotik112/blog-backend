@@ -2,12 +2,12 @@ package com.example.blogbackend.service;
 
 import static org.mockito.Mockito.*;
 
-import com.example.blogbackend.domain.Role;
 import com.example.blogbackend.domain.User;
 import com.example.blogbackend.dto.ApiLoginResponse;
 import com.example.blogbackend.dto.CreateUserRequestDto;
 import com.example.blogbackend.dto.LoginRequestDto;
 import com.example.blogbackend.enums.LoginResponseEnum;
+import com.example.blogbackend.enums.Role;
 import com.example.blogbackend.exception.LoginFailureException;
 import com.example.blogbackend.exception.RegistrationFailureException;
 import com.example.blogbackend.repository.UserRepository;

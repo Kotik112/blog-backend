@@ -20,6 +20,7 @@ public record BlogPostDto(
         String content,
     @Schema(description = "Creation timestamp", example = "2025-06-26T03:15:19.293Z")
         Instant createdAt,
+    @Schema(description = "Username of creator", example = "john_doe") String createdBy,
     @Schema(description = "Last edited timestamp", example = "2025-06-26T03:20:00.000Z")
         Instant lastEditedAt,
     @Schema(description = "Indicates whether the post has been edited", example = "true")
@@ -40,12 +41,16 @@ public record BlogPostDto(
             : Collections.emptySet();
 
     ImageDto imageDto = post.getImage() != null ? ImageDto.toDto(post.getImage()) : null;
+    // TODO: Remove later, as of now some entries in the database do not have createdBy set
+    String createdBy =
+        (post.getCreatedBy() != null) ? post.getCreatedBy().getUsername() : "Unknown";
 
     return new BlogPostDto(
         post.getId(),
         post.getTitle(),
         post.getContent(),
         post.getCreatedAt(),
+        createdBy,
         post.getLastEditedAt(),
         post.getIsEdited(),
         likeDtos,

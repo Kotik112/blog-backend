@@ -1,23 +1,30 @@
 package com.example.blogbackend.service;
 
-import com.example.blogbackend.domain.Role;
 import com.example.blogbackend.domain.User;
 import com.example.blogbackend.dto.ApiLoginResponse;
 import com.example.blogbackend.dto.CreateUserRequestDto;
 import com.example.blogbackend.dto.LoginRequestDto;
 import com.example.blogbackend.enums.LoginResponseEnum;
+import com.example.blogbackend.enums.Role;
 import com.example.blogbackend.exception.UserAlreadyExistsException;
 import com.example.blogbackend.repository.UserRepository;
 import com.example.blogbackend.ultility.ValidationUtility;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -69,7 +76,7 @@ public class UserService {
     String normalizedUsername = loginRequestDto.getUsername().toLowerCase();
     if (!userExists(normalizedUsername)) {
       logger.warn("Login attempt with non-existing user: {}", normalizedUsername);
-      return new ApiLoginResponse(LoginResponseEnum.USER_NOT_FOUND);
+      return new ApiLoginResponse(null, null, null, null, LoginResponseEnum.USER_NOT_FOUND);
     }
     try {
       Authentication authentication =
@@ -77,13 +84,41 @@ public class UserService {
               new UsernamePasswordAuthenticationToken(
                   normalizedUsername, loginRequestDto.getPassword()));
 
-      SecurityContextHolder.getContext().setAuthentication(authentication);
-      httpRequest.getSession(true); // ensures session is created
+      SecurityContext context = SecurityContextHolder.getContext();
+      context.setAuthentication(authentication);
 
-      return new ApiLoginResponse(LoginResponseEnum.SUCCESS);
+      HttpSession session = httpRequest.getSession(true); // create or reuse session
+      session.setAttribute(
+          HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+
+      String sessionId = session.getId();
+      String ipAddress = httpRequest.getRemoteAddr();
+      List<String> roles =
+          authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
+      return new ApiLoginResponse(
+          normalizedUsername, roles, sessionId, ipAddress, LoginResponseEnum.SUCCESS);
     } catch (AuthenticationException e) {
       logger.warn("Authentication failed for user: {} -> {}", normalizedUsername, e.getMessage());
-      return new ApiLoginResponse(LoginResponseEnum.INVALID_CREDENTIALS);
+      return new ApiLoginResponse(null, null, null, null, LoginResponseEnum.INVALID_CREDENTIALS);
     }
+  }
+
+  public void logoutUser(HttpServletRequest request, HttpServletResponse response) {
+    // Clear the security context
+    SecurityContextHolder.clearContext();
+
+    // Invalidate the session if it exists
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      logger.info("Invalidating session: {}", session.getId());
+      session.invalidate();
+    }
+
+    // Expire the JSESSIONID cookie
+    Cookie cookie = new Cookie("JSESSIONID", null);
+    cookie.setPath("/");
+    cookie.setHttpOnly(true);
+    cookie.setMaxAge(0);
+    response.addCookie(cookie);
   }
 }

@@ -1,7 +1,7 @@
 package com.example.blogbackend;
 
-import com.example.blogbackend.domain.Role;
 import com.example.blogbackend.domain.User;
+import com.example.blogbackend.enums.Role;
 import com.example.blogbackend.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;

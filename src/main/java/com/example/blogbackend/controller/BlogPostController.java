@@ -144,4 +144,21 @@ public class BlogPostController {
   public BlogPostDto getBlogPostById(@PathVariable("id") Long id) {
     return blogPostService.getBlogPostById(id);
   }
+
+  @GetMapping("/logged-in-user")
+  public Page<BlogPostDto> getBlogPostsByUsername(
+      Principal principal,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "5") int size) {
+    logger.info("Retrieving blog posts for user: {}", principal.getName());
+    Page<BlogPostDto> blogPosts =
+        blogPostService.getBlogPostsByUser(principal.getName(), page, size);
+    logger.info(
+        "Retrieved {} blog posts for user: {} on page {} with size {}",
+        blogPosts.getTotalElements(),
+        principal.getName(),
+        page,
+        size);
+    return blogPosts;
+  }
 }

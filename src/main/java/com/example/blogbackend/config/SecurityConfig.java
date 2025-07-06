@@ -2,11 +2,13 @@ package com.example.blogbackend.config;
 
 import static org.springframework.http.HttpMethod.POST;
 
+import com.example.blogbackend.enums.Role;
 import com.example.blogbackend.service.DatabaseUserService;
+import jakarta.servlet.MultipartConfigElement;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -33,8 +36,7 @@ public class SecurityConfig {
    */
   @Bean
   public AuthenticationManager authenticationManager(
-      @Qualifier("passwordEncoder") PasswordEncoder passwordEncoder,
-      @Qualifier("userDetailsService") UserDetailsService userDetailsService) {
+      PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
     authProvider.setUserDetailsService(userDetailsService);
     authProvider.setPasswordEncoder(passwordEncoder);
@@ -52,9 +54,11 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(POST, "/api/v1/blog/**")
-                    .hasRole("USER")
+                    .hasAnyRole(Role.USER.name(), Role.ADMIN.name())
+                    .requestMatchers("/api/v1/blog/logged-in-user")
+                    .hasAnyRole(Role.USER.name(), Role.ADMIN.name())
                     .requestMatchers("/api/v1/admin/**")
-                    .hasRole("ADMIN")
+                    .hasRole(Role.ADMIN.name())
                     .requestMatchers("/api/v1/auth/**")
                     .permitAll()
                     .anyRequest()
@@ -78,13 +82,29 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowCredentials(true);
-    config.setAllowedOriginPatterns(List.of("http://localhost:5173", "http://127.0.0.1:5173"));
+    config.setAllowedOrigins(List.of("http://localhost:5173", "http://127.0.0.1:5173"));
     config.setAllowedHeaders(List.of("*"));
-    config.setAllowedMethods(List.of("*"));
+    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", config);
     return source;
+  }
+
+  /**
+   * Multipart configuration for file uploads. Sets maximum file size and request size limits.
+   *
+   * @see <a
+   *     href="https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-config-multipart">Spring
+   *     Multipart Configuration</a>
+   * @return MultipartConfigElement
+   */
+  @Bean
+  public MultipartConfigElement multipartConfigElement() {
+    MultipartConfigFactory factory = new MultipartConfigFactory();
+    factory.setMaxFileSize(DataSize.ofMegabytes(10));
+    factory.setMaxRequestSize(DataSize.ofMegabytes(10));
+    return factory.createMultipartConfig();
   }
 
   /**

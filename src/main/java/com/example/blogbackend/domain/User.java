@@ -1,5 +1,6 @@
 package com.example.blogbackend.domain;
 
+import com.example.blogbackend.enums.Role;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -111,5 +112,26 @@ public class BlogPostService {
                 () -> new BlogPostNotFoundException("Blog post with id: " + id + " not found."));
     logger.info("Retrieved blog post with ID: {}", id);
     return BlogPostDto.toDto(blogPost);
+  }
+
+  public Page<BlogPostDto> getBlogPostsByUser(String username, int page, int size) {
+    PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+    User user =
+        userRepository
+            .findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    Page<BlogPost> blogPostPage =
+        blogPostRepository.findAllByCreatedBy_Username(user.getUsername(), pageRequest);
+    logger.info(
+        "Retrieved {} blog posts for user {} on page {} with size {}",
+        blogPostPage.getTotalElements(),
+        username,
+        page,
+        size);
+
+    List<BlogPostDto> blogPostDtoList =
+        blogPostPage.getContent().stream().map(BlogPostDto::toDto).toList();
+
+    return new PageImpl<>(blogPostDtoList, pageRequest, blogPostPage.getTotalElements());
   }
 }

@@ -3,18 +3,22 @@ package com.example.blogbackend.controller;
 import com.example.blogbackend.dto.ApiLoginResponse;
 import com.example.blogbackend.dto.CreateUserRequestDto;
 import com.example.blogbackend.dto.LoginRequestDto;
+import com.example.blogbackend.dto.WhoAmIResponseDto;
 import com.example.blogbackend.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Authentication", description = "Endpoints for user authentication and authorization")
 @SuppressWarnings("unused")
@@ -71,5 +75,28 @@ public class AuthController {
           ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);
       default -> ResponseEntity.badRequest().body(result);
     };
+  }
+
+  @PostMapping("/logout")
+  public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+    userService.logoutUser(request, response);
+    return ResponseEntity.noContent().build(); // 204 No Content
+  }
+
+  @GetMapping("/whoami")
+  public ResponseEntity<WhoAmIResponseDto> whoAmI(
+      @AuthenticationPrincipal UserDetails user,
+      HttpServletRequest request,
+      Authentication authentication) {
+    if (user == null) {
+      throw new RuntimeException("User is not authenticated");
+    }
+    String username = user.getUsername();
+    String ipAddress = request.getRemoteAddr();
+    List<String> roles =
+        authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
+    String sessionId = request.getSession(false) != null ? request.getSession(false).getId() : null;
+    WhoAmIResponseDto responseDto = new WhoAmIResponseDto(username, ipAddress, roles, sessionId);
+    return ResponseEntity.ok(responseDto);
   }
 }
