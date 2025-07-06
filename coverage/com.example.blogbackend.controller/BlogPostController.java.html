@@ -144,5 +144,22 @@ public class BlogPostController {
   public BlogPostDto getBlogPostById(@PathVariable(&quot;id&quot;) Long id) {
 <span class="fc" id="L145">    return blogPostService.getBlogPostById(id);</span>
   }
+
+  @GetMapping(&quot;/logged-in-user&quot;)
+  public Page&lt;BlogPostDto&gt; getBlogPostsByUsername(
+      Principal principal,
+      @RequestParam(defaultValue = &quot;0&quot;) int page,
+      @RequestParam(defaultValue = &quot;5&quot;) int size) {
+<span class="nc" id="L153">    logger.info(&quot;Retrieving blog posts for user: {}&quot;, principal.getName());</span>
+<span class="nc" id="L154">    Page&lt;BlogPostDto&gt; blogPosts =</span>
+<span class="nc" id="L155">        blogPostService.getBlogPostsByUser(principal.getName(), page, size);</span>
+<span class="nc" id="L156">    logger.info(</span>
+        &quot;Retrieved {} blog posts for user: {} on page {} with size {}&quot;,
+<span class="nc" id="L158">        blogPosts.getTotalElements(),</span>
+<span class="nc" id="L159">        principal.getName(),</span>
+<span class="nc" id="L160">        page,</span>
+<span class="nc" id="L161">        size);</span>
+<span class="nc" id="L162">    return blogPosts;</span>
+  }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
