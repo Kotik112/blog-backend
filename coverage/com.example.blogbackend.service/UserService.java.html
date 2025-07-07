@@ -105,21 +105,21 @@ public class UserService {
 
   public void logoutUser(HttpServletRequest request, HttpServletResponse response) {
     // Clear the security context
-<span class="nc" id="L108">    SecurityContextHolder.clearContext();</span>
+<span class="fc" id="L108">    SecurityContextHolder.clearContext();</span>
 
     // Invalidate the session if it exists
-<span class="nc" id="L111">    HttpSession session = request.getSession(false);</span>
-<span class="nc bnc" id="L112" title="All 2 branches missed.">    if (session != null) {</span>
-<span class="nc" id="L113">      logger.info(&quot;Invalidating session: {}&quot;, session.getId());</span>
-<span class="nc" id="L114">      session.invalidate();</span>
+<span class="fc" id="L111">    HttpSession session = request.getSession(false);</span>
+<span class="pc bpc" id="L112" title="1 of 2 branches missed.">    if (session != null) {</span>
+<span class="fc" id="L113">      logger.info(&quot;Invalidating session: {}&quot;, session.getId());</span>
+<span class="fc" id="L114">      session.invalidate();</span>
     }
 
     // Expire the JSESSIONID cookie
-<span class="nc" id="L118">    Cookie cookie = new Cookie(&quot;JSESSIONID&quot;, null);</span>
-<span class="nc" id="L119">    cookie.setPath(&quot;/&quot;);</span>
-<span class="nc" id="L120">    cookie.setHttpOnly(true);</span>
-<span class="nc" id="L121">    cookie.setMaxAge(0);</span>
-<span class="nc" id="L122">    response.addCookie(cookie);</span>
-<span class="nc" id="L123">  }</span>
+<span class="fc" id="L118">    Cookie cookie = new Cookie(&quot;JSESSIONID&quot;, null);</span>
+<span class="fc" id="L119">    cookie.setPath(&quot;/&quot;);</span>
+<span class="fc" id="L120">    cookie.setHttpOnly(true);</span>
+<span class="fc" id="L121">    cookie.setMaxAge(0);</span>
+<span class="fc" id="L122">    response.addCookie(cookie);</span>
+<span class="fc" id="L123">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

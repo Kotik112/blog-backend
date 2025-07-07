@@ -4,8 +4,8 @@ blog-backend,com.example.blogbackend.ultility,ValidationUtility,0,74,3,19,0,18,3
 blog-backend,com.example.blogbackend.service,BlogPostService,25,227,1,3,3,50,3,7,2,6
 blog-backend,com.example.blogbackend.service,CommentService,0,124,0,0,0,34,0,7,0,7
 blog-backend,com.example.blogbackend.service,DatabaseUserService,6,39,0,0,1,12,1,2,1,2
-blog-backend,com.example.blogbackend.service,UserService,34,171,2,8,11,42,2,8,1,4
-blog-backend,com.example.blogbackend.service,MailService,45,207,1,9,9,47,2,7,1,3
+blog-backend,com.example.blogbackend.service,UserService,0,205,1,9,0,53,1,9,0,5
+blog-backend,com.example.blogbackend.service,MailService,25,237,1,9,4,54,1,8,0,4
 blog-backend,com.example.blogbackend.service,ImageService,5,236,2,8,1,58,2,12,0,9
 blog-backend,com.example.blogbackend.exception,ImageUploadException,0,4,0,0,0,2,0,1,0,1
 blog-backend,com.example.blogbackend.exception,GlobalExceptionHandler,30,100,0,0,5,28,5,8,5,8
