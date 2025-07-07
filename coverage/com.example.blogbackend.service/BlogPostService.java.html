@@ -57,9 +57,9 @@ public class BlogPostService {
       try {
 <span class="fc" id="L58">        Image preparedImage = imageService.prepareImageForUpload(image);</span>
 <span class="fc" id="L59">        blogPost.setImage(preparedImage);</span>
-<span class="nc" id="L60">      } catch (IOException e) {</span>
-<span class="nc" id="L61">        logger.debug(&quot;Error occurred while preparing the image for upload: {}&quot;, e.getMessage());</span>
-<span class="nc" id="L62">        throw new ImageUploadException(&quot;Error occurred while preparing the image for upload&quot;);</span>
+<span class="fc" id="L60">      } catch (IOException e) {</span>
+<span class="fc" id="L61">        logger.debug(&quot;Error occurred while preparing the image for upload: {}&quot;, e.getMessage());</span>
+<span class="fc" id="L62">        throw new ImageUploadException(&quot;Error occurred while preparing the image for upload&quot;);</span>
 <span class="fc" id="L63">      }</span>
     } else {
 <span class="fc" id="L65">      logger.debug(&quot;No image provided for blog post with title: {}&quot;, blogPost.getTitle());</span>
