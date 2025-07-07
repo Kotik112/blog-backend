@@ -11,9 +11,11 @@ import com.example.blogbackend.dto.BlogPostDto;
 import com.example.blogbackend.dto.CreateBlogPostDto;
 import com.example.blogbackend.enums.Role;
 import com.example.blogbackend.exception.BlogPostNotFoundException;
+import com.example.blogbackend.exception.ImageUploadException;
 import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
 import com.example.blogbackend.repository.UserRepository;
+import java.io.IOException;
 import java.security.Principal;
 import java.time.Instant;
 import java.util.Collections;
@@ -29,6 +31,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class BlogPostServiceTest {
@@ -37,6 +40,7 @@ class BlogPostServiceTest {
   @Mock BlogPostRepository blogPostRepository;
   @Mock UserRepository userRepository;
   @Mock TimeProvider timeProvider;
+  @Mock ImageService imageService;
 
   //    @Mock
   //    TimeProvider timeProvider;
@@ -176,5 +180,32 @@ class BlogPostServiceTest {
 
     verify(userRepository).findByUsername(username);
     verify(blogPostRepository).findAllByCreatedBy_Username(eq(username), any(PageRequest.class));
+  }
+
+  @Test
+  void test_createBlogPost_withInvalidImage_throwsImageUploadException() throws IOException {
+    // Arrange
+    CreateBlogPostDto createBlogPostDTO = new CreateBlogPostDto("Test title", "Test content");
+    Principal mockPrincipal = mock(Principal.class);
+    MultipartFile mockFile = mock(MultipartFile.class);
+
+    when(mockFile.isEmpty()).thenReturn(false);
+    when(imageService.prepareImageForUpload(mockFile))
+        .thenThrow(new IOException("Simulated failure"));
+
+    // Act & Assert
+    ImageUploadException exception =
+        assertThrows(
+            ImageUploadException.class,
+            () -> blogPostService.createBlogPost(createBlogPostDTO, mockFile, mockPrincipal));
+
+    assertEquals("Error occurred while preparing the image for upload", exception.getMessage());
+
+    verify(mockPrincipal, never()).getName();
+    verify(mockFile, times(1)).isEmpty();
+    verify(imageService, times(1)).prepareImageForUpload(mockFile);
+
+    // Ensure DB and time are not hit due to early failure
+    verifyNoInteractions(blogPostRepository, userRepository, timeProvider);
   }
 }
