@@ -2,8 +2,13 @@
 
 import com.example.blogbackend.domain.Contact;
 import com.example.blogbackend.dto.ContactRequestDto;
+import com.example.blogbackend.enums.ContactStatus;
 import com.example.blogbackend.exception.EmailSendException;
+import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.ContactRepository;
+import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,45 +19,107 @@ import org.springframework.stereotype.Service;
 @Service
 public class MailService {
 
-<span class="fc" id="L17">  private final Logger logger = LoggerFactory.getLogger(MailService.class);</span>
+<span class="fc" id="L22">  private final Logger logger = LoggerFactory.getLogger(MailService.class);</span>
 
   private final JavaMailSender mailSender;
   private final ContactRepository contactRepository;
+  public final TimeProvider timeProvider;
 
   @Value(value = &quot;${mail.to}&quot;)
   protected String to;
 
-<span class="fc" id="L25">  public MailService(JavaMailSender mailSender, ContactRepository contactRepository) {</span>
-<span class="fc" id="L26">    this.mailSender = mailSender;</span>
-<span class="fc" id="L27">    this.contactRepository = contactRepository;</span>
-<span class="fc" id="L28">  }</span>
+  public MailService(
+<span class="fc" id="L32">      JavaMailSender mailSender, ContactRepository contactRepository, TimeProvider timeProvider) {</span>
+<span class="fc" id="L33">    this.mailSender = mailSender;</span>
+<span class="fc" id="L34">    this.contactRepository = contactRepository;</span>
+<span class="fc" id="L35">    this.timeProvider = timeProvider;</span>
+<span class="fc" id="L36">  }</span>
 
-  public String sendContactEmail(ContactRequestDto request, String userAgent) {
-<span class="nc" id="L31">    SimpleMailMessage message = new SimpleMailMessage();</span>
-<span class="nc" id="L32">    message.setTo(to);</span>
-<span class="nc" id="L33">    message.setFrom(request.getEmail());</span>
-<span class="nc" id="L34">    message.setSubject(&quot;Contact form submission from &quot; + request.getName());</span>
-<span class="nc" id="L35">    message.setText(</span>
-<span class="nc" id="L36">        String.format(</span>
+  @Transactional
+  public void processPendingContactEmails() {
+<span class="fc" id="L40">    List&lt;Contact&gt; pendingContacts = contactRepository.findByStatus(ContactStatus.PENDING);</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">    if (pendingContacts.isEmpty()) {</span>
+<span class="fc" id="L42">      logger.info(&quot;No pending contact emails to process.&quot;);</span>
+<span class="fc" id="L43">      return;</span>
+    }
+<span class="fc" id="L45">    logger.info(&quot;Processing {} pending contact emails.&quot;, pendingContacts.size());</span>
+
+<span class="fc" id="L47">    List&lt;Long&gt; sendIds = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L48">    List&lt;Long&gt; failedIds = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">    for (Contact contact : pendingContacts) {</span>
+      try {
+<span class="fc" id="L51">        sendEmail(contact);</span>
+<span class="fc" id="L52">        sendIds.add(contact.getId());</span>
+<span class="nc" id="L53">      } catch (EmailSendException e) {</span>
+<span class="nc" id="L54">        logger.error(&quot;Error sending email for contact {}: {}&quot;, contact.getId(), e.getMessage());</span>
+<span class="nc" id="L55">        failedIds.add(contact.getId());</span>
+<span class="fc" id="L56">      }</span>
+<span class="fc" id="L57">    }</span>
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">    if (!sendIds.isEmpty()) {</span>
+<span class="fc" id="L59">      contactRepository.updateStatusById(sendIds, ContactStatus.SENT, timeProvider.getNow());</span>
+<span class="fc" id="L60">      logger.info(&quot;Successfully sent {} emails for contacts: {}&quot;, sendIds.size(), sendIds);</span>
+    }
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">    if (!failedIds.isEmpty()) {</span>
+<span class="nc" id="L63">      contactRepository.updateStatusById(failedIds, ContactStatus.FAILED, timeProvider.getNow());</span>
+<span class="nc" id="L64">      logger.error(&quot;Failed to send {} emails for contacts: {}&quot;, failedIds.size(), failedIds);</span>
+    }
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">    if (sendIds.size() + failedIds.size() != pendingContacts.size()) {</span>
+<span class="nc" id="L67">      logger.warn(</span>
+          &quot;Some contacts were not processed. Total contacts: {}, Sent: {}, Failed: {}&quot;,
+<span class="nc" id="L69">          pendingContacts.size(),</span>
+<span class="nc" id="L70">          sendIds.size(),</span>
+<span class="nc" id="L71">          failedIds.size());</span>
+    } else {
+<span class="fc" id="L73">      logger.info(&quot;All pending contact emails processed successfully.&quot;);</span>
+    }
+<span class="fc" id="L75">  }</span>
+
+  /**
+   * Sends an email using the provided contact information.
+   *
+   * @param contact the contact information containing name, email, and message
+   * @throws EmailSendException if there is an error sending the email
+   */
+  private void sendEmail(Contact contact) {
+<span class="fc" id="L84">    SimpleMailMessage message = new SimpleMailMessage();</span>
+<span class="fc" id="L85">    message.setTo(to);</span>
+<span class="fc" id="L86">    message.setFrom(contact.getEmail());</span>
+<span class="fc" id="L87">    message.setSubject(&quot;Contact form submission from &quot; + contact.getName());</span>
+<span class="fc" id="L88">    message.setText(</span>
+<span class="fc" id="L89">        String.format(</span>
                 &quot;&quot;&quot;
     From: %s
     Email: %s
     Message: %s
     &quot;&quot;&quot;,
-<span class="nc" id="L42">                request.getName(), request.getEmail(), request.getMessage())</span>
-<span class="nc" id="L43">            .trim());</span>
+<span class="fc" id="L95">                contact.getName(), contact.getEmail(), contact.getMessage())</span>
+<span class="fc" id="L96">            .trim());</span>
+
     try {
-      // mailSender.send(message);
-<span class="nc" id="L46">      logger.info(&quot;Email sent successfully from {} to {}&quot;, request.getEmail(), to);</span>
-      // Save contact request to the database
-<span class="nc" id="L48">      Contact contact = Contact.from(request);</span>
-<span class="nc" id="L49">      contact.setUserAgent(userAgent);</span>
-<span class="nc" id="L50">      contactRepository.save(contact);</span>
-<span class="nc" id="L51">      return &quot;Email sent successfully&quot;;</span>
-<span class="nc" id="L52">    } catch (Exception e) {</span>
-<span class="nc" id="L53">      logger.error(&quot;Failed to send email from {}: {}&quot;, request.getEmail(), e.getMessage());</span>
-<span class="nc" id="L54">      throw new EmailSendException(&quot;Failed to send email&quot;);</span>
-    }
+<span class="fc" id="L99">      mailSender.send(message);</span>
+<span class="fc" id="L100">      logger.info(&quot;Email sent successfully from {} to {}&quot;, contact.getEmail(), to);</span>
+<span class="fc" id="L101">      contact.setStatus(ContactStatus.SENT);</span>
+<span class="fc" id="L102">      contactRepository.save(contact);</span>
+<span class="nc" id="L103">    } catch (Exception e) {</span>
+<span class="nc" id="L104">      logger.error(&quot;Failed to send email from {}: {}&quot;, contact.getEmail(), e.getMessage());</span>
+<span class="nc" id="L105">      throw new EmailSendException(&quot;Failed to send email&quot;);</span>
+<span class="fc" id="L106">    }</span>
+<span class="fc" id="L107">  }</span>
+
+  /**
+   * Sends a contact email with the details provided in the ContactRequestDto.
+   *
+   * @param request the contact request containing name, email, and message
+   * @param userAgent the user agent string from the request header
+   * @return a success message if the email is sent successfully
+   * @throws EmailSendException if there is an error sending the email
+   */
+  public String saveContactToDB(ContactRequestDto request, String userAgent) {
+<span class="nc" id="L118">    Contact contact = Contact.from(request);</span>
+<span class="nc" id="L119">    contact.setUserAgent(userAgent);</span>
+<span class="nc" id="L120">    contactRepository.save(contact);</span>
+<span class="nc" id="L121">    logger.info(&quot;Contact saved to database with ID: {}&quot;, contact.getId());</span>
+<span class="nc" id="L122">    return &quot;Contact request submitted successfully. We will get back to you soon.&quot;;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

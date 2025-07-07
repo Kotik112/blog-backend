@@ -2,9 +2,9 @@
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-@EnableJpaRepositories(basePackages = &quot;com.example.blogbackend.repository&quot;)
+@EnableScheduling
 @SpringBootApplication
 <span class="fc" id="L9">public class BlogBackendApplication {</span>
   public static final String API_VERSION_1 = &quot;/api/v1&quot;;
