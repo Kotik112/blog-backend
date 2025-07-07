@@ -61,6 +61,8 @@ public class SecurityConfig {
                     .hasRole(Role.ADMIN.name())
                     .requestMatchers("/api/v1/auth/**")
                     .permitAll()
+                    .requestMatchers("/api/v1/contact/**")
+                    .permitAll()
                     .anyRequest()
                     .permitAll())
         // .httpBasic(Customizer.withDefaults())  // Basic Auth for Postman or frontend fetch

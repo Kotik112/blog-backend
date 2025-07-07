@@ -1,0 +1,2 @@
+ALTER TABLE contact_us_tbl
+  ALTER COLUMN status TYPE VARCHAR(20);

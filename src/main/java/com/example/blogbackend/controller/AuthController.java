@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -89,7 +90,7 @@ public class AuthController {
       HttpServletRequest request,
       Authentication authentication) {
     if (user == null) {
-      throw new RuntimeException("User is not authenticated");
+      throw new AuthenticationException("User is not authenticated") {};
     }
     String username = user.getUsername();
     String ipAddress = request.getRemoteAddr();

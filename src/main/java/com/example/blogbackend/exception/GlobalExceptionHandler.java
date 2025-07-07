@@ -111,6 +111,12 @@ public class GlobalExceptionHandler {
     return handleException(ex, request, HttpStatus.CONFLICT);
   }
 
+  @ExceptionHandler(EmailSendException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ApiError handleEmailSendException(EmailSendException ex, WebRequest request) {
+    return handleException(ex, request, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ApiError handleValidationException(
