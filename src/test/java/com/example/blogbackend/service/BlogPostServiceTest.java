@@ -17,6 +17,7 @@ import com.example.blogbackend.repository.UserRepository;
 import java.security.Principal;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
@@ -138,5 +140,42 @@ class BlogPostServiceTest {
   @Test
   void when_getBlogPostByInvalidId_then_throwBlogPostNotFoundException() {
     assertThrows(BlogPostNotFoundException.class, () -> blogPostService.getBlogPostById(999L));
+  }
+
+  @Test
+  void getBlogPostsByUser_shouldReturnPagedDtos() {
+    // Arrange
+    String username = "john";
+    int page = 0;
+    int size = 2;
+
+    User mockUser = new User();
+    mockUser.setId(1L);
+    mockUser.setUsername(username);
+
+    BlogPost blogPost1 = new BlogPost();
+    blogPost1.setId(101L);
+    blogPost1.setTitle("Post 1");
+
+    BlogPost blogPost2 = new BlogPost();
+    blogPost2.setId(102L);
+    blogPost2.setTitle("Post 2");
+
+    Page<BlogPost> blogPostPage = new PageImpl<>(List.of(blogPost1, blogPost2));
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.of(mockUser));
+    when(blogPostRepository.findAllByCreatedBy_Username(eq(username), any(PageRequest.class)))
+        .thenReturn(blogPostPage);
+
+    // Act
+    Page<BlogPostDto> result = blogPostService.getBlogPostsByUser(username, page, size);
+
+    // Assert
+    assertEquals(2, result.getContent().size());
+    assertEquals("Post 1", result.getContent().get(0).title());
+    assertEquals("Post 2", result.getContent().get(1).title());
+
+    verify(userRepository).findByUsername(username);
+    verify(blogPostRepository).findAllByCreatedBy_Username(eq(username), any(PageRequest.class));
   }
 }
