@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MailService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">blog-backend</a> &gt; <a href="index.source.html" class="el_package">com.example.blogbackend.service</a> &gt; <span class="el_source">MailService.java</span></div><h1>MailService.java</h1><pre class="source lang-java linenums">package com.example.blogbackend.service;
+
+import com.example.blogbackend.domain.Contact;
+import com.example.blogbackend.dto.ContactRequestDto;
+import com.example.blogbackend.exception.EmailSendException;
+import com.example.blogbackend.repository.ContactRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MailService {
+
+<span class="fc" id="L17">  private final Logger logger = LoggerFactory.getLogger(MailService.class);</span>
+
+  private final JavaMailSender mailSender;
+  private final ContactRepository contactRepository;
+
+  @Value(value = &quot;${mail.to}&quot;)
+  protected String to;
+
+<span class="fc" id="L25">  public MailService(JavaMailSender mailSender, ContactRepository contactRepository) {</span>
+<span class="fc" id="L26">    this.mailSender = mailSender;</span>
+<span class="fc" id="L27">    this.contactRepository = contactRepository;</span>
+<span class="fc" id="L28">  }</span>
+
+  public String sendContactEmail(ContactRequestDto request, String userAgent) {
+<span class="nc" id="L31">    SimpleMailMessage message = new SimpleMailMessage();</span>
+<span class="nc" id="L32">    message.setTo(to);</span>
+<span class="nc" id="L33">    message.setFrom(request.getEmail());</span>
+<span class="nc" id="L34">    message.setSubject(&quot;Contact form submission from &quot; + request.getName());</span>
+<span class="nc" id="L35">    message.setText(</span>
+<span class="nc" id="L36">        String.format(</span>
+                &quot;&quot;&quot;
+    From: %s
+    Email: %s
+    Message: %s
+    &quot;&quot;&quot;,
+<span class="nc" id="L42">                request.getName(), request.getEmail(), request.getMessage())</span>
+<span class="nc" id="L43">            .trim());</span>
+    try {
+      // mailSender.send(message);
+<span class="nc" id="L46">      logger.info(&quot;Email sent successfully from {} to {}&quot;, request.getEmail(), to);</span>
+      // Save contact request to the database
+<span class="nc" id="L48">      Contact contact = Contact.from(request);</span>
+<span class="nc" id="L49">      contact.setUserAgent(userAgent);</span>
+<span class="nc" id="L50">      contactRepository.save(contact);</span>
+<span class="nc" id="L51">      return &quot;Email sent successfully&quot;;</span>
+<span class="nc" id="L52">    } catch (Exception e) {</span>
+<span class="nc" id="L53">      logger.error(&quot;Failed to send email from {}: {}&quot;, request.getEmail(), e.getMessage());</span>
+<span class="nc" id="L54">      throw new EmailSendException(&quot;Failed to send email&quot;);</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -111,19 +111,25 @@ public class GlobalExceptionHandler {
 <span class="fc" id="L111">    return handleException(ex, request, HttpStatus.CONFLICT);</span>
   }
 
+  @ExceptionHandler(EmailSendException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ApiError handleEmailSendException(EmailSendException ex, WebRequest request) {
+<span class="nc" id="L117">    return handleException(ex, request, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+  }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ApiError handleValidationException(
       MethodArgumentNotValidException ex, WebRequest request) {
     // Extract the first non-null error message or use fallback
-<span class="fc" id="L119">    String errorMessage =</span>
-<span class="fc" id="L120">        ex.getBindingResult().getFieldErrors().stream()</span>
-<span class="fc" id="L121">            .map(DefaultMessageSourceResolvable::getDefaultMessage)</span>
-<span class="fc" id="L122">            .filter(Objects::nonNull)</span>
-<span class="fc" id="L123">            .findFirst()</span>
-<span class="fc" id="L124">            .orElse(&quot;Validation failed&quot;);</span>
+<span class="fc" id="L125">    String errorMessage =</span>
+<span class="fc" id="L126">        ex.getBindingResult().getFieldErrors().stream()</span>
+<span class="fc" id="L127">            .map(DefaultMessageSourceResolvable::getDefaultMessage)</span>
+<span class="fc" id="L128">            .filter(Objects::nonNull)</span>
+<span class="fc" id="L129">            .findFirst()</span>
+<span class="fc" id="L130">            .orElse(&quot;Validation failed&quot;);</span>
 
-<span class="fc" id="L126">    return buildApiError(HttpStatus.BAD_REQUEST, errorMessage, request);</span>
+<span class="fc" id="L132">    return buildApiError(HttpStatus.BAD_REQUEST, errorMessage, request);</span>
   }
 
   /**
@@ -134,23 +140,23 @@ public class GlobalExceptionHandler {
    * @return an ApiError object containing error details
    */
   private ApiError handleException(Exception ex, WebRequest request, HttpStatus status) {
-<span class="fc" id="L137">    ApiError apiError = new ApiError();</span>
-<span class="fc" id="L138">    apiError.setTimestamp(LocalDateTime.now());</span>
-<span class="fc" id="L139">    apiError.setStatus(status.value());</span>
-<span class="fc" id="L140">    apiError.setError(status.getReasonPhrase());</span>
-<span class="fc" id="L141">    apiError.setMessage(ex.getMessage());</span>
-<span class="fc" id="L142">    apiError.setPath(request.getDescription(false));</span>
-<span class="fc" id="L143">    return apiError;</span>
+<span class="fc" id="L143">    ApiError apiError = new ApiError();</span>
+<span class="fc" id="L144">    apiError.setTimestamp(LocalDateTime.now());</span>
+<span class="fc" id="L145">    apiError.setStatus(status.value());</span>
+<span class="fc" id="L146">    apiError.setError(status.getReasonPhrase());</span>
+<span class="fc" id="L147">    apiError.setMessage(ex.getMessage());</span>
+<span class="fc" id="L148">    apiError.setPath(request.getDescription(false));</span>
+<span class="fc" id="L149">    return apiError;</span>
   }
 
   private ApiError buildApiError(HttpStatus status, String message, WebRequest request) {
-<span class="fc" id="L147">    ApiError apiError = new ApiError();</span>
-<span class="fc" id="L148">    apiError.setTimestamp(LocalDateTime.now());</span>
-<span class="fc" id="L149">    apiError.setStatus(status.value());</span>
-<span class="fc" id="L150">    apiError.setError(status.getReasonPhrase());</span>
-<span class="fc" id="L151">    apiError.setMessage(message);</span>
-<span class="fc" id="L152">    apiError.setPath(request.getDescription(false));</span>
-<span class="fc" id="L153">    return apiError;</span>
+<span class="fc" id="L153">    ApiError apiError = new ApiError();</span>
+<span class="fc" id="L154">    apiError.setTimestamp(LocalDateTime.now());</span>
+<span class="fc" id="L155">    apiError.setStatus(status.value());</span>
+<span class="fc" id="L156">    apiError.setError(status.getReasonPhrase());</span>
+<span class="fc" id="L157">    apiError.setMessage(message);</span>
+<span class="fc" id="L158">    apiError.setPath(request.getDescription(false));</span>
+<span class="fc" id="L159">    return apiError;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

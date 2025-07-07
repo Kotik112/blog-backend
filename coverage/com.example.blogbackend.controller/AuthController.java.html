@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,12 +26,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(&quot;/api/v1/auth&quot;)
 public class AuthController {
-<span class="fc" id="L28">  private final Logger logger = LoggerFactory.getLogger(AuthController.class);</span>
+<span class="fc" id="L29">  private final Logger logger = LoggerFactory.getLogger(AuthController.class);</span>
   private final UserService userService;
 
-<span class="fc" id="L31">  public AuthController(UserService userService) {</span>
-<span class="fc" id="L32">    this.userService = userService;</span>
-<span class="fc" id="L33">  }</span>
+<span class="fc" id="L32">  public AuthController(UserService userService) {</span>
+<span class="fc" id="L33">    this.userService = userService;</span>
+<span class="fc" id="L34">  }</span>
 
   /**
    * Registers a new user with the provided username and password. Validates the username length and
@@ -41,18 +42,18 @@ public class AuthController {
    */
   @PostMapping(&quot;/register&quot;)
   public ResponseEntity&lt;String&gt; registerUser(@RequestBody @Valid CreateUserRequestDto userRequest) {
-<span class="fc" id="L44">    String result = userService.registerUser(userRequest);</span>
+<span class="fc" id="L45">    String result = userService.registerUser(userRequest);</span>
 
-<span class="pc bpc" id="L46" title="3 of 4 branches missed.">    return switch (result) {</span>
-<span class="fc" id="L47">      case &quot;User registered successfully&quot; -&gt; ResponseEntity.status(HttpStatus.CREATED).body(result);</span>
+<span class="pc bpc" id="L47" title="3 of 4 branches missed.">    return switch (result) {</span>
+<span class="fc" id="L48">      case &quot;User registered successfully&quot; -&gt; ResponseEntity.status(HttpStatus.CREATED).body(result);</span>
       case &quot;Username must be between 3 and 20 characters&quot;,
           &quot;Password must be at least 6 characters long&quot; -&gt;
-<span class="nc" id="L50">          ResponseEntity.badRequest().body(result);</span>
-<span class="nc" id="L51">      case &quot;User already exists&quot; -&gt; ResponseEntity.status(HttpStatus.CONFLICT).body(result);</span>
+<span class="nc" id="L51">          ResponseEntity.badRequest().body(result);</span>
+<span class="nc" id="L52">      case &quot;User already exists&quot; -&gt; ResponseEntity.status(HttpStatus.CONFLICT).body(result);</span>
       default -&gt; {
-<span class="nc" id="L53">        logger.error(&quot;Unexpected registration error: {}&quot;, result);</span>
-<span class="nc" id="L54">        yield ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)</span>
-<span class="nc" id="L55">            .body(&quot;Registration failed unexpectedly&quot;);</span>
+<span class="nc" id="L54">        logger.error(&quot;Unexpected registration error: {}&quot;, result);</span>
+<span class="nc" id="L55">        yield ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)</span>
+<span class="nc" id="L56">            .body(&quot;Registration failed unexpectedly&quot;);</span>
       }
     };
   }
@@ -68,19 +69,19 @@ public class AuthController {
   @PostMapping(&quot;/login&quot;)
   public ResponseEntity&lt;ApiLoginResponse&gt; loginUser(
       @RequestBody @Valid LoginRequestDto loginRequest, HttpServletRequest request) {
-<span class="fc" id="L71">    ApiLoginResponse result = userService.loginUser(loginRequest, request);</span>
-<span class="pc bpc" id="L72" title="1 of 3 branches missed.">    return switch (result.responseEnum()) {</span>
-<span class="fc" id="L73">      case SUCCESS -&gt; ResponseEntity.ok(result);</span>
+<span class="fc" id="L72">    ApiLoginResponse result = userService.loginUser(loginRequest, request);</span>
+<span class="pc bpc" id="L73" title="1 of 3 branches missed.">    return switch (result.responseEnum()) {</span>
+<span class="fc" id="L74">      case SUCCESS -&gt; ResponseEntity.ok(result);</span>
       case USER_NOT_FOUND, INVALID_CREDENTIALS -&gt;
-<span class="fc" id="L75">          ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);</span>
-<span class="nc" id="L76">      default -&gt; ResponseEntity.badRequest().body(result);</span>
+<span class="fc" id="L76">          ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);</span>
+<span class="nc" id="L77">      default -&gt; ResponseEntity.badRequest().body(result);</span>
     };
   }
 
   @PostMapping(&quot;/logout&quot;)
   public ResponseEntity&lt;Void&gt; logout(HttpServletRequest request, HttpServletResponse response) {
-<span class="nc" id="L82">    userService.logoutUser(request, response);</span>
-<span class="nc" id="L83">    return ResponseEntity.noContent().build(); // 204 No Content</span>
+<span class="nc" id="L83">    userService.logoutUser(request, response);</span>
+<span class="nc" id="L84">    return ResponseEntity.noContent().build(); // 204 No Content</span>
   }
 
   @GetMapping(&quot;/whoami&quot;)
@@ -88,16 +89,16 @@ public class AuthController {
       @AuthenticationPrincipal UserDetails user,
       HttpServletRequest request,
       Authentication authentication) {
-<span class="nc bnc" id="L91" title="All 2 branches missed.">    if (user == null) {</span>
-<span class="nc" id="L92">      throw new RuntimeException(&quot;User is not authenticated&quot;);</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">    if (user == null) {</span>
+<span class="nc" id="L93">      throw new AuthenticationException(&quot;User is not authenticated&quot;) {};</span>
     }
-<span class="nc" id="L94">    String username = user.getUsername();</span>
-<span class="nc" id="L95">    String ipAddress = request.getRemoteAddr();</span>
-<span class="nc" id="L96">    List&lt;String&gt; roles =</span>
-<span class="nc" id="L97">        authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();</span>
-<span class="nc bnc" id="L98" title="All 2 branches missed.">    String sessionId = request.getSession(false) != null ? request.getSession(false).getId() : null;</span>
-<span class="nc" id="L99">    WhoAmIResponseDto responseDto = new WhoAmIResponseDto(username, ipAddress, roles, sessionId);</span>
-<span class="nc" id="L100">    return ResponseEntity.ok(responseDto);</span>
+<span class="nc" id="L95">    String username = user.getUsername();</span>
+<span class="nc" id="L96">    String ipAddress = request.getRemoteAddr();</span>
+<span class="nc" id="L97">    List&lt;String&gt; roles =</span>
+<span class="nc" id="L98">        authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">    String sessionId = request.getSession(false) != null ? request.getSession(false).getId() : null;</span>
+<span class="nc" id="L100">    WhoAmIResponseDto responseDto = new WhoAmIResponseDto(username, ipAddress, roles, sessionId);</span>
+<span class="nc" id="L101">    return ResponseEntity.ok(responseDto);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
