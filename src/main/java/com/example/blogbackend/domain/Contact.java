@@ -32,24 +32,12 @@ public class Contact {
   private String userAgent;
   private String internalNote;
 
-  @PrePersist
-  public void prePersist() {
-    Instant now = Instant.now();
-    this.createdAt = now;
-    this.updatedAt = now;
-    this.status = ContactStatus.PENDING;
-  }
-
-  @PreUpdate
-  public void preUpdate() {
-    this.updatedAt = Instant.now();
-  }
-
   public static Contact from(ContactRequestDto contactRequestDto) {
     Contact contact = new Contact();
     contact.setName(contactRequestDto.getName());
     contact.setEmail(contactRequestDto.getEmail());
     contact.setMessage(contactRequestDto.getMessage());
+    contact.setStatus(ContactStatus.PENDING);
     return contact;
   }
 }

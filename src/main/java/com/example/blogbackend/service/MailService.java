@@ -80,7 +80,7 @@ public class MailService {
    * @param contact the contact information containing name, email, and message
    * @throws EmailSendException if there is an error sending the email
    */
-  private void sendEmail(Contact contact) {
+  protected void sendEmail(Contact contact) {
     SimpleMailMessage message = new SimpleMailMessage();
     message.setTo(to);
     message.setFrom(contact.getEmail());
@@ -99,6 +99,7 @@ public class MailService {
       mailSender.send(message);
       logger.info("Email sent successfully from {} to {}", contact.getEmail(), to);
       contact.setStatus(ContactStatus.SENT);
+      contact.setUpdatedAt(timeProvider.getNow());
       contactRepository.save(contact);
     } catch (Exception e) {
       logger.error("Failed to send email from {}: {}", contact.getEmail(), e.getMessage());
@@ -117,6 +118,7 @@ public class MailService {
   public String saveContactToDB(ContactRequestDto request, String userAgent) {
     Contact contact = Contact.from(request);
     contact.setUserAgent(userAgent);
+    contact.setCreatedAt(timeProvider.getNow());
     contactRepository.save(contact);
     logger.info("Contact saved to database with ID: {}", contact.getId());
     return "Contact request submitted successfully. We will get back to you soon.";

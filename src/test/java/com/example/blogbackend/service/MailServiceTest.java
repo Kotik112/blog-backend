@@ -3,6 +3,7 @@ package com.example.blogbackend.service;
 import static org.mockito.Mockito.*;
 
 import com.example.blogbackend.domain.Contact;
+import com.example.blogbackend.dto.ContactRequestDto;
 import com.example.blogbackend.enums.ContactStatus;
 import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.ContactRepository;
@@ -11,6 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -136,7 +138,7 @@ class MailServiceTest {
   }
 
   @Test
-  void testProcessPendingContactEmails_SomeUnprocessed() {
+  void testProcessPendingContactEmails_SomeFailed() {
     Instant now = Instant.now();
     Contact contact1 =
         new Contact(
@@ -152,8 +154,8 @@ class MailServiceTest {
     doAnswer(
             invocation -> {
               SimpleMailMessage msg = invocation.getArgument(0);
-                Assertions.assertNotNull(msg.getFrom());
-                if (msg.getFrom().equals("jane@example.com")) {
+              Assertions.assertNotNull(msg.getFrom());
+              if (msg.getFrom().equals("jane@example.com")) {
                 throw new NullPointerException("Unexpected failure");
               }
               return null;
@@ -166,5 +168,34 @@ class MailServiceTest {
     // Both should be processed (1 SENT, 2 FAILED)
     verify(contactRepository).updateStatusById(List.of(1L), ContactStatus.SENT, now);
     verify(contactRepository).updateStatusById(List.of(2L), ContactStatus.FAILED, now);
+  }
+
+  @Test
+  void test_saveContactToDatabase() {
+    ContactRequestDto contactRequestDto = new ContactRequestDto();
+    contactRequestDto.setName("John Doe");
+    contactRequestDto.setEmail("test@example.com");
+    contactRequestDto.setMessage("Hello, this is a test message.");
+
+    Instant now = Instant.parse("2025-07-07T12:00:00Z");
+    String userAgent = "Mozilla/5.0";
+
+    when(timeProvider.getNow()).thenReturn(now);
+    ArgumentCaptor<Contact> captor = ArgumentCaptor.forClass(Contact.class);
+
+    String response = mailService.saveContactToDB(contactRequestDto, userAgent);
+
+    verify(contactRepository, times(1)).save(captor.capture());
+    Contact saved = captor.getValue();
+
+    Assertions.assertEquals("John Doe", saved.getName());
+    Assertions.assertEquals("test@example.com", saved.getEmail());
+    Assertions.assertEquals("Hello, this is a test message.", saved.getMessage());
+    Assertions.assertEquals(ContactStatus.PENDING, saved.getStatus());
+    Assertions.assertEquals(userAgent, saved.getUserAgent());
+    Assertions.assertEquals(now, saved.getCreatedAt());
+
+    Assertions.assertEquals(
+        "Contact request submitted successfully. We will get back to you soon.", response);
   }
 }

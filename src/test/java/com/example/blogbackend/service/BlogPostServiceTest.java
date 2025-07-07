@@ -43,7 +43,6 @@ class BlogPostServiceTest {
 
   @Test
   void test_createBlogPost() {
-    // Create the input data
     CreateBlogPostDto createBlogPostDTO = new CreateBlogPostDto("Test title", "Test content");
 
     // Expected output data

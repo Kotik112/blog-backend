@@ -6,18 +6,25 @@ A Spring Boot backend for managing blog posts with support for image uploads, li
 
 ## 🚀 Features
 
-- Create, update, and retrieve blog posts
-- Upload blog images via multipart form data
-- Track likes for individual blog posts
-- RESTful API design with clean DTO mappings
+- User authentication and authorization (Session, roles)
+- Blog post CRUD operations
+- Commenting system
+- Like functionality
+- Image upload and management
+- Contact Us form with status tracking
+- Swagger API documentation
+- Exception handling
+- Database migrations with Flyway
 
 ---
 
 ## ⚙️ Tech Stack
 
-- **Java + Spring Boot**
+- **Java 17 + Spring Boot**
 - **PostgreSQL**
 - **Maven**
+- **Flyway**
+- **Spring Security**
 - **Elastic Beanstalk**
 - **Multipart File Upload Support**
 
@@ -25,10 +32,16 @@ A Spring Boot backend for managing blog posts with support for image uploads, li
 
 ## 🛠️ Setup Instructions
 
+1. **Clone the repository**
+2. **Configure the database** in `application-<your profile>.yml`
+3. **Run migrations** (Flyway auto-runs on startup)
+4. **Start the application**
+5. **Access Swagger UI** at `/swagger-ui.html`
+
 ### ✅ Prerequisites
 
-- Java 21
-- Gradle
+- Java 17
+- Maven
 - PostgreSQL (Ensure it's running locally on port `5432`)
 - IntelliJ IDEA (Recommended)
 

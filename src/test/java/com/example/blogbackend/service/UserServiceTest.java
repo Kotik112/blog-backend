@@ -12,6 +12,7 @@ import com.example.blogbackend.exception.LoginFailureException;
 import com.example.blogbackend.exception.RegistrationFailureException;
 import com.example.blogbackend.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -205,5 +206,31 @@ class UserServiceTest {
         Assertions.assertThrows(
             LoginFailureException.class, () -> userService.loginUser(loginRequest, httpRequest));
     Assertions.assertEquals(LoginResponseEnum.REQUEST_BODY_MISSING.getMessage(), ex.getMessage());
+  }
+
+  @Test
+  void test_logoutUser_success() {
+    // Arrange
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpServletResponse response = mock(HttpServletResponse.class);
+    HttpSession session = mock(HttpSession.class);
+
+    // Simulate an active session
+    when(request.getSession(false)).thenReturn(session);
+
+    // Act
+    userService.logoutUser(request, response);
+
+    // Assert
+    verify(session, times(1)).invalidate();
+    verify(response, times(1))
+        .addCookie(
+            argThat(
+                cookie ->
+                    "JSESSIONID".equals(cookie.getName())
+                        && cookie.getValue() == null
+                        && cookie.getMaxAge() == 0
+                        && cookie.isHttpOnly()
+                        && "/".equals(cookie.getPath())));
   }
 }
