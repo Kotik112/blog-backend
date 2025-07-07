@@ -24,8 +24,6 @@ spring:
     locations: classpath:db/migration
 
 logging:
-  file:
-    name: logs/app.log
   level:
     root: INFO
     com.example.backend: TRACE
@@ -52,3 +50,13 @@ server:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true

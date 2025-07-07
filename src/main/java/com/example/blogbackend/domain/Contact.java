@@ -4,11 +4,15 @@ import com.example.blogbackend.dto.ContactRequestDto;
 import com.example.blogbackend.enums.ContactStatus;
 import jakarta.persistence.*;
 import java.time.Instant;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "contact_us_tbl")
 public class Contact {

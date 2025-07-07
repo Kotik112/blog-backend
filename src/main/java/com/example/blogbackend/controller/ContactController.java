@@ -21,7 +21,7 @@ public class ContactController {
   public ResponseEntity<String> handleContactSubmission(
       @Valid @RequestBody ContactRequestDto dto,
       @RequestHeader(value = "User-Agent", required = false) String userAgent) {
-    String responseMessage = mailService.sendContactEmail(dto, userAgent);
+    String responseMessage = mailService.saveContactToDB(dto, userAgent);
     return ResponseEntity.ok(responseMessage);
   }
 }
