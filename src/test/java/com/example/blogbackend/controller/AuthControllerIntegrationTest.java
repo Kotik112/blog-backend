@@ -96,50 +96,52 @@ class AuthControllerIntegrationTest extends SpringBootComponentTest {
 
   // Login tests
   @Test
-  void when_loginUser_then_userIsLoggedIn() throws Exception {
-    CreateUserRequestDto user = new CreateUserRequestDto("loginUser", "loginPassword");
+  void when_loginWithCorrectCredentials_then_returnSuccess() throws Exception {
+    LoginRequestDto login = new LoginRequestDto("testuser", "testPassword");
 
-    // First register the user
-    mvc.perform(
-            post(BASE_AUTH_URL + "/register")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(user)))
-        .andExpect(status().isCreated());
-
-    LoginRequestDto loginRequestDto = new LoginRequestDto(user.username(), user.password());
-    // Now login the user
     MvcResult result =
         mvc.perform(
-                post(BASE_AUTH_URL + "/login")
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .content(objectMapper.writeValueAsString(loginRequestDto)))
+                post("/api/v1/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(login)))
             .andExpect(status().isOk())
             .andReturn();
 
     ApiLoginResponse response = getFromResult(result, ApiLoginResponse.class);
-    Assertions.assertEquals(
-        LoginResponseEnum.SUCCESS,
-        response.responseEnum(),
-        "Expected login success message, got: " + response);
+    Assertions.assertEquals(LoginResponseEnum.SUCCESS, response.responseEnum());
+    Assertions.assertEquals("testuser", response.username());
   }
 
   @Test
-  void when_loginUserWithNonExistingUser_then_unauthorized() throws Exception {
-    LoginRequestDto user = new LoginRequestDto("nonExistingUser", "somePassword");
+  void when_loginWithWrongPassword_then_returnInvalidCredentials() throws Exception {
+    LoginRequestDto login = new LoginRequestDto("testuser", "wrongPassword");
 
     MvcResult result =
         mvc.perform(
-                post(BASE_AUTH_URL + "/login")
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .content(objectMapper.writeValueAsString(user)))
+                post("/api/v1/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(login)))
             .andExpect(status().isUnauthorized())
             .andReturn();
 
     ApiLoginResponse response = getFromResult(result, ApiLoginResponse.class);
-    Assertions.assertEquals(
-        LoginResponseEnum.USER_NOT_FOUND,
-        response.responseEnum(),
-        "Expected user does not exist error, got: " + response);
+    Assertions.assertEquals(LoginResponseEnum.INVALID_CREDENTIALS, response.responseEnum());
+  }
+
+  @Test
+  void when_loginWithNonExistingUser_then_returnUserNotFound() throws Exception {
+    LoginRequestDto login = new LoginRequestDto("nonexistent", "somePassword");
+
+    MvcResult result =
+        mvc.perform(
+                post("/api/v1/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(login)))
+            .andExpect(status().isUnauthorized())
+            .andReturn();
+
+    ApiLoginResponse response = getFromResult(result, ApiLoginResponse.class);
+    Assertions.assertEquals(LoginResponseEnum.USER_NOT_FOUND, response.responseEnum());
   }
 
   @Test

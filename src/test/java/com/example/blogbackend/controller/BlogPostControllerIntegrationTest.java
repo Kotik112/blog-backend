@@ -54,7 +54,7 @@ class BlogPostControllerIntegrationTest extends SpringBootComponentTest {
   @WithMockUser(username = "testuser", roles = "USER")
   @Transactional
   @Test
-  void test_createBlogPostWithImageSuccess() throws Exception {
+  void test_createBlogPostWithImage_success() throws Exception {
     String title = "Test title";
     String content = "Test content";
 
@@ -166,5 +166,20 @@ class BlogPostControllerIntegrationTest extends SpringBootComponentTest {
   void when_getBlogPostByInvalidId_then_returnNotFound() throws Exception {
     int invalidId = 999;
     mvc.perform(get(BASE_BLOG_POST_URL + "/{id}", invalidId)).andExpect(status().isNotFound());
+  }
+
+  @WithMockUser(username = "testuser", roles = "USER")
+  @Test
+  void when_getWhoAmI_then_returnAuthenticatedUserDetails() throws Exception {
+    MvcResult result =
+        mvc.perform(get("/api/v1/auth/whoami")) // adjust path to match your controller mapping
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.username").value("testuser"))
+            .andExpect(jsonPath("$.roles[0]").value("ROLE_USER"))
+            .andExpect(jsonPath("$.ipAddress").exists())
+            .andReturn();
+
+    String sessionId = JsonPath.read(result.getResponse().getContentAsString(), "$.sessionId");
+    Assertions.assertNotNull(sessionId, "Session ID should not be null");
   }
 }
