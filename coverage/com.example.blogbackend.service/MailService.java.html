@@ -50,18 +50,18 @@ public class MailService {
       try {
 <span class="fc" id="L51">        sendEmail(contact);</span>
 <span class="fc" id="L52">        sendIds.add(contact.getId());</span>
-<span class="nc" id="L53">      } catch (EmailSendException e) {</span>
-<span class="nc" id="L54">        logger.error(&quot;Error sending email for contact {}: {}&quot;, contact.getId(), e.getMessage());</span>
-<span class="nc" id="L55">        failedIds.add(contact.getId());</span>
+<span class="fc" id="L53">      } catch (EmailSendException e) {</span>
+<span class="fc" id="L54">        logger.error(&quot;Error sending email for contact {}: {}&quot;, contact.getId(), e.getMessage());</span>
+<span class="fc" id="L55">        failedIds.add(contact.getId());</span>
 <span class="fc" id="L56">      }</span>
 <span class="fc" id="L57">    }</span>
-<span class="pc bpc" id="L58" title="1 of 2 branches missed.">    if (!sendIds.isEmpty()) {</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">    if (!sendIds.isEmpty()) {</span>
 <span class="fc" id="L59">      contactRepository.updateStatusById(sendIds, ContactStatus.SENT, timeProvider.getNow());</span>
 <span class="fc" id="L60">      logger.info(&quot;Successfully sent {} emails for contacts: {}&quot;, sendIds.size(), sendIds);</span>
     }
-<span class="pc bpc" id="L62" title="1 of 2 branches missed.">    if (!failedIds.isEmpty()) {</span>
-<span class="nc" id="L63">      contactRepository.updateStatusById(failedIds, ContactStatus.FAILED, timeProvider.getNow());</span>
-<span class="nc" id="L64">      logger.error(&quot;Failed to send {} emails for contacts: {}&quot;, failedIds.size(), failedIds);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">    if (!failedIds.isEmpty()) {</span>
+<span class="fc" id="L63">      contactRepository.updateStatusById(failedIds, ContactStatus.FAILED, timeProvider.getNow());</span>
+<span class="fc" id="L64">      logger.error(&quot;Failed to send {} emails for contacts: {}&quot;, failedIds.size(), failedIds);</span>
     }
 <span class="pc bpc" id="L66" title="1 of 2 branches missed.">    if (sendIds.size() + failedIds.size() != pendingContacts.size()) {</span>
 <span class="nc" id="L67">      logger.warn(</span>
@@ -100,9 +100,9 @@ public class MailService {
 <span class="fc" id="L100">      logger.info(&quot;Email sent successfully from {} to {}&quot;, contact.getEmail(), to);</span>
 <span class="fc" id="L101">      contact.setStatus(ContactStatus.SENT);</span>
 <span class="fc" id="L102">      contactRepository.save(contact);</span>
-<span class="nc" id="L103">    } catch (Exception e) {</span>
-<span class="nc" id="L104">      logger.error(&quot;Failed to send email from {}: {}&quot;, contact.getEmail(), e.getMessage());</span>
-<span class="nc" id="L105">      throw new EmailSendException(&quot;Failed to send email&quot;);</span>
+<span class="fc" id="L103">    } catch (Exception e) {</span>
+<span class="fc" id="L104">      logger.error(&quot;Failed to send email from {}: {}&quot;, contact.getEmail(), e.getMessage());</span>
+<span class="fc" id="L105">      throw new EmailSendException(&quot;Failed to send email&quot;);</span>
 <span class="fc" id="L106">    }</span>
 <span class="fc" id="L107">  }</span>
 

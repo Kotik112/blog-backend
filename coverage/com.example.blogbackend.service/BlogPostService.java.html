@@ -115,24 +115,24 @@ public class BlogPostService {
   }
 
   public Page&lt;BlogPostDto&gt; getBlogPostsByUser(String username, int page, int size) {
-<span class="nc" id="L118">    PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, &quot;createdAt&quot;));</span>
-<span class="nc" id="L119">    User user =</span>
+<span class="fc" id="L118">    PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, &quot;createdAt&quot;));</span>
+<span class="fc" id="L119">    User user =</span>
         userRepository
-<span class="nc" id="L121">            .findByUsername(username)</span>
-<span class="nc" id="L122">            .orElseThrow(() -&gt; new UsernameNotFoundException(&quot;User not found: &quot; + username));</span>
-<span class="nc" id="L123">    Page&lt;BlogPost&gt; blogPostPage =</span>
-<span class="nc" id="L124">        blogPostRepository.findAllByCreatedBy_Username(user.getUsername(), pageRequest);</span>
-<span class="nc" id="L125">    logger.info(</span>
+<span class="fc" id="L121">            .findByUsername(username)</span>
+<span class="pc" id="L122">            .orElseThrow(() -&gt; new UsernameNotFoundException(&quot;User not found: &quot; + username));</span>
+<span class="fc" id="L123">    Page&lt;BlogPost&gt; blogPostPage =</span>
+<span class="fc" id="L124">        blogPostRepository.findAllByCreatedBy_Username(user.getUsername(), pageRequest);</span>
+<span class="fc" id="L125">    logger.info(</span>
         &quot;Retrieved {} blog posts for user {} on page {} with size {}&quot;,
-<span class="nc" id="L127">        blogPostPage.getTotalElements(),</span>
+<span class="fc" id="L127">        blogPostPage.getTotalElements(),</span>
         username,
-<span class="nc" id="L129">        page,</span>
-<span class="nc" id="L130">        size);</span>
+<span class="fc" id="L129">        page,</span>
+<span class="fc" id="L130">        size);</span>
 
-<span class="nc" id="L132">    List&lt;BlogPostDto&gt; blogPostDtoList =</span>
-<span class="nc" id="L133">        blogPostPage.getContent().stream().map(BlogPostDto::toDto).toList();</span>
+<span class="fc" id="L132">    List&lt;BlogPostDto&gt; blogPostDtoList =</span>
+<span class="fc" id="L133">        blogPostPage.getContent().stream().map(BlogPostDto::toDto).toList();</span>
 
-<span class="nc" id="L135">    return new PageImpl&lt;&gt;(blogPostDtoList, pageRequest, blogPostPage.getTotalElements());</span>
+<span class="fc" id="L135">    return new PageImpl&lt;&gt;(blogPostDtoList, pageRequest, blogPostPage.getTotalElements());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
