@@ -89,16 +89,16 @@ public class AuthController {
       @AuthenticationPrincipal UserDetails user,
       HttpServletRequest request,
       Authentication authentication) {
-<span class="nc bnc" id="L92" title="All 2 branches missed.">    if (user == null) {</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">    if (user == null) {</span>
 <span class="nc" id="L93">      throw new AuthenticationException(&quot;User is not authenticated&quot;) {};</span>
     }
-<span class="nc" id="L95">    String username = user.getUsername();</span>
-<span class="nc" id="L96">    String ipAddress = request.getRemoteAddr();</span>
-<span class="nc" id="L97">    List&lt;String&gt; roles =</span>
-<span class="nc" id="L98">        authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();</span>
-<span class="nc bnc" id="L99" title="All 2 branches missed.">    String sessionId = request.getSession(false) != null ? request.getSession(false).getId() : null;</span>
-<span class="nc" id="L100">    WhoAmIResponseDto responseDto = new WhoAmIResponseDto(username, ipAddress, roles, sessionId);</span>
-<span class="nc" id="L101">    return ResponseEntity.ok(responseDto);</span>
+<span class="fc" id="L95">    String username = user.getUsername();</span>
+<span class="fc" id="L96">    String ipAddress = request.getRemoteAddr();</span>
+<span class="fc" id="L97">    List&lt;String&gt; roles =</span>
+<span class="fc" id="L98">        authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();</span>
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">    String sessionId = request.getSession(false) != null ? request.getSession(false).getId() : null;</span>
+<span class="fc" id="L100">    WhoAmIResponseDto responseDto = new WhoAmIResponseDto(username, ipAddress, roles, sessionId);</span>
+<span class="fc" id="L101">    return ResponseEntity.ok(responseDto);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
