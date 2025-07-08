@@ -47,10 +47,8 @@ jobs:
           mkdir -p staging/.ebextensions
           cp target/*.jar staging/application.jar
 
-          # Create Procfile
           echo 'web: java -jar application.jar' > staging/Procfile
 
-          # Write .ebextensions config with environment values
           {
             echo "option_settings:"
             echo "  aws:elasticbeanstalk:application:environment:"
@@ -58,6 +56,13 @@ jobs:
             echo "    DB_URL: \"${DB_URL}\""
             echo "    DB_USER: \"${DB_USER}\""
             echo "    DB_PW: \"${DB_PW}\""
+            echo "    SPRING_MAIL_HOST: \"${SPRING_MAIL_HOST}\""
+            echo "    SPRING_MAIL_PORT: \"${SPRING_MAIL_PORT}\""
+            echo "    SPRING_MAIL_USERNAME: \"${MAIL_USERNAME}\""
+            echo "    SPRING_MAIL_PASSWORD: \"${MAIL_PASSWORD}\""
+            echo "    SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: \"${SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH}\""
+            echo "    SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: \"${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE}\""
+            echo "    MAIL_TO: \"${MAIL_TO}\""
           } > staging/.ebextensions/01_environment.config
 
           cd staging
