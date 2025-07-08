@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SessionRateLimiter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">blog-backend</a> &gt; <a href="index.source.html" class="el_package">com.example.blogbackend.service.rate_limiter</a> &gt; <span class="el_source">SessionRateLimiter.java</span></div><h1>SessionRateLimiter.java</h1><pre class="source lang-java linenums">package com.example.blogbackend.service.rate_limiter;
+
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Refill;
+import java.time.Duration;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.stereotype.Service;
+
+@Service
+<span class="fc" id="L12">public class SessionRateLimiter {</span>
+
+<span class="fc" id="L14">  private final Map&lt;String, Bucket&gt; buckets = new ConcurrentHashMap&lt;&gt;();</span>
+
+  public Bucket resolveBucket(String sessionId) {
+<span class="nc" id="L17">    return buckets.computeIfAbsent(sessionId, this::createNewBucket);</span>
+  }
+
+  private Bucket createNewBucket(String sessionId) {
+<span class="nc" id="L21">    Bandwidth limit = Bandwidth.classic(50, Refill.greedy(50, Duration.ofMinutes(1)));</span>
+
+    // Build the bucket
+<span class="nc" id="L24">    return Bucket.builder().addLimit(limit).build();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

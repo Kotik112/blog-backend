@@ -18,8 +18,14 @@ blog-backend,com.example.blogbackend.exception,RegistrationFailureException,0,4,
 blog-backend,com.example.blogbackend.exception,LoginFailureException,0,4,0,0,0,2,0,1,0,1
 blog-backend,com.example.blogbackend.exception,CommentNotFoundException,0,4,0,0,0,2,0,1,0,1
 blog-backend,com.example.blogbackend.exception,EmptyFileException,0,4,0,0,0,2,0,1,0,1
+blog-backend,com.example.blogbackend.service.rate_limiter,SessionRateLimiter,20,8,0,0,3,2,2,1,2,1
+blog-backend,com.example.blogbackend.service.rate_limiter,IpKeyResolver,0,8,0,0,0,2,0,2,0,2
+blog-backend,com.example.blogbackend.service.rate_limiter,RateLimitFilter,0,32,0,2,0,10,0,3,0,2
+blog-backend,com.example.blogbackend.service.rate_limiter,SessionKeyResolver,13,3,2,0,2,1,2,1,1,1
+blog-backend,com.example.blogbackend.service.rate_limiter,RateLimiterService,0,36,0,0,0,8,0,3,0,3
+blog-backend,com.example.blogbackend.service.rate_limiter,CompositeKeyResolver,5,25,0,0,0,9,1,3,1,3
 blog-backend,com.example.blogbackend.jobs,PendingContactEmailJob,0,14,0,0,0,6,0,2,0,2
-blog-backend,com.example.blogbackend.controller,BlogPostController,43,39,0,0,9,9,1,4,1,4
+blog-backend,com.example.blogbackend.controller,BlogPostController,0,82,0,0,0,18,0,5,0,5
 blog-backend,com.example.blogbackend.controller,CommentController,5,19,0,0,1,6,1,3,1,3
 blog-backend,com.example.blogbackend.controller,ImageController,5,21,0,0,1,6,1,3,1,3
 blog-backend,com.example.blogbackend.controller,AuthController.new AuthenticationException() {...},7,0,0,0,1,0,1,0,1,0

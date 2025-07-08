@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RateLimiterService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">blog-backend</a> &gt; <a href="index.source.html" class="el_package">com.example.blogbackend.service.rate_limiter</a> &gt; <span class="el_source">RateLimiterService.java</span></div><h1>RateLimiterService.java</h1><pre class="source lang-java linenums">package com.example.blogbackend.service.rate_limiter;
+
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Refill;
+import jakarta.servlet.http.HttpServletRequest;
+import java.time.Duration;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.stereotype.Service;
+
+@Service
+public class RateLimiterService {
+<span class="fc" id="L14">  private final Map&lt;String, Bucket&gt; bucketCache = new ConcurrentHashMap&lt;&gt;();</span>
+  private final CompositeKeyResolver keyResolver;
+
+<span class="fc" id="L17">  public RateLimiterService(CompositeKeyResolver keyResolver) {</span>
+<span class="fc" id="L18">    this.keyResolver = keyResolver;</span>
+<span class="fc" id="L19">  }</span>
+
+  public Bucket resolveBucket(HttpServletRequest request) {
+<span class="fc" id="L22">    String key = keyResolver.resolveKey(request);</span>
+<span class="fc" id="L23">    return bucketCache.computeIfAbsent(key, this::createNewBucket);</span>
+  }
+
+  private Bucket createNewBucket(String key) {
+<span class="fc" id="L27">    Bandwidth limit = Bandwidth.classic(100, Refill.greedy(100, Duration.ofMinutes(1)));</span>
+<span class="fc" id="L28">    return Bucket.builder().addLimit(limit).build();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
