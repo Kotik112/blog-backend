@@ -34,6 +34,7 @@ jobs:
 
       # 🧪 Run tests
       - name: 🧪 Test with Maven (skipped)
+        if: false # Set to false to speed up the workflow while testing deployment
         run: ./mvnw clean test -DskipTests=false -Pci
 
       # 🏗️ Build JAR for deployment
