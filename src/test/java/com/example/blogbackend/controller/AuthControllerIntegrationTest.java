@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -98,10 +99,11 @@ class AuthControllerIntegrationTest extends SpringBootComponentTest {
   @Test
   void when_loginWithCorrectCredentials_then_returnSuccess() throws Exception {
     LoginRequestDto login = new LoginRequestDto("testuser", "testPassword");
-
+    MockHttpSession session = new MockHttpSession();
     MvcResult result =
         mvc.perform(
                 post("/api/v1/auth/login")
+                    .session(session)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(login)))
             .andExpect(status().isOk())
