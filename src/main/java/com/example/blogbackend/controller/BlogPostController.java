@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,7 +34,8 @@ public class BlogPostController {
   }
 
   /**
-   * Creates a new blog post with an optional image.
+   * Creates a new blog post with an optional image. This endpoint consumes multipart/form-data for
+   * the request body, allowing for file uploads.
    *
    * @param title the title of the blog post
    * @param content the content of the blog post
@@ -61,7 +63,10 @@ public class BlogPostController {
             description = "Internal server error",
             content = @Content)
       })
-  @PostMapping(value = "", consumes = "multipart/form-data", produces = "application/json")
+  @PostMapping(
+      value = "",
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BlogPostDto> createBlogPost(
       @RequestPart("title") String title,
       @RequestPart("content") String content,
