@@ -1,4 +1,4 @@
-name: Deploy to AWS Elastic Beanstalk
+name: Deploy to AWS Elastic Beanstalk (DEV)
 on:
   workflow_dispatch:
 
@@ -32,9 +32,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-m2-
 
-      # 🧪 (Optional) Run tests
+      # 🧪 Run tests
       - name: 🧪 Test with Maven (skipped)
-        if: false
         run: ./mvnw clean test -DskipTests=false -Pci
 
       # 🏗️ Build JAR for deployment
@@ -76,6 +75,6 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: ${{ secrets.EB_APPLICATION_NAME }}
           environment_name: ${{ secrets.EB_ENVIRONMENT_NAME }}
-          version_label: v-${{ github.run_number }}
+          version_label: v-${{ github.run_number }}-${{ github.run_attempt }}
           region: ${{ secrets.AWS_REGION }}
           deployment_package: deploy.zip
