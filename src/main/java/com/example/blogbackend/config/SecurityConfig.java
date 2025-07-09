@@ -63,6 +63,8 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers("/api/v1/contact/**")
                     .permitAll()
+                    .requestMatchers("actuator/health", "actuator/info")
+                    .permitAll()
                     .anyRequest()
                     .permitAll())
         // .httpBasic(Customizer.withDefaults())  // Basic Auth for Postman or frontend fetch
