@@ -3,24 +3,30 @@
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CompositeKeyResolver {
-
+<span class="fc" id="L12">  private final Logger logger = LoggerFactory.getLogger(CompositeKeyResolver.class);</span>
   private final List&lt;RateLimitKeyResolver&gt; resolvers;
 
-<span class="fc" id="L13">  public CompositeKeyResolver(List&lt;RateLimitKeyResolver&gt; resolvers) {</span>
-<span class="fc" id="L14">    this.resolvers = resolvers;</span>
-<span class="fc" id="L15">  }</span>
+<span class="fc" id="L15">  public CompositeKeyResolver(List&lt;RateLimitKeyResolver&gt; resolvers) {</span>
+<span class="fc" id="L16">    this.resolvers = resolvers;</span>
+<span class="fc" id="L17">  }</span>
 
   public String resolveKey(HttpServletRequest request) {
-<span class="fc" id="L18">    return resolvers.stream()</span>
-<span class="fc" id="L19">        .map(resolver -&gt; resolver.resolveKey(request))</span>
-<span class="fc" id="L20">        .filter(java.util.Optional::isPresent)</span>
-<span class="fc" id="L21">        .map(Optional::get)</span>
-<span class="fc" id="L22">        .findFirst()</span>
-<span class="pc" id="L23">        .orElseThrow(() -&gt; new IllegalStateException(&quot;No key could be resolved&quot;));</span>
+<span class="fc" id="L20">    String resolveKey =</span>
+<span class="fc" id="L21">        resolvers.stream()</span>
+<span class="fc" id="L22">            .map(resolver -&gt; resolver.resolveKey(request))</span>
+<span class="fc" id="L23">            .filter(java.util.Optional::isPresent)</span>
+<span class="fc" id="L24">            .map(Optional::get)</span>
+<span class="fc" id="L25">            .findFirst()</span>
+<span class="pc" id="L26">            .orElseThrow(() -&gt; new IllegalStateException(&quot;No key could be resolved&quot;));</span>
+
+<span class="fc" id="L28">    logger.debug(&quot;Resolved key: {}&quot;, resolveKey);</span>
+<span class="fc" id="L29">    return resolveKey;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

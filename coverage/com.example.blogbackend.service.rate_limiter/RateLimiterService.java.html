@@ -7,25 +7,28 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RateLimiterService {
-<span class="fc" id="L14">  private final Map&lt;String, Bucket&gt; bucketCache = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L16">  private final Logger logger = LoggerFactory.getLogger(RateLimiterService.class);</span>
+<span class="fc" id="L17">  private final Map&lt;String, Bucket&gt; bucketCache = new ConcurrentHashMap&lt;&gt;();</span>
   private final CompositeKeyResolver keyResolver;
 
-<span class="fc" id="L17">  public RateLimiterService(CompositeKeyResolver keyResolver) {</span>
-<span class="fc" id="L18">    this.keyResolver = keyResolver;</span>
-<span class="fc" id="L19">  }</span>
+<span class="fc" id="L20">  public RateLimiterService(CompositeKeyResolver keyResolver) {</span>
+<span class="fc" id="L21">    this.keyResolver = keyResolver;</span>
+<span class="fc" id="L22">  }</span>
 
   public Bucket resolveBucket(HttpServletRequest request) {
-<span class="fc" id="L22">    String key = keyResolver.resolveKey(request);</span>
-<span class="fc" id="L23">    return bucketCache.computeIfAbsent(key, this::createNewBucket);</span>
+<span class="fc" id="L25">    String key = keyResolver.resolveKey(request);</span>
+<span class="fc" id="L26">    return bucketCache.computeIfAbsent(key, this::createNewBucket);</span>
   }
 
   private Bucket createNewBucket(String key) {
-<span class="fc" id="L27">    Bandwidth limit = Bandwidth.classic(100, Refill.greedy(100, Duration.ofMinutes(1)));</span>
-<span class="fc" id="L28">    return Bucket.builder().addLimit(limit).build();</span>
+<span class="fc" id="L30">    Bandwidth limit = Bandwidth.classic(100, Refill.greedy(100, Duration.ofMinutes(1)));</span>
+<span class="fc" id="L31">    return Bucket.builder().addLimit(limit).build();</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

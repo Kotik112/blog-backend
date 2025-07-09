@@ -2,13 +2,21 @@
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 @Component
-<span class="fc" id="L8">public class IpKeyResolver implements RateLimitKeyResolver {</span>
+<span class="fc" id="L9">public class IpKeyResolver implements RateLimitKeyResolver {</span>
+<span class="fc" id="L10">  private final Logger logger = org.slf4j.LoggerFactory.getLogger(IpKeyResolver.class);</span>
+
   @Override
   public Optional&lt;String&gt; resolveKey(HttpServletRequest request) {
-<span class="fc" id="L11">    return Optional.of(&quot;IP_&quot; + request.getRemoteAddr());</span>
+<span class="pc bpc" id="L14" title="2 of 4 branches missed.">    if (request == null || request.getRemoteAddr() == null) {</span>
+<span class="nc" id="L15">      logger.warn(&quot;Request or remote address is null, cannot resolve IP key.&quot;);</span>
+<span class="nc" id="L16">      return Optional.empty();</span>
+    }
+<span class="fc" id="L18">    logger.debug(&quot;Resolving key for IP: {}&quot;, request.getRemoteAddr());</span>
+<span class="fc" id="L19">    return Optional.of(&quot;IP_&quot; + request.getRemoteAddr());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

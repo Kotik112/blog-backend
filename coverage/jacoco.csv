@@ -19,11 +19,11 @@ blog-backend,com.example.blogbackend.exception,LoginFailureException,0,4,0,0,0,2
 blog-backend,com.example.blogbackend.exception,CommentNotFoundException,0,4,0,0,0,2,0,1,0,1
 blog-backend,com.example.blogbackend.exception,EmptyFileException,0,4,0,0,0,2,0,1,0,1
 blog-backend,com.example.blogbackend.service.rate_limiter,SessionRateLimiter,20,8,0,0,3,2,2,1,2,1
-blog-backend,com.example.blogbackend.service.rate_limiter,IpKeyResolver,0,8,0,0,0,2,0,2,0,2
+blog-backend,com.example.blogbackend.service.rate_limiter,IpKeyResolver,6,23,2,2,2,5,2,2,0,2
 blog-backend,com.example.blogbackend.service.rate_limiter,RateLimitFilter,0,32,0,2,0,10,0,3,0,2
-blog-backend,com.example.blogbackend.service.rate_limiter,SessionKeyResolver,13,3,2,0,2,1,2,1,1,1
-blog-backend,com.example.blogbackend.service.rate_limiter,RateLimiterService,0,36,0,0,0,8,0,3,0,3
-blog-backend,com.example.blogbackend.service.rate_limiter,CompositeKeyResolver,5,25,0,0,0,9,1,3,1,3
+blog-backend,com.example.blogbackend.service.rate_limiter,SessionKeyResolver,19,7,2,0,3,2,2,1,1,1
+blog-backend,com.example.blogbackend.service.rate_limiter,RateLimiterService,0,40,0,0,0,9,0,3,0,3
+blog-backend,com.example.blogbackend.service.rate_limiter,CompositeKeyResolver,5,36,0,0,0,13,1,3,1,3
 blog-backend,com.example.blogbackend.jobs,PendingContactEmailJob,0,14,0,0,0,6,0,2,0,2
 blog-backend,com.example.blogbackend.controller,BlogPostController,0,82,0,0,0,18,0,5,0,5
 blog-backend,com.example.blogbackend.controller,CommentController,5,19,0,0,1,6,1,3,1,3
@@ -32,7 +32,7 @@ blog-backend,com.example.blogbackend.controller,AuthController.new Authenticatio
 blog-backend,com.example.blogbackend.controller,ContactController,9,6,0,0,2,3,1,1,1,1
 blog-backend,com.example.blogbackend.controller,AuthController,36,86,6,5,9,19,7,5,1,4
 blog-backend,com.example.blogbackend.config,SwaggerConfig,0,3,0,0,0,1,0,1,0,1
-blog-backend,com.example.blogbackend.config,SecurityConfig,0,182,0,0,0,37,0,9,0,9
+blog-backend,com.example.blogbackend.config,SecurityConfig,0,195,0,0,0,39,0,9,0,9
 blog-backend,com.example.blogbackend.provider,TimeProvider,0,5,0,0,0,2,0,2,0,2
 blog-backend,com.example.blogbackend.enums,Role,0,19,0,0,0,4,0,2,0,2
 blog-backend,com.example.blogbackend.enums,ContactUsConstants,21,0,0,0,6,0,3,0,3,0

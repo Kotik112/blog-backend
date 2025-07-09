@@ -3,14 +3,19 @@
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-<span class="fc" id="L9">public class SessionKeyResolver implements RateLimitKeyResolver {</span>
+<span class="fc" id="L11">public class SessionKeyResolver implements RateLimitKeyResolver {</span>
+<span class="fc" id="L12">  private final Logger logger = LoggerFactory.getLogger(SessionKeyResolver.class);</span>
+
   @Override
   public Optional&lt;String&gt; resolveKey(HttpServletRequest request) {
-<span class="nc" id="L12">    HttpSession session = request.getSession(false);</span>
-<span class="nc bnc" id="L13" title="All 2 branches missed.">    return session != null ? Optional.of(&quot;SESSION_&quot; + session.getId()) : Optional.empty();</span>
+<span class="nc" id="L16">    logger.debug(&quot;Resolving key for session: {}&quot;, request.getRequestURI());</span>
+<span class="nc" id="L17">    HttpSession session = request.getSession(false);</span>
+<span class="nc bnc" id="L18" title="All 2 branches missed.">    return session != null ? Optional.of(&quot;SESSION_&quot; + session.getId()) : Optional.empty();</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
