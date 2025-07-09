@@ -7,10 +7,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RateLimiterService {
+  private final Logger logger = LoggerFactory.getLogger(RateLimiterService.class);
   private final Map<String, Bucket> bucketCache = new ConcurrentHashMap<>();
   private final CompositeKeyResolver keyResolver;
 

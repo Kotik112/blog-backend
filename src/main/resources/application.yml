@@ -34,10 +34,6 @@ logging:
     console: "%d{HH:mm:ss.SSS} [%level] %c{1.} [%t] %msg%n"
     file: "%d{HH:mm:ss.SSS} [%level] %c{1.} [%t] %msg%n"
 
-
-server:
-  port: 8080
-
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

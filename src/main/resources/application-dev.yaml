@@ -17,7 +17,7 @@ spring:
             enable: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE}
 
 server:
-  port: 8080
+  port: 5000
 
 logging:
   level:
