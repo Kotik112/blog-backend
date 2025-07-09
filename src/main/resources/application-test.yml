@@ -11,5 +11,9 @@ spring:
           starttls:
             enable: false
 
+logging:
+  level:
+    root: INFO
+
 mail:
   to: test@example.com

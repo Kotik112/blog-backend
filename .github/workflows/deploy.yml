@@ -34,7 +34,7 @@ jobs:
 
       # 🧪 Run tests
       - name: 🧪 Test with Maven (skipped)
-        if: false # Set to false to speed up the workflow while testing deployment
+        if: false
         run: ./mvnw clean test -DskipTests=false -Pci
 
       # 🏗️ Build JAR for deployment
@@ -44,41 +44,35 @@ jobs:
       # 📦 Create deployment zip for Elastic Beanstalk
       - name: 📦 Create zip for Elastic Beanstalk
         run: |
+          # 🔐 Create .env file from GitHub secrets
+          cat <<EOF > .env
+          DB_URL=${{ secrets.DB_URL }}
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PW=${{ secrets.DB_PW }}
+          SPRING_MAIL_HOST=${{ secrets.SPRING_MAIL_HOST }}
+          SPRING_MAIL_PORT=${{ secrets.SPRING_MAIL_PORT }}
+          SPRING_MAIL_USERNAME=${{ secrets.SPRING_MAIL_USERNAME }}
+          SPRING_MAIL_PASSWORD=${{ secrets.SPRING_MAIL_PASSWORD }}
+          SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=${{ secrets.SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH }}
+          SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=${{ secrets.SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE }}
+          MAIL_TO=${{ secrets.MAIL_TO }}
+          EOF
+  
+          # 📦 Generate environment config
+          set -o allexport
+          source .env
           mkdir -p staging/.ebextensions
+          envsubst < .github/eb_env.template > staging/.ebextensions/01_environment.config
+          set +o allexport
+          
+          # 🚚 Copy JAR and Procfile
           cp target/*.jar staging/application.jar
-
           echo 'web: java -jar application.jar' > staging/Procfile
 
-          {
-            echo "option_settings:"
-            echo "  aws:elasticbeanstalk:application:environment:"
-            echo "    SPRING_PROFILES_ACTIVE: dev"
-            echo "    DB_URL: \"${DB_URL}\""
-            echo "    DB_USER: \"${DB_USER}\""
-            echo "    DB_PW: \"${DB_PW}\""
-            echo "    SPRING_MAIL_HOST: \"${SPRING_MAIL_HOST}\""
-            echo "    SPRING_MAIL_PORT: \"${SPRING_MAIL_PORT}\""
-            echo "    SPRING_MAIL_USERNAME: \"${SPRING_MAIL_USERNAME}\""
-            echo "    SPRING_MAIL_PASSWORD: \"${SPRING_MAIL_PASSWORD}\""
-            echo "    SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: \"${SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH}\""
-            echo "    SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: \"${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE}\""
-            echo "    MAIL_TO: \"${MAIL_TO}\""
-          } > staging/.ebextensions/01_environment.config
-
+          # 📦 Create deployable zip
           cd staging
           zip -r ../deploy.zip .
           cd ..
-        env:
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PW: ${{ secrets.DB_PW }}
-          SPRING_MAIL_HOST: ${{ secrets.SPRING_MAIL_HOST }}
-          SPRING_MAIL_PORT: ${{ secrets.SPRING_MAIL_PORT }}
-          SPRING_MAIL_USERNAME: ${{ secrets.SPRING_MAIL_USERNAME }}
-          SPRING_MAIL_PASSWORD: ${{ secrets.SPRING_MAIL_PASSWORD }}
-          SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: ${{ secrets.SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH }}
-          SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: ${{ secrets.SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE }}
-          MAIL_TO: ${{ secrets.MAIL_TO }}
 
       # 🚀 Deploy to AWS Elastic Beanstalk
       - name: 🚀 Deploy to EB

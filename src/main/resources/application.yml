@@ -34,18 +34,9 @@ logging:
     console: "%d{HH:mm:ss.SSS} [%level] %c{1.} [%t] %msg%n"
     file: "%d{HH:mm:ss.SSS} [%level] %c{1.} [%t] %msg%n"
 
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PW}
-    driver-class-name: org.postgresql.Driver
-
 
 server:
   port: 8080
-  error:
-    include-stacktrace: never
-    include-message: always
 
 springdoc:
   swagger-ui:
