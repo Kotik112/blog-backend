@@ -32,7 +32,7 @@ blog-backend,com.example.blogbackend.controller,AuthController.new Authenticatio
 blog-backend,com.example.blogbackend.controller,ContactController,9,6,0,0,2,3,1,1,1,1
 blog-backend,com.example.blogbackend.controller,AuthController,36,86,6,5,9,19,7,5,1,4
 blog-backend,com.example.blogbackend.config,SwaggerConfig,0,3,0,0,0,1,0,1,0,1
-blog-backend,com.example.blogbackend.config,SecurityConfig,0,195,0,0,0,39,0,9,0,9
+blog-backend,com.example.blogbackend.config,SecurityConfig,0,196,0,0,0,40,0,9,0,9
 blog-backend,com.example.blogbackend.provider,TimeProvider,0,5,0,0,0,2,0,2,0,2
 blog-backend,com.example.blogbackend.enums,Role,0,19,0,0,0,4,0,2,0,2
 blog-backend,com.example.blogbackend.enums,ContactUsConstants,21,0,0,0,6,0,3,0,3,0
