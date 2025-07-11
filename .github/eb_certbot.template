@@ -33,23 +33,21 @@ commands:
 
   configure_nginx_ssl:
     command: |
-      cat > /etc/nginx/conf.d/ssl_redirect.conf <<EOF
-server {
-    listen 443 ssl;
-    server_name ${DOMAIN};
-
-    ssl_certificate /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
-
-    location / {
-        proxy_pass http://localhost:8080;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-    }
-}
-EOF
+      echo "server {\n\
+    listen 443 ssl;\n\
+    server_name ${DOMAIN};\n\
+\n\
+    ssl_certificate /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;\n\
+    ssl_certificate_key /etc/letsencrypt/live/${DOMAIN}/privkey.pem;\n\
+\n\
+    location / {\n\
+        proxy_pass http://localhost:8080;\n\
+        proxy_set_header Host \$host;\n\
+        proxy_set_header X-Real-IP \$remote_addr;\n\
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;\n\
+        proxy_set_header X-Forwarded-Proto \$scheme;\n\
+    }\n\
+}" > /etc/nginx/conf.d/ssl_redirect.conf
 
   restart_nginx:
     command: service nginx restart
