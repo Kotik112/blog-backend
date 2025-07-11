@@ -56,6 +56,8 @@ jobs:
           SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=${{ secrets.SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH }}
           SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=${{ secrets.SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE }}
           MAIL_TO=${{ secrets.MAIL_TO }}
+          DOMAIN=${{ secrets.DOMAIN }}
+          EMAIL=${{ secrets.EMAIL }}
           EOF
   
           # 📦 Generate environment config
@@ -63,6 +65,7 @@ jobs:
           source .env
           mkdir -p staging/.ebextensions
           envsubst < .github/eb_env.template > staging/.ebextensions/01_environment.config
+          envsubst < .github/eb_certbot.template > staging/.ebextensions/02_certbot.config
           set +o allexport
           
           # 🚚 Copy JAR and Procfile
