@@ -33,7 +33,7 @@ commands:
 
   configure_nginx_ssl:
     command: |
-      echo 'server {
+      echo "server {
   listen 443 ssl;
   server_name ${DOMAIN};
 
@@ -47,7 +47,7 @@ commands:
     proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto \$scheme;
   }
-}' > /etc/nginx/conf.d/ssl_redirect.conf
+}" > /etc/nginx/conf.d/ssl_redirect.conf
 
   restart_nginx:
     command: service nginx restart
