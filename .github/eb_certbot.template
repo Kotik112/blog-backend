@@ -52,4 +52,4 @@ commands:
       EOF
 
   restart_nginx:
-    command: systemctl restart nginx
+    command: service nginx restart
