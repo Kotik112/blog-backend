@@ -53,4 +53,6 @@ commands:
         -d ${DOMAIN} || echo "Cert already exists"
 
   restart_nginx:
-    command: service nginx restart
+      command: |
+        nginx -t || (cat /etc/nginx/conf.d/*.conf && exit 1)
+        service nginx restart
