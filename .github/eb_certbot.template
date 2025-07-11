@@ -1,6 +1,5 @@
 packages:
   yum:
-    epel-release: []
     nginx: []
     certbot: []
 
