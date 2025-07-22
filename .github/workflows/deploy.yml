@@ -32,19 +32,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-m2-
 
-      # 🧪 Run tests
+      # 🧪 Run tests (optional)
       - name: 🧪 Test with Maven (skipped)
         if: false
         run: ./mvnw clean test -DskipTests=false -Pci
 
-      # 🏗️ Build JAR for deployment
-      - name: 🏗️ Build JAR (for deployment)
+      # 🏗️ Build JAR
+      - name: 🏗️ Build JAR
         run: ./mvnw clean package -DskipTests -Pci
 
-      # 📦 Create deployment zip for Elastic Beanstalk
-      - name: 📦 Create zip for Elastic Beanstalk
+      # 📦 Create deployment zip
+      - name: 📦 Create deployment ZIP
         run: |
-          # 🔐 Create .env file from GitHub secrets
+          # 🔐 Create .env file for envsubst
           cat <<EOF > .env
           DB_URL=${{ secrets.DB_URL }}
           DB_USER=${{ secrets.DB_USER }}
@@ -56,28 +56,22 @@ jobs:
           SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=${{ secrets.SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH }}
           SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=${{ secrets.SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE }}
           MAIL_TO=${{ secrets.MAIL_TO }}
-          DOMAIN=${{ secrets.DOMAIN }}
-          EMAIL=${{ secrets.EMAIL }}
           EOF
-  
-          # 📦 Generate environment config
+
           set -o allexport
           source .env
           mkdir -p staging/.ebextensions
           envsubst < .github/eb_env.template > staging/.ebextensions/01_environment.config
-          envsubst '${DOMAIN},${EMAIL}' < .github/eb_certbot.template > staging/.ebextensions/02_certbot.config
           set +o allexport
-          
-          # 🚚 Copy JAR and Procfile
+
           cp target/*.jar staging/application.jar
           echo 'web: java -jar application.jar' > staging/Procfile
 
-          # 📦 Create deployable zip
           cd staging
           zip -r ../deploy.zip .
           cd ..
 
-      # 🚀 Deploy to AWS Elastic Beanstalk
+      # 🚀 Deploy to EB
       - name: 🚀 Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v22
         with:
