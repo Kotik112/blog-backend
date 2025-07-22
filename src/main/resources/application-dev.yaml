@@ -18,6 +18,11 @@ spring:
 
 server:
   port: 5000
+  servlet:
+    session:
+      cookie:
+        secure: true
+        same-site: None
 
 logging:
   level:
