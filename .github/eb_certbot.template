@@ -4,7 +4,7 @@ packages:
     certbot: []
 
 files:
-  "/etc/nginx/conf.d/ssl.conf":
+  "/etc/nginx/conf.d/00_http.conf":
     mode: "000644"
     owner: root
     group: root
@@ -22,11 +22,23 @@ files:
           }
       }
 
-  "/etc/nginx/conf.d/ssl_redirect.conf":
-    mode: "000644"
-    owner: root
-    group: root
-    content: |
+commands:
+  01_start_nginx:
+    command: service nginx start
+
+  02_create_cert:
+    command: |
+      mkdir -p /var/www/html
+      certbot certonly --webroot -w /var/www/html \
+        --non-interactive --agree-tos \
+        -m ${EMAIL} \
+        -d ${DOMAIN}
+
+  03_replace_config:
+    command: |
+      rm -f /etc/nginx/conf.d/00_http.conf
+
+      cat <<EOF > /etc/nginx/conf.d/01_ssl.conf
       server {
           listen 443 ssl;
           server_name ${DOMAIN};
@@ -36,25 +48,15 @@ files:
 
           location / {
               proxy_pass http://localhost:5000;
-              proxy_set_header Host $host;
-              proxy_set_header X-Real-IP $remote_addr;
-              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-              proxy_set_header X-Forwarded-Proto $scheme;
+              proxy_set_header Host \$host;
+              proxy_set_header X-Real-IP \$remote_addr;
+              proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto \$scheme;
           }
       }
+      EOF
 
-commands:
-  create_cert:
+  04_restart_nginx:
     command: |
-      mkdir -p /var/www/html
-      certbot certonly --webroot -w /var/www/html \
-        --non-interactive --agree-tos \
-        -m ${EMAIL} \
-        -d ${DOMAIN}
-
-  restart_nginx:
-    command: |
-      echo "=== NGINX CONFIG TEST ==="
-      nginx -t 2>&1 || (echo "--- /etc/nginx/conf.d/*.conf contents ---" && cat /etc/nginx/conf.d/*.conf && exit 1)
-      echo "=== RESTARTING NGINX ==="
+      nginx -t || (cat /etc/nginx/conf.d/*.conf && exit 1)
       service nginx restart
