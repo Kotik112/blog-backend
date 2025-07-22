@@ -65,7 +65,7 @@ jobs:
           source .env
           mkdir -p staging/.ebextensions
           envsubst < .github/eb_env.template > staging/.ebextensions/01_environment.config
-          envsubst < .github/eb_certbot.template > staging/.ebextensions/02_certbot.config
+          envsubst '${DOMAIN},${EMAIL}' < .github/eb_certbot.template > staging/.ebextensions/02_certbot.config
           set +o allexport
           
           # 🚚 Copy JAR and Procfile
