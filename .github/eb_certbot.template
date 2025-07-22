@@ -23,8 +23,14 @@ files:
       }
 
 commands:
+  00_remove_default_conf:
+    command: |
+      rm -f /etc/nginx/conf.d/default.conf
+
   01_start_nginx:
-    command: service nginx start
+    command: |
+      nginx -t || (cat /etc/nginx/conf.d/*.conf && exit 1)
+      service nginx start
 
   02_create_cert:
     command: |

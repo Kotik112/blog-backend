@@ -1,4 +1,4 @@
-name: CI
+name: Build and Test with JaCoCo Coverage
 on:
   push:
     branches:
