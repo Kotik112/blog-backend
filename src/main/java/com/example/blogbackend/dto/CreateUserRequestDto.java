@@ -12,4 +12,13 @@ public record CreateUserRequestDto(
     @NotBlank(message = "Password is required")
         @NotNull
         @Size(min = 6, message = "Password must be at least 6 characters long")
-        String password) {}
+        String password,
+        @NotBlank(message = "Email is required")
+        @NotNull
+        @Size(max = 255, message = "Email must not exceed 255 characters")
+        String email,
+        @Size(max = 100, message = "First name must not exceed 100 characters")
+        String firstName,
+        @Size(max = 100, message = "Last name must not exceed 100 characters")
+        String lastName
+    ) {}

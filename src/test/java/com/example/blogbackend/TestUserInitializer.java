@@ -4,6 +4,7 @@ import com.example.blogbackend.domain.User;
 import com.example.blogbackend.enums.Role;
 import com.example.blogbackend.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
+import java.time.LocalDateTime;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,7 +33,13 @@ public class TestUserInitializer {
     User user = new User();
     user.setUsername("testuser");
     user.setPassword(passwordEncoder.encode("testPassword"));
+    user.setEmail("testuser@example.com"); // ✅ Add this
+    user.setFirstName("Test");
+    user.setLastName("User");
     user.setRole(Role.USER);
+    user.setCreatedAt(LocalDateTime.now());
+    user.setActive(true);
+    user.setEmailVerified(true);
 
     userRepository.save(user);
   }

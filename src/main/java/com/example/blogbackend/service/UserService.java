@@ -8,7 +8,7 @@ import com.example.blogbackend.enums.LoginResponseEnum;
 import com.example.blogbackend.enums.Role;
 import com.example.blogbackend.exception.UserAlreadyExistsException;
 import com.example.blogbackend.repository.UserRepository;
-import com.example.blogbackend.ultility.ValidationUtility;
+import com.example.blogbackend.utility.ValidationUtility;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
