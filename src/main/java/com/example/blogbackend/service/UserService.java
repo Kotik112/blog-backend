@@ -13,6 +13,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +64,14 @@ public class UserService {
     User user = new User();
     user.setUsername(normalizedUsername);
     user.setPassword(passwordEncoder.encode(userRequest.password()));
-    user.setRole(Role.USER);
+    user.setEmail(userRequest.email().toLowerCase());
+    user.setFirstName(userRequest.firstName());
+    user.setLastName(userRequest.lastName());
+    user.setRole(Role.USER); // default role
+    user.setActive(true); // default as per schema
+    user.setEmailVerified(false); // default as per schema
+    user.setCreatedAt(LocalDateTime.now()); // TODO: Use a datetime provider for easier testing
+
     User savedUser = userRepository.save(user);
     logger.info("User registered successfully: {}", savedUser.getUsername());
     return "User registered successfully";

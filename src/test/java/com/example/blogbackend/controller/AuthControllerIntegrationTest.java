@@ -24,7 +24,8 @@ class AuthControllerIntegrationTest extends SpringBootComponentTest {
 
   @Test
   void when_registerUser_then_userIsRegistered() throws Exception {
-    CreateUserRequestDto user = new CreateUserRequestDto("test", "testPassword");
+    CreateUserRequestDto user =
+        new CreateUserRequestDto("test", "testPassword", "test@example.com", "John", "Doe");
 
     MvcResult result =
         mvc.perform(
@@ -43,7 +44,13 @@ class AuthControllerIntegrationTest extends SpringBootComponentTest {
 
   @Test
   void when_registerUserWithShortUsername_then_badRequest() throws Exception {
-    CreateUserRequestDto user = new CreateUserRequestDto("ab", "testPassword");
+    CreateUserRequestDto user =
+        new CreateUserRequestDto(
+            "ab", // too short
+            "testPassword",
+            "short@example.com",
+            "Jane",
+            "Smith");
 
     MvcResult result =
         mvc.perform(
@@ -62,7 +69,9 @@ class AuthControllerIntegrationTest extends SpringBootComponentTest {
 
   @Test
   void when_registerUserWithExistingUsername_then_badRequest() throws Exception {
-    CreateUserRequestDto user = new CreateUserRequestDto("existingUser", "testPassword");
+    CreateUserRequestDto user =
+        new CreateUserRequestDto(
+            "existingUser", "testPassword", "existing@example.com", "Jane", "Doe");
 
     // First registration should succeed
     MvcResult successResult =
@@ -148,7 +157,9 @@ class AuthControllerIntegrationTest extends SpringBootComponentTest {
 
   @Test
   void when_loginUserWithInvalidCredentials_then_unauthorized() throws Exception {
-    CreateUserRequestDto user = new CreateUserRequestDto("test1", "correctPassword");
+    CreateUserRequestDto user =
+        new CreateUserRequestDto(
+            "newUser", "correctPassword", "existing@example.com", "Jane", "Doe");
     // First register the user
     val mvcResult =
         mvc.perform(
