@@ -14,6 +14,7 @@ import com.example.blogbackend.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -73,11 +74,18 @@ class UserServiceTest {
 
   @Test
   void test_registerUser_success() {
-    CreateUserRequestDto userRequest = new CreateUserRequestDto("newuser", "password123");
+    CreateUserRequestDto userRequest =
+        new CreateUserRequestDto("newuser", "password123", "newuser@example.com", "John", "Doe");
     User savedUser = new User();
     savedUser.setUsername("newuser");
     savedUser.setPassword("encodedPassword");
+    savedUser.setEmail("newuser@example.com");
+    savedUser.setFirstName("John");
+    savedUser.setLastName("Doe");
     savedUser.setRole(Role.USER);
+    savedUser.setActive(true);
+    savedUser.setEmailVerified(false);
+    savedUser.setCreatedAt(LocalDateTime.now());
 
     when(userRepository.existsByUsername("newuser")).thenReturn(false);
     when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
@@ -93,7 +101,8 @@ class UserServiceTest {
 
   @Test
   void test_registerUser_usernameTooShort() {
-    CreateUserRequestDto userRequest = new CreateUserRequestDto("nu", "password123");
+    CreateUserRequestDto userRequest =
+        new CreateUserRequestDto("nu", "password123", "newuser@example.com", "John", "Doe");
     RegistrationFailureException ex =
         Assertions.assertThrows(
             RegistrationFailureException.class, () -> userService.registerUser(userRequest));
@@ -103,7 +112,8 @@ class UserServiceTest {
   @Test
   void test_registerUser_usernameTooLong() {
     CreateUserRequestDto userRequest =
-        new CreateUserRequestDto("thisusernameistoolong", "password123");
+        new CreateUserRequestDto(
+            "thisusernameiswaytoolong", "password123", "newuser@example.com", "John", "Doe");
     RegistrationFailureException ex =
         Assertions.assertThrows(
             RegistrationFailureException.class, () -> userService.registerUser(userRequest));
@@ -112,7 +122,8 @@ class UserServiceTest {
 
   @Test
   void test_registerUser_passwordTooShort() {
-    CreateUserRequestDto userRequest = new CreateUserRequestDto("newuser", "123");
+    CreateUserRequestDto userRequest =
+        new CreateUserRequestDto("newuser", "p1", "newuser@example.com", "John", "Doe");
     RegistrationFailureException ex =
         Assertions.assertThrows(
             RegistrationFailureException.class, () -> userService.registerUser(userRequest));
@@ -121,7 +132,8 @@ class UserServiceTest {
 
   @Test
   void test_registerUser_passwordNull_throwsException() {
-    CreateUserRequestDto userRequest = new CreateUserRequestDto("newuser", null);
+    CreateUserRequestDto userRequest =
+        new CreateUserRequestDto("newuser", null, "newuser@example.com", "John", "Doe");
     RegistrationFailureException ex =
         Assertions.assertThrows(
             RegistrationFailureException.class, () -> userService.registerUser(userRequest));

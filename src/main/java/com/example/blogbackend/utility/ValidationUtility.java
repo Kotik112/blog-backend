@@ -1,4 +1,4 @@
-package com.example.blogbackend.ultility;
+package com.example.blogbackend.utility;
 
 import com.example.blogbackend.dto.CreateUserRequestDto;
 import com.example.blogbackend.dto.LoginRequestDto;
