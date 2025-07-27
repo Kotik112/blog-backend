@@ -90,13 +90,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 <span class="fc" id="L90">        List.of(</span>
             &quot;http://localhost:5173&quot;,
             &quot;http://127.0.0.1:5173&quot;,
-            &quot;http://blog-frontend-dev1.s3-website-us-east-1.amazonaws.com&quot;));
-<span class="fc" id="L94">    config.setAllowedHeaders(List.of(&quot;*&quot;));</span>
-<span class="fc" id="L95">    config.setAllowedMethods(List.of(&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;));</span>
+            &quot;http://blog-frontend-dev1.s3-website-us-east-1.amazonaws.com&quot;,
+            &quot;https://kitok.click&quot;));
+<span class="fc" id="L95">    config.setAllowedHeaders(List.of(&quot;*&quot;));</span>
+<span class="fc" id="L96">    config.setAllowedMethods(List.of(&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;));</span>
 
-<span class="fc" id="L97">    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();</span>
-<span class="fc" id="L98">    source.registerCorsConfiguration(&quot;/**&quot;, config);</span>
-<span class="fc" id="L99">    return source;</span>
+<span class="fc" id="L98">    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();</span>
+<span class="fc" id="L99">    source.registerCorsConfiguration(&quot;/**&quot;, config);</span>
+<span class="fc" id="L100">    return source;</span>
   }
 
   /**
@@ -109,10 +110,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
    */
   @Bean
   public MultipartConfigElement multipartConfigElement() {
-<span class="fc" id="L112">    MultipartConfigFactory factory = new MultipartConfigFactory();</span>
-<span class="fc" id="L113">    factory.setMaxFileSize(DataSize.ofMegabytes(10));</span>
-<span class="fc" id="L114">    factory.setMaxRequestSize(DataSize.ofMegabytes(10));</span>
-<span class="fc" id="L115">    return factory.createMultipartConfig();</span>
+<span class="fc" id="L113">    MultipartConfigFactory factory = new MultipartConfigFactory();</span>
+<span class="fc" id="L114">    factory.setMaxFileSize(DataSize.ofMegabytes(10));</span>
+<span class="fc" id="L115">    factory.setMaxRequestSize(DataSize.ofMegabytes(10));</span>
+<span class="fc" id="L116">    return factory.createMultipartConfig();</span>
   }
 
   /**
@@ -126,12 +127,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
    */
   @Bean
   public PasswordEncoder passwordEncoder() {
-<span class="fc" id="L129">    return new BCryptPasswordEncoder();</span>
+<span class="fc" id="L130">    return new BCryptPasswordEncoder();</span>
   }
 
   @Bean
   public UserDetailsService userDetailsService(DatabaseUserService databaseUserService) {
-<span class="fc" id="L134">    return databaseUserService;</span>
+<span class="fc" id="L135">    return databaseUserService;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

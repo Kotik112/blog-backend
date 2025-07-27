@@ -1,12 +1,12 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 blog-backend,com.example.blogbackend,BlogBackendApplication,5,3,0,0,2,1,1,1,1,1
-blog-backend,com.example.blogbackend.ultility,ValidationUtility,0,74,3,19,0,18,3,12,0,4
 blog-backend,com.example.blogbackend.service,BlogPostService,13,239,1,3,0,53,3,7,2,6
 blog-backend,com.example.blogbackend.service,CommentService,0,124,0,0,0,34,0,7,0,7
 blog-backend,com.example.blogbackend.service,DatabaseUserService,6,39,0,0,1,12,1,2,1,2
-blog-backend,com.example.blogbackend.service,UserService,0,205,1,9,0,53,1,9,0,5
+blog-backend,com.example.blogbackend.service,UserService,11,233,2,10,2,60,2,9,0,5
 blog-backend,com.example.blogbackend.service,MailService,25,237,1,9,4,54,1,8,0,4
 blog-backend,com.example.blogbackend.service,ImageService,5,236,2,8,1,58,2,12,0,9
+blog-backend,com.example.blogbackend.utility,ValidationUtility,0,74,3,19,0,18,3,12,0,4
 blog-backend,com.example.blogbackend.exception,ImageUploadException,0,4,0,0,0,2,0,1,0,1
 blog-backend,com.example.blogbackend.exception,GlobalExceptionHandler,30,100,0,0,5,28,5,8,5,8
 blog-backend,com.example.blogbackend.exception,BlogPostNotFoundException,0,4,0,0,0,2,0,1,0,1
@@ -20,19 +20,19 @@ blog-backend,com.example.blogbackend.exception,CommentNotFoundException,0,4,0,0,
 blog-backend,com.example.blogbackend.exception,EmptyFileException,0,4,0,0,0,2,0,1,0,1
 blog-backend,com.example.blogbackend.service.rate_limiter,SessionRateLimiter,20,8,0,0,3,2,2,1,2,1
 blog-backend,com.example.blogbackend.service.rate_limiter,IpKeyResolver,6,23,2,2,2,5,2,2,0,2
-blog-backend,com.example.blogbackend.service.rate_limiter,RateLimitFilter,0,32,0,2,0,10,0,3,0,2
+blog-backend,com.example.blogbackend.service.rate_limiter,RateLimitFilter,11,21,1,1,3,7,1,2,0,2
 blog-backend,com.example.blogbackend.service.rate_limiter,SessionKeyResolver,19,7,2,0,3,2,2,1,1,1
 blog-backend,com.example.blogbackend.service.rate_limiter,RateLimiterService,0,40,0,0,0,9,0,3,0,3
 blog-backend,com.example.blogbackend.service.rate_limiter,CompositeKeyResolver,5,36,0,0,0,13,1,3,1,3
 blog-backend,com.example.blogbackend.jobs,PendingContactEmailJob,0,14,0,0,0,6,0,2,0,2
-blog-backend,com.example.blogbackend.controller,BlogPostController,0,82,0,0,0,18,0,5,0,5
+blog-backend,com.example.blogbackend.controller,BlogPostController,43,39,0,0,9,9,1,4,1,4
 blog-backend,com.example.blogbackend.controller,CommentController,5,19,0,0,1,6,1,3,1,3
 blog-backend,com.example.blogbackend.controller,ImageController,5,21,0,0,1,6,1,3,1,3
 blog-backend,com.example.blogbackend.controller,AuthController.new AuthenticationException() {...},7,0,0,0,1,0,1,0,1,0
 blog-backend,com.example.blogbackend.controller,ContactController,9,6,0,0,2,3,1,1,1,1
 blog-backend,com.example.blogbackend.controller,AuthController,36,86,6,5,9,19,7,5,1,4
 blog-backend,com.example.blogbackend.config,SwaggerConfig,0,3,0,0,0,1,0,1,0,1
-blog-backend,com.example.blogbackend.config,SecurityConfig,0,196,0,0,0,40,0,9,0,9
+blog-backend,com.example.blogbackend.config,SecurityConfig,0,197,0,0,0,40,0,9,0,9
 blog-backend,com.example.blogbackend.provider,TimeProvider,0,5,0,0,0,2,0,2,0,2
 blog-backend,com.example.blogbackend.enums,Role,0,19,0,0,0,4,0,2,0,2
 blog-backend,com.example.blogbackend.enums,ContactUsConstants,21,0,0,0,6,0,3,0,3,0

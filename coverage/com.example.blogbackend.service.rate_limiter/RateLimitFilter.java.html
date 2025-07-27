@@ -24,14 +24,14 @@ public class RateLimitFilter extends OncePerRequestFilter {
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
 <span class="fc" id="L26">    Bucket bucket = rateLimiterService.resolveBucket(request);</span>
-<span class="fc bfc" id="L27" title="All 2 branches covered.">    if (bucket.tryConsume(1)) {</span>
+<span class="pc bpc" id="L27" title="1 of 2 branches missed.">    if (bucket.tryConsume(1)) {</span>
       // Proceed with the request if the token is consumed successfully
 <span class="fc" id="L29">      filterChain.doFilter(request, response);</span>
     } else {
       // If the rate limit is exceeded, send a 429 Too Many Requests response
-<span class="fc" id="L32">      response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());</span>
-<span class="fc" id="L33">      response.setContentType(MediaType.TEXT_PLAIN_VALUE);</span>
-<span class="fc" id="L34">      response.getWriter().write(&quot;Rate limit exceeded. Try again later.&quot;);</span>
+<span class="nc" id="L32">      response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());</span>
+<span class="nc" id="L33">      response.setContentType(MediaType.TEXT_PLAIN_VALUE);</span>
+<span class="nc" id="L34">      response.getWriter().write(&quot;Rate limit exceeded. Try again later.&quot;);</span>
     }
 <span class="fc" id="L36">  }</span>
 }
