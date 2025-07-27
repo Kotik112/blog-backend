@@ -86,12 +86,12 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowCredentials(true);
-    config.setAllowedOrigins(List.of(
+    config.setAllowedOrigins(
+        List.of(
             "http://localhost:5173",
             "http://127.0.0.1:5173",
             "http://blog-frontend-dev1.s3-website-us-east-1.amazonaws.com",
-            "https://kitok.click"
-    ));
+            "https://kitok.click"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 

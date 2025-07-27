@@ -8,11 +8,12 @@ import com.example.blogbackend.enums.LoginResponseEnum;
 import com.example.blogbackend.enums.Role;
 import com.example.blogbackend.exception.UserAlreadyExistsException;
 import com.example.blogbackend.repository.UserRepository;
-import com.example.blogbackend.ultility.ValidationUtility;
+import com.example.blogbackend.utility.ValidationUtility;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,11 +60,22 @@ public class UserService {
       logger.warn("Registration attempt with existing username: {}", userRequest.username());
       throw new UserAlreadyExistsException("User already exists");
     }
+    if (userRepository.existsByEmail(userRequest.email())) {
+      logger.warn("Registration attempt with existing email: {}", userRequest.email());
+      throw new UserAlreadyExistsException("Email already registered");
+    }
 
     User user = new User();
     user.setUsername(normalizedUsername);
     user.setPassword(passwordEncoder.encode(userRequest.password()));
-    user.setRole(Role.USER);
+    user.setEmail(userRequest.email().toLowerCase());
+    user.setFirstName(userRequest.firstName());
+    user.setLastName(userRequest.lastName());
+    user.setRole(Role.USER); // default role
+    user.setActive(true); // default as per schema
+    user.setEmailVerified(false); // default as per schema
+    user.setCreatedAt(LocalDateTime.now()); // TODO: Use a datetime provider for easier testing
+
     User savedUser = userRepository.save(user);
     logger.info("User registered successfully: {}", savedUser.getUsername());
     return "User registered successfully";

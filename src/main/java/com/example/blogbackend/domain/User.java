@@ -1,13 +1,8 @@
 package com.example.blogbackend.domain;
 
 import com.example.blogbackend.enums.Role;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,25 +19,28 @@ public class User {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(nullable = false, unique = true)
   private String username;
+
+  @Column(nullable = false)
   private String password;
+
+  @Column(nullable = false, unique = true)
+  private String email;
+
+  private String firstName;
+  private String lastName;
+
+  private boolean isActive = true;
+  private boolean isEmailVerified = false;
 
   @Enumerated(EnumType.STRING)
   private Role role;
 
-  @Override
-  public String toString() {
-    return "User{"
-        + "id="
-        + id
-        + ", username='"
-        + username
-        + '\''
-        + ", password='"
-        + password
-        + '\''
-        + ", role="
-        + role
-        + '}';
-  }
+  @Column(name = "profile_picture_url", length = 500)
+  private String profilePictureUrl;
+
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
+  private LocalDateTime lastLoginAt;
 }
