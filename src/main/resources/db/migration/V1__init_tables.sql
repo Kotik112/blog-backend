@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS image (
 ALTER TABLE blog_post
     ADD COLUMN image_id BIGINT;
 
+
 ALTER TABLE blog_post
     ADD CONSTRAINT fk_blog_post_image_id
         FOREIGN KEY (image_id)

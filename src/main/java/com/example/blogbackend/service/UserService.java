@@ -60,6 +60,10 @@ public class UserService {
       logger.warn("Registration attempt with existing username: {}", userRequest.username());
       throw new UserAlreadyExistsException("User already exists");
     }
+    if (userRepository.existsByEmail(userRequest.email())) {
+      logger.warn("Registration attempt with existing email: {}", userRequest.email());
+      throw new UserAlreadyExistsException("Email already registered");
+    }
 
     User user = new User();
     user.setUsername(normalizedUsername);

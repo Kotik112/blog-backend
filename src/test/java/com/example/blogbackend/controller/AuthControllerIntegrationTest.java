@@ -71,7 +71,7 @@ class AuthControllerIntegrationTest extends SpringBootComponentTest {
   void when_registerUserWithExistingUsername_then_badRequest() throws Exception {
     CreateUserRequestDto user =
         new CreateUserRequestDto(
-            "existingUser", "testPassword", "existing@example.com", "Jane", "Doe");
+            "existingUser", "testPassword", "existingEmail@example.com", "Jane", "Doe");
 
     // First registration should succeed
     MvcResult successResult =
