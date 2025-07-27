@@ -1,16 +1,8 @@
 package com.example.blogbackend.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.blogbackend.utils.SpringBootComponentTest;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 
-//class RateLimitFilterTest extends SpringBootComponentTest {
+// class RateLimitFilterTest extends SpringBootComponentTest {
 //
 //  @Autowired MockMvc mvc;
 //
@@ -52,4 +44,4 @@ import org.springframework.test.web.servlet.MockMvc;
 //    // The 101st request should be rejected due to rate limit
 //    mvc.perform(get(BASE_BLOG_POST_URL)).andExpect(status().isTooManyRequests());
 //  }
-}
+// }
