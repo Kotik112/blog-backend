@@ -65,7 +65,7 @@ jobs:
           set +o allexport
 
           cp target/*.jar staging/application.jar
-          echo 'web: java -jar application.jar' > staging/Procfile
+          echo 'web: java -jar application.jar --spring.profiles.active=dev' > staging/Procfile
 
           cd staging
           zip -r ../deploy.zip .
