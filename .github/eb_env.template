@@ -1,5 +1,6 @@
 option_settings:
   aws:elasticbeanstalk:application:environment:
+    Application Healthcheck URL: "/actuator/health"
     SPRING_PROFILES_ACTIVE: dev
     SERVER_PORT: 5000
 

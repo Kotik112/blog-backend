@@ -5,7 +5,6 @@ import static org.springframework.http.HttpMethod.POST;
 import com.example.blogbackend.enums.Role;
 import com.example.blogbackend.service.DatabaseUserService;
 import jakarta.servlet.MultipartConfigElement;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
@@ -21,16 +20,19 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.util.unit.DataSize;
-import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @SuppressWarnings("unused")
 @Configuration
 public class SecurityConfig {
   private final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+  private final CorsConfigurationSource corsConfigurationSource;
 
-  /**
+  public SecurityConfig(CorsConfigurationSource corsConfigurationSource) {
+    this.corsConfigurationSource = corsConfigurationSource;
+  }
+
+    /**
    * Authentication manager bean that uses the in-memory user details service. This can be replaced
    * with a custom UserDetailsService for database-backed users.
    */
@@ -50,7 +52,7 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .cors(cors -> cors.configurationSource(corsConfigurationSource))
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(POST, "/api/v1/blog/**")
@@ -71,33 +73,6 @@ public class SecurityConfig {
         .formLogin(AbstractHttpConfigurer::disable);
 
     return http.build();
-  }
-
-  /**
-   * CORS configuration to allow requests from specific origins. This is necessary for frontend
-   * applications to interact with the backend API.
-   *
-   * @see <a
-   *     href="https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-cors">Spring
-   *     CORS Documentation</a>
-   * @return CorsConfigurationSource
-   */
-  @Bean
-  public CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration config = new CorsConfiguration();
-    config.setAllowCredentials(true);
-    config.setAllowedOrigins(
-        List.of(
-            "http://localhost:5173",
-            "http://127.0.0.1:5173",
-            "http://blog-frontend-dev1.s3-website-us-east-1.amazonaws.com",
-            "https://kitok.click"));
-    config.setAllowedHeaders(List.of("*"));
-    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", config);
-    return source;
   }
 
   /**
