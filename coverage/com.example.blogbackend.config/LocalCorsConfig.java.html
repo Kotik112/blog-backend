@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LocalCorsConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">blog-backend</a> &gt; <a href="index.source.html" class="el_package">com.example.blogbackend.config</a> &gt; <span class="el_source">LocalCorsConfig.java</span></div><h1>LocalCorsConfig.java</h1><pre class="source lang-java linenums">package com.example.blogbackend.config;
+
+import java.util.List;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+/**
+ * CORS configuration for local development environment. This allows requests from the local
+ * development React app running on localhost:5173 and 127.0.0.1:5173.
+ */
+@SuppressWarnings(&quot;unused&quot;)
+@Configuration
+@Profile(&quot;local&quot;)
+<span class="nc" id="L18">public class LocalCorsConfig {</span>
+  /**
+   * CORS configuration for local development. This allows requests from the local development react
+   * app running on localhost:5173 and 127.0.0.1:5173.
+   *
+   * @return CorsConfigurationSource
+   * @see &lt;a href=&quot;https://docs.spring.io/spring-framework/reference/web/webmvc-cors.html&quot;&gt;Spring
+   *     CORS Documentation&lt;/a&gt;
+   */
+  @Bean
+  public CorsConfigurationSource localCorsConfigurationSource() {
+<span class="nc" id="L29">    CorsConfiguration config = new CorsConfiguration();</span>
+<span class="nc" id="L30">    config.setAllowCredentials(true);</span>
+<span class="nc" id="L31">    config.setAllowedOrigins(List.of(&quot;http://localhost:5173&quot;, &quot;http://127.0.0.1:5173&quot;));</span>
+<span class="nc" id="L32">    config.setAllowedHeaders(List.of(&quot;*&quot;));</span>
+<span class="nc" id="L33">    config.setAllowedMethods(List.of(&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;));</span>
+
+<span class="nc" id="L35">    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();</span>
+<span class="nc" id="L36">    source.registerCorsConfiguration(&quot;/**&quot;, config);</span>
+<span class="nc" id="L37">    return source;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
