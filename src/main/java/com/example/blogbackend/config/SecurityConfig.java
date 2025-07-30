@@ -26,13 +26,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @Configuration
 public class SecurityConfig {
   private final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
-  private final CorsConfigurationSource corsConfigurationSource;
 
-  public SecurityConfig(CorsConfigurationSource corsConfigurationSource) {
-    this.corsConfigurationSource = corsConfigurationSource;
-  }
-
-    /**
+  /**
    * Authentication manager bean that uses the in-memory user details service. This can be replaced
    * with a custom UserDetailsService for database-backed users.
    */
@@ -50,7 +45,8 @@ public class SecurityConfig {
    * stateless API use - Basic Auth and form login enabled - Endpoint-based authorization
    */
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain securityFilterChain(
+      HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
         .cors(cors -> cors.configurationSource(corsConfigurationSource))
         .authorizeHttpRequests(
