@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,9 +26,9 @@ public class CommentController {
 
   private final CommentService commentService;
 
-<span class="fc" id="L27">  public CommentController(CommentService commentService) {</span>
-<span class="fc" id="L28">    this.commentService = commentService;</span>
-<span class="fc" id="L29">  }</span>
+<span class="fc" id="L29">  public CommentController(CommentService commentService) {</span>
+<span class="fc" id="L30">    this.commentService = commentService;</span>
+<span class="fc" id="L31">  }</span>
 
   /**
    * Creates a new comment.
@@ -38,9 +40,11 @@ public class CommentController {
       summary = &quot;Create a new comment&quot;,
       description = &quot;Creates a new comment for a blog post.&quot;)
   @PostMapping(&quot;&quot;)
-  public ResponseEntity&lt;CommentDto&gt; createComment(@RequestBody CreateCommentDto createCommentDto) {
-<span class="fc" id="L42">    return ResponseEntity.status(HttpStatus.CREATED)</span>
-<span class="fc" id="L43">        .body(commentService.createComment(createCommentDto));</span>
+  public ResponseEntity&lt;CommentDto&gt; createComment(
+      @RequestBody CreateCommentDto createCommentDto,
+      @AuthenticationPrincipal UserDetails userDetails) {
+<span class="fc" id="L46">    return ResponseEntity.status(HttpStatus.CREATED)</span>
+<span class="fc" id="L47">        .body(commentService.createComment(createCommentDto, userDetails.getUsername()));</span>
   }
 
   /**
@@ -55,7 +59,7 @@ public class CommentController {
   @GetMapping(&quot;/{id}&quot;)
   @ResponseStatus(HttpStatus.OK)
   public CommentDto getCommentById(@PathVariable(&quot;id&quot;) Long id) {
-<span class="fc" id="L58">    return commentService.getCommentById(id);</span>
+<span class="fc" id="L62">    return commentService.getCommentById(id);</span>
   }
 
   /**
@@ -70,7 +74,7 @@ public class CommentController {
   @GetMapping(&quot;/blogPost/{blogPostId}&quot;)
   @ResponseStatus(HttpStatus.OK)
   public List&lt;CommentDto&gt; getCommentsByBlogPostId(@PathVariable(&quot;blogPostId&quot;) Long blogPostId) {
-<span class="nc" id="L73">    return commentService.getCommentsByBlogPostId(blogPostId);</span>
+<span class="nc" id="L77">    return commentService.getCommentsByBlogPostId(blogPostId);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

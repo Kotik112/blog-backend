@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">blog-backend</a> &gt; <a href="index.source.html" class="el_package">com.example.blogbackend.controller</a> &gt; <span class="el_source">AdminController.java</span></div><h1>AdminController.java</h1><pre class="source lang-java linenums">package com.example.blogbackend.controller;
+
+import com.example.blogbackend.dto.BlogPostDto;
+import com.example.blogbackend.dto.UserDto;
+import com.example.blogbackend.exception.IllegalOperationException;
+import com.example.blogbackend.service.BlogPostService;
+import com.example.blogbackend.service.UserService;
+import java.security.Principal;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * AdminController handles administrative operations such as managing blog posts and users. It
+ * provides endpoints for retrieving all blog posts, deleting posts, retrieving all users, updating
+ * user roles, and deleting users. This controller is intended for use by users with administrative
+ * privileges.
+ */
+@RestController
+@RequestMapping(&quot;/api/v1/admin&quot;)
+@Validated
+public class AdminController {
+
+  private final BlogPostService blogPostService;
+  private final UserService userService;
+
+<span class="fc" id="L28">  public AdminController(BlogPostService blogPostService, UserService userService) {</span>
+<span class="fc" id="L29">    this.blogPostService = blogPostService;</span>
+<span class="fc" id="L30">    this.userService = userService;</span>
+<span class="fc" id="L31">  }</span>
+
+  /**
+   * Retrieves a paginated list of all blog posts.
+   *
+   * @param page the page number to retrieve (default is 0)
+   * @param size the number of posts per page (default is 10)
+   * @return A ResponseEntity containing a Page of BlogPostDto objects
+   */
+  @GetMapping(&quot;/all-posts&quot;)
+  public ResponseEntity&lt;Page&lt;BlogPostDto&gt;&gt; getAllPosts(
+      @RequestParam(defaultValue = &quot;0&quot;) int page, @RequestParam(defaultValue = &quot;10&quot;) int size) {
+<span class="nc" id="L43">    Page&lt;BlogPostDto&gt; allBlogPosts = blogPostService.getAllBlogPosts(page, size);</span>
+<span class="nc" id="L44">    return ResponseEntity.ok(allBlogPosts);</span>
+  }
+
+  /**
+   * Deletes a blog post by its ID. If the post does not exist, returns a 404 Not Found response.
+   *
+   * @param id the ID of the blog post to delete
+   * @return A ResponseEntity with no content if deletion is successful, or 404 if the post is not
+   *     found
+   */
+  @DeleteMapping(&quot;/posts/{id}&quot;)
+  public ResponseEntity&lt;Void&gt; deletePost(@PathVariable Long id) {
+<span class="nc bnc" id="L56" title="All 2 branches missed.">    if (blogPostService.getBlogPostById(id) == null) {</span>
+<span class="nc" id="L57">      return ResponseEntity.notFound().build();</span>
+    }
+<span class="nc" id="L59">    blogPostService.deletePost(id);</span>
+<span class="nc" id="L60">    return ResponseEntity.noContent().build();</span>
+  }
+
+  /**
+   * Retrieves a paginated list of all users.
+   *
+   * @param page the page number to retrieve (default is 0)
+   * @param size the number of users per page (default is 10)
+   * @return A ResponseEntity containing a Page of UserDto objects
+   */
+  @GetMapping(&quot;/all-users&quot;)
+  public ResponseEntity&lt;Page&lt;UserDto&gt;&gt; getAllUsers(
+      @RequestParam(defaultValue = &quot;0&quot;) int page, @RequestParam(defaultValue = &quot;10&quot;) int size) {
+<span class="nc" id="L73">    Page&lt;UserDto&gt; allUsers = userService.getAllUsers(page, size);</span>
+<span class="nc" id="L74">    return ResponseEntity.ok(allUsers);</span>
+  }
+
+  /**
+   * Updates the role of a user identified by their username.
+   *
+   * @param username the username of the user whose role is to be updated
+   * @param role the new role to assign to the user
+   * @return A ResponseEntity containing the updated UserDto, or 404 if the user is not found
+   */
+  @PatchMapping(&quot;/users/{username}/role&quot;)
+  public ResponseEntity&lt;UserDto&gt; updateUserRole(
+      @PathVariable String username, @RequestParam String role, Principal principal) {
+<span class="nc bnc" id="L87" title="All 2 branches missed.">    if (principal.getName().equalsIgnoreCase(username)) {</span>
+<span class="nc" id="L88">      throw new IllegalOperationException(&quot;Administrators cannot change their own roles.&quot;);</span>
+    }
+<span class="nc bnc" id="L90" title="All 2 branches missed.">    if (!userService.userExists(username)) {</span>
+<span class="nc" id="L91">      return ResponseEntity.notFound().build();</span>
+    }
+<span class="nc" id="L93">    UserDto updatedUser = userService.updateUserRole(username, role);</span>
+<span class="nc" id="L94">    return ResponseEntity.ok(updatedUser);</span>
+  }
+
+  @DeleteMapping(&quot;/users/{username}&quot;)
+  public ResponseEntity&lt;Void&gt; deleteUser(@PathVariable String username) {
+<span class="nc bnc" id="L99" title="All 2 branches missed.">    if (!userService.userExists(username)) {</span>
+<span class="nc" id="L100">      return ResponseEntity.notFound().build();</span>
+    }
+<span class="nc" id="L102">    userService.deleteUser(username);</span>
+<span class="nc" id="L103">    return ResponseEntity.noContent().build();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

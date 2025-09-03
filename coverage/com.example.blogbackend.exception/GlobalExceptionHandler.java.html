@@ -132,6 +132,13 @@ public class GlobalExceptionHandler {
 <span class="fc" id="L132">    return buildApiError(HttpStatus.BAD_REQUEST, errorMessage, request);</span>
   }
 
+  @ExceptionHandler({IllegalOperationException.class})
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ApiError handleIllegalOperationException(
+      IllegalOperationException ex, WebRequest request) {
+<span class="nc" id="L139">    return handleException(ex, request, HttpStatus.BAD_REQUEST);</span>
+  }
+
   /**
    * Private function that constructs an ApiError object from any given exception.
    *
@@ -140,23 +147,23 @@ public class GlobalExceptionHandler {
    * @return an ApiError object containing error details
    */
   private ApiError handleException(Exception ex, WebRequest request, HttpStatus status) {
-<span class="fc" id="L143">    ApiError apiError = new ApiError();</span>
-<span class="fc" id="L144">    apiError.setTimestamp(LocalDateTime.now());</span>
-<span class="fc" id="L145">    apiError.setStatus(status.value());</span>
-<span class="fc" id="L146">    apiError.setError(status.getReasonPhrase());</span>
-<span class="fc" id="L147">    apiError.setMessage(ex.getMessage());</span>
-<span class="fc" id="L148">    apiError.setPath(request.getDescription(false));</span>
-<span class="fc" id="L149">    return apiError;</span>
+<span class="fc" id="L150">    ApiError apiError = new ApiError();</span>
+<span class="fc" id="L151">    apiError.setTimestamp(LocalDateTime.now());</span>
+<span class="fc" id="L152">    apiError.setStatus(status.value());</span>
+<span class="fc" id="L153">    apiError.setError(status.getReasonPhrase());</span>
+<span class="fc" id="L154">    apiError.setMessage(ex.getMessage());</span>
+<span class="fc" id="L155">    apiError.setPath(request.getDescription(false));</span>
+<span class="fc" id="L156">    return apiError;</span>
   }
 
   private ApiError buildApiError(HttpStatus status, String message, WebRequest request) {
-<span class="fc" id="L153">    ApiError apiError = new ApiError();</span>
-<span class="fc" id="L154">    apiError.setTimestamp(LocalDateTime.now());</span>
-<span class="fc" id="L155">    apiError.setStatus(status.value());</span>
-<span class="fc" id="L156">    apiError.setError(status.getReasonPhrase());</span>
-<span class="fc" id="L157">    apiError.setMessage(message);</span>
-<span class="fc" id="L158">    apiError.setPath(request.getDescription(false));</span>
-<span class="fc" id="L159">    return apiError;</span>
+<span class="fc" id="L160">    ApiError apiError = new ApiError();</span>
+<span class="fc" id="L161">    apiError.setTimestamp(LocalDateTime.now());</span>
+<span class="fc" id="L162">    apiError.setStatus(status.value());</span>
+<span class="fc" id="L163">    apiError.setError(status.getReasonPhrase());</span>
+<span class="fc" id="L164">    apiError.setMessage(message);</span>
+<span class="fc" id="L165">    apiError.setPath(request.getDescription(false));</span>
+<span class="fc" id="L166">    return apiError;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

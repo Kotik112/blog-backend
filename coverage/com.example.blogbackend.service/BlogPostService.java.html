@@ -134,5 +134,14 @@ public class BlogPostService {
 
 <span class="fc" id="L135">    return new PageImpl&lt;&gt;(blogPostDtoList, pageRequest, blogPostPage.getTotalElements());</span>
   }
+
+  public void deletePost(Long id) {
+<span class="nc" id="L139">    BlogPost blogPost =</span>
+        blogPostRepository
+<span class="nc" id="L141">            .findById(id)</span>
+<span class="nc" id="L142">            .orElseThrow(</span>
+<span class="nc" id="L143">                () -&gt; new BlogPostNotFoundException(&quot;Blog post with id: &quot; + id + &quot; not found.&quot;));</span>
+<span class="nc" id="L144">    blogPostRepository.delete(blogPost);</span>
+<span class="nc" id="L145">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

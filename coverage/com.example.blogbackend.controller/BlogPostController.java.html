@@ -156,15 +156,7 @@ public class BlogPostController {
       @RequestParam(defaultValue = &quot;0&quot;) int page,
       @RequestParam(defaultValue = &quot;5&quot;) int size) {
 <span class="nc" id="L158">    logger.info(&quot;Retrieving blog posts for user: {}&quot;, principal.getName());</span>
-<span class="nc" id="L159">    Page&lt;BlogPostDto&gt; blogPosts =</span>
-<span class="nc" id="L160">        blogPostService.getBlogPostsByUser(principal.getName(), page, size);</span>
-<span class="nc" id="L161">    logger.info(</span>
-        &quot;Retrieved {} blog posts for user: {} on page {} with size {}&quot;,
-<span class="nc" id="L163">        blogPosts.getTotalElements(),</span>
-<span class="nc" id="L164">        principal.getName(),</span>
-<span class="nc" id="L165">        page,</span>
-<span class="nc" id="L166">        size);</span>
-<span class="nc" id="L167">    return blogPosts;</span>
+<span class="nc" id="L159">    return blogPostService.getBlogPostsByUser(principal.getName(), page, size);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
