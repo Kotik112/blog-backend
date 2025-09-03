@@ -11,6 +11,7 @@ import com.example.blogbackend.utils.SpringBootComponentTest;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -20,11 +21,8 @@ import org.springframework.test.web.servlet.MvcResult;
 class CommentControllerIntegrationTest extends SpringBootComponentTest {
 
   private static final String TEST_COMMENT = "Test comment";
+  @Autowired
   MockMvc mvc;
-
-  public CommentControllerIntegrationTest(MockMvc mvc) {
-    this.mvc = mvc;
-  }
 
   @WithMockUser(username = "testuser", roles = "USER")
   @Transactional
