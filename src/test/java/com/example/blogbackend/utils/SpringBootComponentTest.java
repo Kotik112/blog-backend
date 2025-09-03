@@ -35,6 +35,8 @@ public abstract class SpringBootComponentTest {
   public static final String BASE_IMAGE_URL = API_VERSION_1 + "/images";
   public static final String BASE_AUTH_URL = API_VERSION_1 + "/auth";
 
+  public static final String PLAIN_TEXT = "text/plain";
+
   @DynamicPropertySource
   static void overrideProperties(DynamicPropertyRegistry registry) {
     PostgreSQLContainer<?> postgres = PostgresTestContainer.getInstance();

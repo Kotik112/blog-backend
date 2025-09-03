@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.example.blogbackend.domain.BlogPost;
 import com.example.blogbackend.domain.Comment;
+import com.example.blogbackend.domain.User;
 import com.example.blogbackend.dto.CommentDto;
 import com.example.blogbackend.dto.CreateCommentDto;
 import com.example.blogbackend.exception.BlogPostNotFoundException;
@@ -15,6 +16,7 @@ import com.example.blogbackend.exception.CommentNotFoundException;
 import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
 import com.example.blogbackend.repository.CommentRepository;
+import com.example.blogbackend.repository.UserRepository;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -36,13 +38,16 @@ class CommentServiceTest {
 
   @Mock BlogPostRepository blogPostRepository;
 
+  @Mock UserRepository userRepository;
+
   @Mock TimeProvider timeProvider;
 
   @Test
   void when_createComment_then_retrieveComment() {
     // Input comment
     CreateCommentDto createCommentDto = new CreateCommentDto("Test comment", 1L);
-
+    User user = new User();
+    user.setUsername("testiser");
     Instant now = Instant.now();
 
     // Expected comment
@@ -53,6 +58,7 @@ class CommentServiceTest {
             .createdAt(now)
             .lastEditedAt(now)
             .isEdited(false)
+            .createdBy(user)
             .build();
 
     BlogPost blogPost = new BlogPost();
@@ -65,9 +71,10 @@ class CommentServiceTest {
     when(commentRepository.save(any())).thenReturn(comment);
     when(blogPostRepository.findById(1L)).thenReturn(Optional.of(blogPost));
     when(blogPostRepository.save(blogPost)).thenReturn(blogPost);
+    when(userRepository.findByUsername(any())).thenReturn(Optional.of(user));
     when(timeProvider.getNow()).thenReturn(now);
 
-    commentService.createComment(createCommentDto);
+    commentService.createComment(createCommentDto, "testUser");
 
     verify(commentRepository, times(1)).save(any());
     verify(blogPostRepository, times(1)).findById(1L);
@@ -76,13 +83,15 @@ class CommentServiceTest {
 
   @Test
   void when_createComment_then_throwBlogPostNotFoundException() {
+
     // Input comment
     CreateCommentDto createCommentDto = new CreateCommentDto("Test comment", 1L);
 
     when(blogPostRepository.findById(1L)).thenReturn(Optional.empty());
 
     assertThrows(
-        BlogPostNotFoundException.class, () -> commentService.createComment(createCommentDto));
+        BlogPostNotFoundException.class,
+        () -> commentService.createComment(createCommentDto, "testUser"));
   }
 
   @Test

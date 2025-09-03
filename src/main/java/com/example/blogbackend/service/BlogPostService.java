@@ -134,4 +134,13 @@ public class BlogPostService {
 
     return new PageImpl<>(blogPostDtoList, pageRequest, blogPostPage.getTotalElements());
   }
+
+  public void deletePost(Long id) {
+    BlogPost blogPost =
+        blogPostRepository
+            .findById(id)
+            .orElseThrow(
+                () -> new BlogPostNotFoundException("Blog post with id: " + id + " not found."));
+    blogPostRepository.delete(blogPost);
+  }
 }

@@ -132,6 +132,13 @@ public class GlobalExceptionHandler {
     return buildApiError(HttpStatus.BAD_REQUEST, errorMessage, request);
   }
 
+  @ExceptionHandler({IllegalOperationException.class})
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ApiError handleIllegalOperationException(
+      IllegalOperationException ex, WebRequest request) {
+    return handleException(ex, request, HttpStatus.BAD_REQUEST);
+  }
+
   /**
    * Private function that constructs an ApiError object from any given exception.
    *

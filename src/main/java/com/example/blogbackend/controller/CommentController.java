@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,9 +40,11 @@ public class CommentController {
       summary = "Create a new comment",
       description = "Creates a new comment for a blog post.")
   @PostMapping("")
-  public ResponseEntity<CommentDto> createComment(@RequestBody CreateCommentDto createCommentDto) {
+  public ResponseEntity<CommentDto> createComment(
+      @RequestBody CreateCommentDto createCommentDto,
+      @AuthenticationPrincipal UserDetails userDetails) {
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(commentService.createComment(createCommentDto));
+        .body(commentService.createComment(createCommentDto, userDetails.getUsername()));
   }
 
   /**

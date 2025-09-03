@@ -18,8 +18,9 @@ public record CommentDto(
             description = "Timestamp when the comment was last edited",
             example = "2025-06-26T03:20:00.000Z")
         Instant lastEditedAt,
-    @Schema(description = "Whether the comment has been edited", example = "true")
-        Boolean isEdited) {
+    @Schema(description = "Whether the comment has been edited", example = "true") Boolean isEdited,
+    @Schema(description = "The user who created this comment", example = "john_doe")
+        String createdBy) {
   public static CommentDto from(Comment comment) {
     return CommentDto.builder()
         .id(comment.getId())
@@ -27,6 +28,7 @@ public record CommentDto(
         .createdAt(comment.getCreatedAt())
         .lastEditedAt(comment.getLastEditedAt())
         .isEdited(comment.getIsEdited())
+        .createdBy(comment.getCreatedBy().getUsername())
         .build();
   }
 }

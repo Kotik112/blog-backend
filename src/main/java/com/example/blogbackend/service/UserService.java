@@ -4,6 +4,7 @@ import com.example.blogbackend.domain.User;
 import com.example.blogbackend.dto.ApiLoginResponse;
 import com.example.blogbackend.dto.CreateUserRequestDto;
 import com.example.blogbackend.dto.LoginRequestDto;
+import com.example.blogbackend.dto.UserDto;
 import com.example.blogbackend.enums.LoginResponseEnum;
 import com.example.blogbackend.enums.Role;
 import com.example.blogbackend.exception.UserAlreadyExistsException;
@@ -14,9 +15,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,6 +28,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
@@ -81,6 +86,11 @@ public class UserService {
     return "User registered successfully";
   }
 
+  public Page<UserDto> getAllUsers(int page, int size) {
+    Page<User> usersPage = userRepository.findAll(PageRequest.of(page, size));
+    return usersPage.map(UserDto::from);
+  }
+
   public ApiLoginResponse loginUser(
       LoginRequestDto loginRequestDto, HttpServletRequest httpRequest) {
     ValidationUtility.validateLoginRequest(loginRequestDto);
@@ -132,5 +142,50 @@ public class UserService {
     cookie.setHttpOnly(true);
     cookie.setMaxAge(0);
     response.addCookie(cookie);
+  }
+
+  public UserDto updateUserRole(String username, String role) {
+    if (!isValidRole(role)) {
+      throw new IllegalArgumentException("Invalid role: " + role);
+    }
+    User user =
+        userRepository
+            .findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
+    Role newRole = parseRole(role);
+    if (user.getRole() == newRole) {
+      logger.info("User: {} already has role: {}", username, newRole);
+      return UserDto.from(user);
+    }
+    user.setRole(newRole);
+    User updatedUser = userRepository.save(user);
+    logger.info("Updated role for user: {} to {}", username, newRole);
+    return UserDto.from(updatedUser);
+  }
+
+  public void deleteUser(String username) {
+    User user =
+        userRepository
+            .findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    userRepository.delete(user);
+  }
+
+  private boolean isValidRole(String role) {
+    if (role == null || role.isBlank()) return false;
+    return Arrays.stream(Role.values()).anyMatch(r -> r.name().equalsIgnoreCase(role.trim()));
+  }
+
+  private Role parseRole(String role) {
+    String normalized = role.trim().toUpperCase();
+    if (normalized.startsWith("ROLE_")) {
+      normalized = normalized.substring(5);
+    }
+    try {
+      return Role.valueOf(normalized);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("Invalid role: " + role);
+    }
   }
 }

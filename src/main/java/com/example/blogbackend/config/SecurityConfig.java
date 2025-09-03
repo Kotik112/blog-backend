@@ -5,6 +5,7 @@ import static org.springframework.http.HttpMethod.POST;
 import com.example.blogbackend.enums.Role;
 import com.example.blogbackend.service.DatabaseUserService;
 import jakarta.servlet.MultipartConfigElement;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
@@ -20,7 +21,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.util.unit.DataSize;
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @SuppressWarnings("unused")
 @Configuration
@@ -48,7 +51,7 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
-        .cors(cors -> cors.configurationSource(corsConfigurationSource))
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(POST, "/api/v1/blog/**")
@@ -69,6 +72,23 @@ public class SecurityConfig {
         .formLogin(AbstractHttpConfigurer::disable);
 
     return http.build();
+  }
+
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowCredentials(true);
+    config.setAllowedOrigins(
+        List.of(
+            "http://localhost:5173",
+            "http://blog-frontend-dev1.s3-website-us-east-1.amazonaws.com",
+            "https://blogify.kitok.click"));
+    config.setAllowedHeaders(List.of("*"));
+    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+    return source;
   }
 
   /**
@@ -92,8 +112,8 @@ public class SecurityConfig {
    * password storage.
    *
    * @see <a
-   *     href="https://docs.spring.io/spring-security/reference/servlet/password-storage.html">Spring
-   *     Security Password Storage</a>
+   *     href="https://docs.spring.io/spring-security/site/docs/current/api/org/springframework/security/crypto/bcrypt/BCryptPasswordEncoder.html">
+   *     BCryptPasswordEncoder</a>
    * @return PasswordEncoder
    */
   @Bean

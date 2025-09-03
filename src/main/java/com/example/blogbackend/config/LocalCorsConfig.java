@@ -12,10 +12,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  * CORS configuration for local development environment. This allows requests from the local
  * development React app running on localhost:5173 and 127.0.0.1:5173.
  */
-@SuppressWarnings("unused")
 @Configuration
 @Profile("local")
 public class LocalCorsConfig {
+
   /**
    * CORS configuration for local development. This allows requests from the local development react
    * app running on localhost:5173 and 127.0.0.1:5173.
@@ -24,11 +24,11 @@ public class LocalCorsConfig {
    * @see <a href="https://docs.spring.io/spring-framework/reference/web/webmvc-cors.html">Spring
    *     CORS Documentation</a>
    */
-  @Bean
+  @Bean(name = "localCorsConfigurationSource")
   public CorsConfigurationSource localCorsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowCredentials(true);
-    config.setAllowedOrigins(List.of("http://localhost:5173", "http://127.0.0.1:5173"));
+    config.setAllowedOrigins(List.of("http://localhost:5173"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 

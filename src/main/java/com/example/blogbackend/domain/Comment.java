@@ -49,13 +49,19 @@ public class Comment {
   @JoinColumn(name = "blogPostId")
   private BlogPost blogPost;
 
-  public static Comment from(CommentDto comment) {
+  @Schema(description = "The user who created this comment")
+  @ManyToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private User createdBy;
+
+  public static Comment from(CommentDto comment, User createdBy) {
     return Comment.builder()
         .id(comment.id())
         .content(comment.content())
         .createdAt(comment.createdAt())
         .lastEditedAt(comment.lastEditedAt())
         .isEdited(comment.isEdited())
+        .createdBy(createdBy)
         .build();
   }
 

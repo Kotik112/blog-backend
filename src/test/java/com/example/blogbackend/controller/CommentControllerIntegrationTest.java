@@ -11,7 +11,6 @@ import com.example.blogbackend.utils.SpringBootComponentTest;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -20,41 +19,21 @@ import org.springframework.test.web.servlet.MvcResult;
 
 class CommentControllerIntegrationTest extends SpringBootComponentTest {
 
-  @Autowired MockMvc mvc;
+  private static final String TEST_COMMENT = "Test comment";
+  MockMvc mvc;
 
-  //  @BeforeAll
-  //  void registerTestUser() throws Exception {
-  //    CreateUserRequestDto user = new CreateUserRequestDto("testUser", "testPassword");
-  //
-  //    MvcResult result =
-  //            mvc.perform(
-  //                            post("/api/v1/auth/register")
-  //                                    .contentType(MediaType.APPLICATION_JSON)
-  //                                    .content(objectMapper.writeValueAsString(user)))
-  //                    .andReturn();
-  //
-  //    int status = result.getResponse().getStatus();
-  //    String body = result.getResponse().getContentAsString();
-  //
-  //    if (status == 201) {
-  //      Assertions.assertEquals("User registered successfully", body);
-  //    } else if (status == 400) {
-  //      Assertions.assertTrue(
-  //              body.contains("Username already exists"),
-  //              "Expected 'Username already exists', got: " + body);
-  //    } else {
-  //      Assertions.fail("Unexpected status: " + status + ", body: " + body);
-  //    }
-  //  }
+  public CommentControllerIntegrationTest(MockMvc mvc) {
+    this.mvc = mvc;
+  }
 
   @WithMockUser(username = "testuser", roles = "USER")
   @Transactional
   @Test
   void when_createComment_return_blogPostWithComment() throws Exception {
     MockMultipartFile titlePart =
-        new MockMultipartFile("title", "", "text/plain", "Test Blog Post".getBytes());
+        new MockMultipartFile("title", "", PLAIN_TEXT, "Test Blog Post".getBytes());
     MockMultipartFile contentPart =
-        new MockMultipartFile("content", "", "text/plain", "This is a test blog post.".getBytes());
+        new MockMultipartFile("content", "", PLAIN_TEXT, "This is a test blog post.".getBytes());
 
     MvcResult mvcResult =
         mvc.perform(multipart(BASE_BLOG_POST_URL).file(titlePart).file(contentPart))
@@ -64,7 +43,7 @@ class CommentControllerIntegrationTest extends SpringBootComponentTest {
     BlogPostDto blogPostDto = getFromResult(mvcResult, BlogPostDto.class);
     Long blogPostId = blogPostDto.id();
 
-    CreateCommentDto createCommentDto = new CreateCommentDto("Test comment", blogPostId);
+    CreateCommentDto createCommentDto = new CreateCommentDto(TEST_COMMENT, blogPostId);
 
     MvcResult commentMvcResult =
         mvc.perform(
@@ -78,9 +57,10 @@ class CommentControllerIntegrationTest extends SpringBootComponentTest {
     Assertions.assertEquals(commentDto.content(), createCommentDto.content());
   }
 
+  @WithMockUser(username = "testuser", roles = "USER")
   @Test
   void when_createCommentWithInvalidBlogPostId_return_404() throws Exception {
-    CreateCommentDto createCommentDto = new CreateCommentDto("Test comment", 1L);
+    CreateCommentDto createCommentDto = new CreateCommentDto(TEST_COMMENT, 1L);
 
     MvcResult result =
         mvc.perform(
@@ -102,9 +82,9 @@ class CommentControllerIntegrationTest extends SpringBootComponentTest {
   @Test
   void when_getCommentById_return_comment() throws Exception {
     MockMultipartFile titlePart =
-        new MockMultipartFile("title", "", "text/plain", "Test Blog Post".getBytes());
+        new MockMultipartFile("title", "", PLAIN_TEXT, "Test Blog Post".getBytes());
     MockMultipartFile contentPart =
-        new MockMultipartFile("content", "", "text/plain", "This is a test blog post.".getBytes());
+        new MockMultipartFile("content", "", PLAIN_TEXT, "This is a test blog post.".getBytes());
 
     MvcResult mvcResult =
         mvc.perform(multipart(BASE_BLOG_POST_URL).file(titlePart).file(contentPart))
@@ -114,7 +94,7 @@ class CommentControllerIntegrationTest extends SpringBootComponentTest {
     BlogPostDto blogPostDto = getFromResult(mvcResult, BlogPostDto.class);
     Long blogPostId = blogPostDto.id();
 
-    CreateCommentDto createCommentDto = new CreateCommentDto("Test comment", blogPostId);
+    CreateCommentDto createCommentDto = new CreateCommentDto(TEST_COMMENT, blogPostId);
 
     MvcResult commentMvcResult =
         mvc.perform(
