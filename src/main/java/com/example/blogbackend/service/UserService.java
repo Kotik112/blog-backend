@@ -8,13 +8,13 @@ import com.example.blogbackend.dto.UserDto;
 import com.example.blogbackend.enums.LoginResponseEnum;
 import com.example.blogbackend.enums.Role;
 import com.example.blogbackend.exception.UserAlreadyExistsException;
+import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.UserRepository;
 import com.example.blogbackend.utility.ValidationUtility;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
@@ -39,14 +39,17 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final AuthenticationManager authenticationManager;
+  private final TimeProvider timeProvider;
 
   public UserService(
       UserRepository userRepository,
       PasswordEncoder passwordEncoder,
-      AuthenticationManager authenticationManager) {
+      AuthenticationManager authenticationManager,
+      TimeProvider timeProvider) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.authenticationManager = authenticationManager;
+    this.timeProvider = timeProvider;
   }
 
   public boolean userExists(String username) {
@@ -77,9 +80,9 @@ public class UserService {
     user.setFirstName(userRequest.firstName());
     user.setLastName(userRequest.lastName());
     user.setRole(Role.USER); // default role
-    user.setActive(true); // default as per schema
-    user.setEmailVerified(false); // default as per schema
-    user.setCreatedAt(LocalDateTime.now()); // TODO: Use a datetime provider for easier testing
+    user.setActive(true);
+    user.setEmailVerified(false);
+    user.setCreatedAt(timeProvider.getNow());
 
     User savedUser = userRepository.save(user);
     logger.info("User registered successfully: {}", savedUser.getUsername());

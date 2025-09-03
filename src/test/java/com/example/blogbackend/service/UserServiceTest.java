@@ -10,11 +10,12 @@ import com.example.blogbackend.enums.LoginResponseEnum;
 import com.example.blogbackend.enums.Role;
 import com.example.blogbackend.exception.LoginFailureException;
 import com.example.blogbackend.exception.RegistrationFailureException;
+import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +34,8 @@ class UserServiceTest {
   @Mock PasswordEncoder passwordEncoder;
 
   @Mock UserRepository userRepository;
+
+  @Mock TimeProvider timeProvider;
 
   @Mock AuthenticationManager authenticationManager;
 
@@ -74,6 +77,7 @@ class UserServiceTest {
 
   @Test
   void test_registerUser_success() {
+    Instant now = Instant.now();
     CreateUserRequestDto userRequest =
         new CreateUserRequestDto("newuser", "password123", "newuser@example.com", "John", "Doe");
     User savedUser = new User();
@@ -85,11 +89,11 @@ class UserServiceTest {
     savedUser.setRole(Role.USER);
     savedUser.setActive(true);
     savedUser.setEmailVerified(false);
-    savedUser.setCreatedAt(LocalDateTime.now());
 
     when(userRepository.existsByUsername("newuser")).thenReturn(false);
     when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
     when(userRepository.save(any())).thenReturn(savedUser);
+    when(timeProvider.getNow()).thenReturn(now);
 
     String result = userService.registerUser(userRequest);
     Assertions.assertEquals("User registered successfully", result);

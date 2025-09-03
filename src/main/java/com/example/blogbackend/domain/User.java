@@ -2,7 +2,7 @@ package com.example.blogbackend.domain;
 
 import com.example.blogbackend.enums.Role;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,7 +40,7 @@ public class User {
   @Column(name = "profile_picture_url", length = 500)
   private String profilePictureUrl;
 
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
-  private LocalDateTime lastLoginAt;
+  private Instant createdAt;
+  private Instant updatedAt;
+  private Instant lastLoginAt;
 }

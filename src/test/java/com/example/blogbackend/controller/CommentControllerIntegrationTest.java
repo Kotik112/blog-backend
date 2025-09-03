@@ -21,8 +21,7 @@ import org.springframework.test.web.servlet.MvcResult;
 class CommentControllerIntegrationTest extends SpringBootComponentTest {
 
   private static final String TEST_COMMENT = "Test comment";
-  @Autowired
-  MockMvc mvc;
+  @Autowired MockMvc mvc;
 
   @WithMockUser(username = "testuser", roles = "USER")
   @Transactional
