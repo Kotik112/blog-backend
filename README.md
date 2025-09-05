@@ -1,4 +1,4 @@
-# 📝 Blog Backend
+# Blogify Backend
 
 A Spring Boot backend for managing blog posts with support for image uploads, likes, and user-friendly APIs. Built with Kotlin, PostgreSQL, and follows modern best practices for scalable backend development.
 Link to the [frontend repository](https://github.com/Kotik112/blog-frontend)
