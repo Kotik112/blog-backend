@@ -4,6 +4,7 @@ import com.example.blogbackend.dto.ImageDto;
 import com.example.blogbackend.service.ImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.security.Principal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
@@ -29,6 +30,7 @@ public class ImageController {
    *
    * @param file the image file to be uploaded
    * @param blogPostId the ID of the blog post to associate the image with
+   * @param principal the authenticated user uploading the image
    * @return the uploaded ImageDto
    */
   @Operation(
@@ -37,8 +39,10 @@ public class ImageController {
   @PostMapping("/blog-post/{blogPostId}")
   @ResponseStatus(HttpStatus.CREATED)
   public ImageDto uploadImage(
-      @RequestParam("image") MultipartFile file, @PathVariable("blogPostId") Long blogPostId) {
-    return imageService.uploadImage(file, blogPostId);
+      @RequestParam("image") MultipartFile file,
+      @PathVariable("blogPostId") Long blogPostId,
+      Principal principal) {
+    return imageService.uploadImage(file, blogPostId, principal);
   }
 
   /**

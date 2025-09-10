@@ -188,9 +188,12 @@ class BlogPostServiceTest {
     CreateBlogPostDto createBlogPostDTO = new CreateBlogPostDto("Test title", "Test content");
     Principal mockPrincipal = mock(Principal.class);
     MultipartFile mockFile = mock(MultipartFile.class);
+    User mockUser = mock(User.class);
 
+    when(mockPrincipal.getName()).thenReturn("testuser");
+    when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(mockUser));
     when(mockFile.isEmpty()).thenReturn(false);
-    when(imageService.prepareImageForUpload(mockFile))
+    when(imageService.prepareImageForUpload(mockFile, mockUser))
         .thenThrow(new IOException("Simulated failure"));
 
     // Act & Assert
@@ -201,11 +204,12 @@ class BlogPostServiceTest {
 
     assertEquals("Error occurred while preparing the image for upload", exception.getMessage());
 
-    verify(mockPrincipal, never()).getName();
+    verify(mockPrincipal, times(1)).getName();
+    verify(userRepository, times(1)).findByUsername("testuser");
     verify(mockFile, times(1)).isEmpty();
-    verify(imageService, times(1)).prepareImageForUpload(mockFile);
+    verify(imageService, times(1)).prepareImageForUpload(mockFile, mockUser);
 
-    // Ensure DB and time are not hit due to early failure
-    verifyNoInteractions(blogPostRepository, userRepository, timeProvider);
+    // Ensure time and blog post repository are not hit due to early failure
+    verifyNoInteractions(timeProvider, blogPostRepository);
   }
 }

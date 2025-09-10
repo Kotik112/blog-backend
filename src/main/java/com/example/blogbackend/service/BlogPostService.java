@@ -53,9 +53,15 @@ public class BlogPostService {
       CreateBlogPostDto blogPostDTO, MultipartFile image, Principal principal) {
     BlogPost blogPost = blogPostDTO.toDomain();
     logger.info("Creating blog post with title: {}", blogPost.getTitle());
+
+    User user =
+        userRepository
+            .findByUsername(principal.getName())
+            .orElseThrow(() -> new RuntimeException("User not found: " + principal.getName()));
+
     if (image != null && !image.isEmpty()) {
       try {
-        Image preparedImage = imageService.prepareImageForUpload(image);
+        Image preparedImage = imageService.prepareImageForUpload(image, user);
         blogPost.setImage(preparedImage);
       } catch (IOException e) {
         logger.debug("Error occurred while preparing the image for upload: {}", e.getMessage());
@@ -65,10 +71,6 @@ public class BlogPostService {
       logger.debug("No image provided for blog post with title: {}", blogPost.getTitle());
     }
     blogPost.setCreatedAt(timeProvider.getNow());
-    User user =
-        userRepository
-            .findByUsername(principal.getName())
-            .orElseThrow(() -> new RuntimeException("User not found: " + principal.getName()));
     blogPost.setCreatedBy(user);
 
     BlogPost savedBlogPost = blogPostRepository.save(blogPost);

@@ -9,6 +9,7 @@ import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
 
 import com.example.blogbackend.domain.BlogPost;
 import com.example.blogbackend.domain.Image;
+import com.example.blogbackend.domain.User;
 import com.example.blogbackend.dto.ImageDto;
 import com.example.blogbackend.exception.EmptyFileException;
 import com.example.blogbackend.exception.ImageNotFoundException;
@@ -16,7 +17,9 @@ import com.example.blogbackend.exception.ImageUploadException;
 import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
 import com.example.blogbackend.repository.ImageRepository;
+import com.example.blogbackend.repository.UserRepository;
 import java.io.IOException;
+import java.security.Principal;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,6 +42,8 @@ class ImageServiceTest {
 
   @Mock ImageRepository imageRepository;
 
+  @Mock UserRepository userRepository;
+
   @Mock TimeProvider timeProvider;
 
   @Test
@@ -46,26 +51,38 @@ class ImageServiceTest {
     BlogPost blogPost = new BlogPost();
     blogPost.setId(1L);
 
+    User user = new User();
+    user.setId(1L);
+    user.setUsername("testuser");
+    user.setEmail("test@example.com");
+    user.setRole(com.example.blogbackend.enums.Role.USER);
+
     Image image = new Image();
     image.setId(1L);
     image.setName("test.jpg");
     image.setType(IMAGE_JPEG_VALUE);
     image.setImageData("some data".getBytes());
+    image.setCreatedBy(user);
     Instant createdAt = Instant.now();
     image.setCreatedAt(createdAt);
 
+    Principal principal = mock(Principal.class);
+    when(principal.getName()).thenReturn("testuser");
+
     // Mocks
     when(blogPostRepository.findById(1L)).thenReturn(Optional.of(blogPost));
+    when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
     when(blogPostRepository.save(any())).thenReturn(blogPost);
     when(timeProvider.getNow()).thenReturn(createdAt);
     when(imageRepository.save(any())).thenReturn(image);
 
     MultipartFile file =
         new MockMultipartFile("file", "test.jpg", IMAGE_JPEG_VALUE, "some data".getBytes());
-    ImageDto imageDto = imageService.uploadImage(file, 1L);
+    ImageDto imageDto = imageService.uploadImage(file, 1L, principal);
 
     // Verify the result
     verify(blogPostRepository).findById(1L);
+    verify(userRepository).findByUsername("testuser");
     verify(blogPostRepository).save(any());
     verify(timeProvider).getNow();
     verify(imageRepository).save(any());
@@ -74,46 +91,72 @@ class ImageServiceTest {
     Assertions.assertEquals("test.jpg", imageDto.name());
     Assertions.assertEquals("image/jpeg", imageDto.type());
     Assertions.assertEquals(createdAt, imageDto.createdAt());
+    Assertions.assertNotNull(imageDto.createdBy());
+    Assertions.assertEquals("testuser", imageDto.createdBy().username());
   }
 
   @Test
   void test_uploadImage_emptyFile() {
+    Principal principal = mock(Principal.class);
+
     MultipartFile file = new MockMultipartFile("file", "test.jpg", IMAGE_JPEG_VALUE, new byte[0]);
 
-    assertThrows(EmptyFileException.class, () -> imageService.uploadImage(file, 1L));
+    assertThrows(EmptyFileException.class, () -> imageService.uploadImage(file, 1L, principal));
   }
 
   @Test
   void test_uploadImage_fileUploadException() {
+    Principal principal = mock(Principal.class);
+
     BlogPost blogPost = new BlogPost();
     blogPost.setId(1L);
 
     MultipartFile file = new MockMultipartFile("file", "test.jpg", IMAGE_JPEG_VALUE, new byte[0]);
 
-    assertThrows(EmptyFileException.class, () -> imageService.uploadImage(file, 1L));
+    assertThrows(EmptyFileException.class, () -> imageService.uploadImage(file, 1L, principal));
   }
 
   @Test
   void test_uploadImage_nullFile_insideTryBlock() {
     BlogPost blogPost = new BlogPost();
     blogPost.setId(1L);
-    when(blogPostRepository.findById(1L)).thenReturn(Optional.of(blogPost));
 
-    assertThrows(EmptyFileException.class, () -> imageService.uploadImage(null, 1L));
+    User user = new User();
+    user.setId(1L);
+    user.setUsername("testuser");
+    user.setRole(com.example.blogbackend.enums.Role.USER);
+
+    Principal principal = mock(Principal.class);
+    when(principal.getName()).thenReturn("testuser");
+
+    when(blogPostRepository.findById(1L)).thenReturn(Optional.of(blogPost));
+    when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+
+    assertThrows(EmptyFileException.class, () -> imageService.uploadImage(null, 1L, principal));
   }
 
   @Test
   void test_uploadImage_ImageUploadException() throws IOException {
     BlogPost blogPost = new BlogPost();
     blogPost.setId(1L);
+
+    User user = new User();
+    user.setId(1L);
+    user.setUsername("testuser");
+    user.setRole(com.example.blogbackend.enums.Role.USER);
+
+    Principal principal = mock(Principal.class);
+    when(principal.getName()).thenReturn("testuser");
+
     when(blogPostRepository.findById(1L)).thenReturn(Optional.of(blogPost));
+    when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
     when(timeProvider.getNow()).thenReturn(Instant.now());
 
     MultipartFile file = mock(MultipartFile.class);
     when(file.isEmpty()).thenReturn(false);
     when(file.getBytes()).thenThrow(IOException.class);
 
-    assertThrows(ImageUploadException.class, () -> imageService.uploadImage(file, 1L));
+    assertThrows(ImageUploadException.class, () -> imageService.uploadImage(file, 1L, principal));
   }
 
   @Test

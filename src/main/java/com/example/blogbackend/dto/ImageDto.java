@@ -12,9 +12,15 @@ public record ImageDto(
     @Schema(
             description = "Timestamp when the image was uploaded",
             example = "2025-06-26T03:15:19.293Z")
-        Instant createdAt) {
+        Instant createdAt,
+    @Schema(description = "User who uploaded the image") UserDto createdBy) {
 
   public static ImageDto toDto(Image image) {
-    return new ImageDto(image.getId(), image.getName(), image.getType(), image.getCreatedAt());
+    return new ImageDto(
+        image.getId(),
+        image.getName(),
+        image.getType(),
+        image.getCreatedAt(),
+        UserDto.from(image.getCreatedBy()));
   }
 }

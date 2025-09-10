@@ -2,6 +2,7 @@ package com.example.blogbackend.service;
 
 import com.example.blogbackend.domain.BlogPost;
 import com.example.blogbackend.domain.Image;
+import com.example.blogbackend.domain.User;
 import com.example.blogbackend.dto.ImageDto;
 import com.example.blogbackend.exception.BlogPostNotFoundException;
 import com.example.blogbackend.exception.EmptyFileException;
@@ -10,13 +11,16 @@ import com.example.blogbackend.exception.ImageUploadException;
 import com.example.blogbackend.provider.TimeProvider;
 import com.example.blogbackend.repository.BlogPostRepository;
 import com.example.blogbackend.repository.ImageRepository;
+import com.example.blogbackend.repository.UserRepository;
 import java.io.IOException;
+import java.security.Principal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,18 +30,21 @@ public class ImageService {
 
   private final ImageRepository imageRepository;
   private final BlogPostRepository blogPostRepository;
+  private final UserRepository userRepository;
   private final TimeProvider timeProvider;
 
   public ImageService(
       ImageRepository imageRepository,
       BlogPostRepository blogPostRepository,
+      UserRepository userRepository,
       TimeProvider timeProvider) {
     this.imageRepository = imageRepository;
     this.blogPostRepository = blogPostRepository;
+    this.userRepository = userRepository;
     this.timeProvider = timeProvider;
   }
 
-  public ImageDto uploadImage(MultipartFile file, Long blogPostId) {
+  public ImageDto uploadImage(MultipartFile file, Long blogPostId, Principal principal) {
     if (file != null && file.isEmpty()) {
       logger.warn("File {} is empty, cannot upload the image", file.getOriginalFilename());
       throw new EmptyFileException(
@@ -50,7 +57,15 @@ public class ImageService {
                 () ->
                     new BlogPostNotFoundException(
                         "Blog post with id: " + blogPostId + " not found"));
-    logger.info("Uploading image for blog post with ID: {}", blogPostId);
+
+    User user =
+        userRepository
+            .findByUsername(principal.getName())
+            .orElseThrow(
+                () -> new UsernameNotFoundException("User not found: " + principal.getName()));
+
+    logger.info(
+        "Uploading image for blog post with ID: {} by user: {}", blogPostId, user.getUsername());
     try {
       Image image = new Image();
       if (file == null || file.isEmpty()) {
@@ -60,13 +75,17 @@ public class ImageService {
       image.setName(file.getOriginalFilename());
       image.setType(file.getContentType());
       image.setCreatedAt(timeProvider.getNow());
+      image.setCreatedBy(user);
       byte[] imageData = file.getBytes();
       image.setImageData(imageData);
 
       blogPost.setImage(image);
       imageRepository.save(image);
       BlogPost updatedBlogPost = blogPostRepository.save(blogPost);
-      logger.info("Image uploaded successfully for blog post with ID: {}", updatedBlogPost.getId());
+      logger.info(
+          "Image uploaded successfully for blog post with ID: {} by user: {}",
+          updatedBlogPost.getId(),
+          user.getUsername());
       Image savedImage = updatedBlogPost.getImage();
       return ImageDto.toDto(savedImage);
 
@@ -108,7 +127,7 @@ public class ImageService {
         .body(resource);
   }
 
-  protected Image prepareImageForUpload(MultipartFile file) throws IOException {
+  protected Image prepareImageForUpload(MultipartFile file, User user) throws IOException {
     if (file.isEmpty()) {
       throw new EmptyFileException("File is empty, cannot upload the image");
     }
@@ -117,6 +136,7 @@ public class ImageService {
     image.setName(file.getOriginalFilename());
     image.setType(file.getContentType());
     image.setCreatedAt(timeProvider.getNow());
+    image.setCreatedBy(user);
     image.setImageData(file.getBytes());
 
     return image;
