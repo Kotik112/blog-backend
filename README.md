@@ -4,6 +4,9 @@ A Spring Boot backend for managing blog posts with support for image uploads, li
 Link to the [frontend repository](https://github.com/Kotik112/blog-frontend)
 ---
 
+## Demo
+Try out the website at https://blogify.kitok.click/
+
 ## 🚀 Features
 
 - User authentication and authorization (Session, roles)
